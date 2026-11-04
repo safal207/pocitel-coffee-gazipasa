@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f7f1e6">
   <meta name="color-scheme" content="only light">
-  <link rel="preload" as="image" media="(max-width: 760px)" imagesrcset="assets/hero-mobile-360.webp 360w, assets/hero-mobile-620.webp 620w" imagesizes="(max-width: 430px) calc(100vw - 44px), calc(100vw - 52px)" fetchpriority="high">
   <link rel="preload" as="image" media="(width > 760px)" imagesrcset="assets/hero-wide-640.webp 640w, assets/hero-wide-960.webp 960w" imagesizes="(min-width: 1344px) 596px, (min-width: 1001px) calc(49.35vw - 71px), calc(49.35vw - 50px)" fetchpriority="high">
-  <script src="appearance.js?v=20261104-themes"></script>
+  <script src="appearance.js?v=20261104-simple"></script>
   <meta name="description" content="Gazipaşa’da Pocitel Coffee & Brunch. Kahvaltı, focaccia, kahve ve menüden favori eşleşmeler.">
   <meta property="og:title" content="Pocitel Coffee & Brunch · Gazipaşa">
   <meta property="og:description" content="İyi kahve, güzel anlar. Menü, kahvaltı ve favori eşleşmeler.">
@@ -15,15 +14,16 @@
   <meta name="robots" content="noindex">
   <title>Pocitel Coffee &amp; Brunch · Gazipaşa</title>
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20261104-themes">
-  <link rel="stylesheet" href="appearance.css?v=20261104-themes">
+  <link rel="stylesheet" href="style.css?v=20261104-simple">
+  <link rel="stylesheet" href="appearance.css?v=20261104-simple">
   <link rel="modulepreload" href="menu.js">
   <link rel="modulepreload" href="order-options.js">
   <link rel="modulepreload" href="checkout-offers.js">
-  <script src="app.js?v=20261104-perf" type="module"></script>
+  <script src="app.js?v=20261104-simple" type="module"></script>
 </head>
 <body>
   <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
     <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
     <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14A9 9 0 0 1 10 3.5 9 9 0 1 0 20.5 14Z"/></symbol>
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20 3.8 12A5 5 0 0 1 12 5.6 5 5 0 0 1 20.2 12Z"/></symbol>
@@ -52,50 +52,29 @@
         <img src="assets/pocitel-logo-256.webp" width="256" height="136" alt="">
       </a>
       <nav class="main-nav" aria-label="Gezinme" data-aria="navigation">
-        <a href="#menu" data-jump="combos" data-copy="navPair">Eşleşmeler</a>
         <a href="#menu" data-copy="navMenu">Menü</a>
         <a href="#visit" data-copy="navVisit">Ziyaret</a>
       </nav>
       <div class="top-actions">
-        <div class="languages" role="group" aria-label="Dil" data-aria="language">
-          <button type="button" data-lang="tr" aria-label="Türkçe" aria-pressed="true">TR</button>
-          <button type="button" data-lang="en" aria-label="English" aria-pressed="false">EN</button>
-          <button type="button" data-lang="ru" aria-label="Русский" aria-pressed="false">RU</button>
-        </div>
+        <button type="button" class="settings-button" id="open-settings" aria-haspopup="dialog" aria-label="Dil ve görünüm" data-aria="settings"><span id="current-language">TR</span><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg></button>
         <button class="bag-button" type="button" data-open-cart aria-label="Seçtiklerim" data-aria="cart">
           <svg class="icon" aria-hidden="true"><use href="#i-bag"/></svg><span data-count>0</span>
         </button>
       </div>
     </div>
-    <div class="shell appearance-bar">
-      <span class="appearance-label" data-copy="appearanceMood">Molanızın havası</span>
-      <div class="appearance-options" role="group" aria-label="Görünüm" data-aria="appearance">
-        <button type="button" data-theme-choice="light" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg><span data-copy="themeLight">Açık</span></button>
-        <button type="button" data-theme-choice="dark" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg><span data-copy="themeDark">Koyu</span></button>
-        <button type="button" data-theme-choice="romantic" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span data-copy="themeRomantic">Romantik</span></button>
-        <button type="button" data-theme-choice="kids" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span data-copy="themeKids">Çocuk</span></button>
-      </div>
-    </div>
+
   </header>
   <main>
     <section class="shell hero" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="eyebrow"><span class="eyebrow-line"></span> Gazipaşa <span class="middot">·</span> Antalya</p>
         <h1 id="hero-title"><span data-copy="heroFirst">İyi kahve.</span><br><em data-copy="heroSecond">Güzel anlar.</em></h1>
-        <p class="hero-intro" data-copy="heroBody">Gazipaşa’da kahve ve brunch. Çılbırdan taze focaccia’ya, sabahın tadını çıkarın.</p>
+        <p class="hero-intro" data-copy="heroBody">Gazipaşa’da kahvaltı, taze focaccia ve kahve.</p>
         <div class="hero-actions">
           <a class="button primary" href="#menu"><span data-copy="seeMenu">Menüyü keşfet</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
           <a class="button quiet" href="#visit"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span data-copy="findUs">Bizi bulun</span></a>
         </div>
-        <div class="quick-choice" id="quick-choice" hidden>
-          <h2 class="eyebrow" id="quick-title" data-copy="quickTitle">Canınız ne çekiyor?</h2>
-          <div class="quick-options" role="group" aria-labelledby="quick-title">
-            <button type="button" data-quick-pick="turkish-classic" data-copy="quickBreakfast" aria-pressed="false" aria-controls="quick-result">Kahvaltı</button>
-            <button type="button" data-quick-pick="sweet-morning" data-copy="quickSweet" aria-pressed="false" aria-controls="quick-result">Kahve ve tatlı</button>
-            <button type="button" data-quick-pick="lunch-favourite" data-copy="quickLunch" aria-pressed="false" aria-controls="quick-result">Atıştırmalık</button>
-          </div>
-          <div class="quick-result" id="quick-result" hidden></div>
-        </div>
+
       </div>
       <figure class="hero-figure">
         <span class="mood-decoration mood-heart one" aria-hidden="true"><svg class="icon"><use href="#i-heart"/></svg></span>
@@ -105,7 +84,7 @@
         <div class="hero-image">
           <picture>
             <source media="(max-width: 760px)" srcset="assets/hero-mobile-360.webp 360w, assets/hero-mobile-620.webp 620w" sizes="(max-width: 430px) calc(100vw - 44px), calc(100vw - 52px)">
-            <img src="assets/hero-wide-640.webp" srcset="assets/hero-wide-640.webp 640w, assets/hero-wide-960.webp 960w" sizes="(min-width: 1344px) 596px, (min-width: 1001px) calc(49.35vw - 71px), calc(49.35vw - 50px)" width="960" height="582" fetchpriority="high" alt="Yoğurt, poşe yumurta ve ekmekle çılbır" data-alt="heroAlt">
+            <img src="assets/hero-wide-640.webp" srcset="assets/hero-wide-640.webp 640w, assets/hero-wide-960.webp 960w" sizes="(min-width: 1344px) 596px, (min-width: 1001px) calc(49.35vw - 71px), calc(49.35vw - 50px)" width="960" height="582" loading="lazy" fetchpriority="high" alt="Yoğurt, poşe yumurta ve ekmekle çılbır" data-alt="heroAlt">
           </picture>
         </div>
         <div class="hero-stamp" aria-hidden="true"><svg><use href="#i-sprig"/></svg><span>POCITEL’S</span><span>CHOICE</span></div>
@@ -116,38 +95,29 @@
       <div class="section-head">
         <div>
           <p class="eyebrow"><span class="eyebrow-line"></span><span data-copy="menuKicker">Pocitel Coffee &amp; Brunch</span></p>
-          <h2 id="menu-title" data-copy="feedTitle">Menü akışı</h2>
+          <h2 id="menu-title" data-copy="feedTitle">Menü</h2>
         </div>
-        <p data-copy="menuBody">Fotoğraflara göz atın, favorilerinizi kaydedin ve seçiminizi ekibimize gösterin.</p>
+        <p data-copy="menuBody">Beğendiğinizi ekleyin. Sipariş ve ödeme kafede.</p>
       </div>
-      <div class="service-picker" id="service-picker" hidden>
-        <div class="service-intro">
-          <img class="service-cup" src="assets/takeaway/cappuccino.webp" alt="" width="64" height="64" loading="lazy" decoding="async">
-          <div>
-            <strong data-copy="takeInvite">Yanınızda götürün</strong>
-            <p data-copy="takeHint">Kahve, matcha ve atıştırmalıklar bardakta.</p>
-          </div>
-        </div>
-        <div class="service-options" role="group" aria-label="Servis şekli" data-aria="serviceMode">
-          <button type="button" data-mode="cafe" data-copy="dineIn" aria-pressed="true">Kafede</button>
-          <button type="button" data-mode="takeaway" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-cup"/></svg><span data-copy="takeaway">Al götür</span></button>
-        </div>
-      </div>
-      <div class="stories" role="group" aria-label="Menü hikâyeleri" data-aria="stories" id="stories"></div>
-      <p class="take-note" id="take-note" data-copy="takeNote" hidden>Paket servis için menü önerileri. Bardak ve uygunluğu ekibimizle teyit edin.</p>
       <div class="menu-tools">
-        <div class="menu-controls">
-          <div class="search">
-            <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
-            <input id="search" type="search" autocomplete="off" placeholder="Menüde ara" aria-label="Menüde ara" data-placeholder="search" data-aria="search">
-            <button type="button" id="clear-search" class="icon-button" aria-label="Aramayı temizle" data-aria="clearSearch" hidden><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+        <div class="menu-toolbar">
+          <div class="service-options" id="service-picker" role="group" aria-label="Servis şekli" data-aria="serviceMode">
+            <button type="button" data-mode="cafe" data-copy="dineIn" aria-pressed="true">Kafede</button>
+            <button type="button" data-mode="takeaway" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-cup"/></svg><span data-copy="takeaway">Al götür</span></button>
           </div>
-          <button type="button" class="button quiet saved-filter" id="saved-filter" aria-pressed="false">
-            <svg class="icon" aria-hidden="true"><use href="#i-bookmark"/></svg><span data-copy="saved">Kaydedilenler</span>
-          </button>
+          <div class="menu-utilities">
+            <button type="button" class="icon-button" id="toggle-search" aria-expanded="false" aria-controls="search-panel" aria-label="Menüde ara" data-aria="search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg></button>
+            <button type="button" class="icon-button saved-filter" id="saved-filter" aria-label="Kaydedilenler" data-aria="saved" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-bookmark"/></svg></button>
+          </div>
+        </div>
+        <div class="search" id="search-panel" hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+          <input id="search" type="search" autocomplete="off" placeholder="Menüde ara" aria-label="Menüde ara" data-placeholder="search" data-aria="search">
+          <button type="button" id="clear-search" class="icon-button" aria-label="Aramayı temizle" data-aria="clearSearch" hidden><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
         </div>
         <div id="filters" class="filters" role="group" aria-label="Kategoriler" data-aria="filters"></div>
       </div>
+      <p class="take-note" id="take-note" data-copy="takeNote" hidden>Paket servis için menü önerileri. Bardak ve uygunluğu ekibimizle teyit edin.</p>
       <div class="result-meta" id="result-meta" role="status"></div>
       <p class="group-note" id="category-note" hidden></p>
       <div class="feed-grid" id="results"></div>
@@ -183,6 +153,27 @@
     <span data-copy="cart">Seçtiklerim</span><span data-count>0</span>
     <strong id="bar-total"></strong><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>
   </button>
+  <dialog id="settings" aria-labelledby="settings-title">
+    <div class="cart-header"><h2 id="settings-title" data-copy="settings">Dil ve görünüm</h2><button type="button" class="icon-button" id="close-settings" data-aria="close" aria-label="Kapat" autofocus><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+    <h3 data-copy="language">Dil</h3>
+        <div class="languages" role="group" aria-label="Dil" data-aria="language">
+          <button type="button" data-lang="tr" aria-label="Türkçe" aria-pressed="true">TR</button>
+          <button type="button" data-lang="en" aria-label="English" aria-pressed="false">EN</button>
+          <button type="button" data-lang="ru" aria-label="Русский" aria-pressed="false">RU</button>
+        </div>
+    <div class="appearance-bar">
+      <span class="appearance-label" data-copy="appearanceMood">Molanızın havası</span>
+      <div class="appearance-options" role="group" aria-label="Görünüm" data-aria="appearance">
+        <button type="button" data-theme-choice="light" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg><span data-copy="themeLight">Açık</span></button>
+        <button type="button" data-theme-choice="dark" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg><span data-copy="themeDark">Koyu</span></button>
+        <button type="button" data-theme-choice="romantic" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span data-copy="themeRomantic">Romantik</span></button>
+        <button type="button" data-theme-choice="kids" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span data-copy="themeKids">Çocuk</span></button>
+      </div>
+    </div>
+    <a class="settings-visit" href="#visit"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span data-copy="findUs">Bizi bulun</span></a>
+    <button class="button primary" id="done-settings" type="button" data-copy="done">Tamam</button>
+  </dialog>
+  <div class="added-notice" id="added-notice" hidden><span id="added-message" role="status"></span><button type="button" id="edit-added" data-copy="edit">Düzenle</button><button type="button" class="icon-button" id="dismiss-added" aria-label="Kapat" data-aria="close"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
   <dialog id="post-viewer" aria-labelledby="post-title">
     <div class="viewer-header">
       <div id="viewer-steps"></div>
@@ -214,11 +205,7 @@
   </dialog>
   <dialog id="configure" aria-labelledby="configure-title">
     <div class="configure-header">
-      <ol class="order-steps" aria-label="Sipariş adımları" data-aria="orderSteps">
-        <li aria-current="step"><span>1</span><span data-copy="stepChoose">Seç</span></li>
-        <li><span>2</span><span data-copy="stepReview">Kontrol et</span></li>
-        <li><span>3</span><span data-copy="stepShow">Göster</span></li>
-      </ol>
+      <p class="eyebrow" data-copy="yourVersion">Nasıl olsun?</p>
       <button type="button" id="close-configure" class="icon-button" aria-label="Kapat" data-aria="close" autofocus><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
     </div>
     <div class="configure-main">
@@ -244,16 +231,11 @@
     <div class="cart-header">
       <div>
         <p class="eyebrow">Pocitel Coffee &amp; Brunch</p>
-        <h2 id="cart-title" data-copy="checkoutTitle">Güzel bir mola zamanı.</h2>
+        <h2 id="cart-title" data-copy="cart">Siparişim</h2>
       </div>
       <button type="button" id="close-cart" class="icon-button" aria-label="Kapat" data-aria="close" autofocus><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
     </div>
-    <ol class="order-steps" aria-label="Sipariş adımları" data-aria="orderSteps">
-      <li><span>1</span><span data-copy="stepChoose">Seç</span></li>
-      <li aria-current="step"><span>2</span><span data-copy="stepReview">Kontrol et</span></li>
-      <li><span>3</span><span data-copy="stepShow">Göster</span></li>
-    </ol>
-    <p class="checkout-intro" data-copy="checkoutIntro">Seçtikleriniz bir arada. Son dokunuş sizin.</p>
+    <p class="checkout-intro" data-copy="checkoutIntro">Seçiminiz hazır. Sipariş ve ödeme kafede.</p>
     <div class="checkout-section-label"><h3 id="checkout-items-label" data-copy="checkoutItems">Seçtikleriniz</h3><small id="checkout-picture-note" data-copy="illustration">Yapay zekâ görseli</small></div>
     <div id="cart-items"></div>
     <div id="cart-suggestion" hidden></div>
@@ -266,7 +248,7 @@
       </div>
       <div id="cart-total" class="cart-total" hidden><span data-copy="total">Toplam</span><strong id="total-price"></strong></div>
       <div class="cart-actions">
-        <button type="button" id="show-waiter" class="button primary" aria-describedby="checkout-help" hidden><span data-copy="checkoutAction">Kafede sipariş ver</span><span id="checkout-button-total"></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        <button type="button" id="show-waiter" class="button primary" aria-describedby="checkout-help" hidden><span data-copy="showWaiter">Garsona göster</span><span id="checkout-button-total"></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
       </div>
       <p id="checkout-help" class="checkout-help" data-copy="checkoutHelp">Sonraki adım: ekibimize gösterin, kafede ödeyin.</p>
     </div>
@@ -276,7 +258,6 @@
       <div class="waiter-toolbar">
         <button type="button" id="close-waiter" class="button quiet" autofocus><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg><span data-copy="backToSelection">Seçime dön</span></button>
       </div>
-      <p class="handoff-step" data-copy="readyToShow">3 · Ekibimize gösterin</p>
       <p class="eyebrow">Poçitel Coffee &amp; Brunch</p>
       <h2 id="waiter-title" data-copy="handoffTitle">Sipariş vermek istiyorum</h2>
       <p class="waiter-note" data-copy="handoffHelp">Bu ekranı ekibimize gösterin. Sipariş ve ödeme kafede tamamlanır.</p>

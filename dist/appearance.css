@@ -106,7 +106,7 @@
   .appearance-options { width: 100%; gap: 3px; }
   .appearance-options button { flex: 1; min-width: 0; padding-inline: 5px; font-size: .7rem; gap: 4px; }
   .appearance-options .icon { width: 14px; height: 14px; }
-  [data-theme="kids"] .hero h1 { font-size: clamp(2.5rem, 10.2vw, 4rem); }
+  [data-theme="kids"] .hero h1 { font-size: clamp(1.8rem, 8vw, 3rem); }
 }
 @media (max-width: 350px) {
   .appearance-options button { font-size: .67rem; padding-inline: 4px; }

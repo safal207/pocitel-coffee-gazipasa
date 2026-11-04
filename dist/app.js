@@ -10,7 +10,12 @@ const copy = {
   navVisit: ['Ziyaret', 'Visit', 'Как добраться'],
   language: ['Dil', 'Language', 'Язык'],
   appearance: ['Görünüm', 'Appearance', 'Оформление'],
-  appearanceMood: ['Molanızın havası', 'A mood for your coffee break', 'Настроение вашей кофейной паузы'],
+  appearanceMood: ['Görünüm', 'Appearance', 'Оформление'],
+  settings: ['Dil ve görünüm', 'Language & appearance', 'Язык и оформление'],
+  done: ['Tamam', 'Done', 'Готово'],
+  added: ['Siparişe eklendi', 'Added to your order', 'Добавлено в заказ'],
+  updated: ['Seçim güncellendi', 'Selection updated', 'Выбор обновлён'],
+  customize: ['Özelleştir', 'Customize', 'Настроить'],
   themeLight: ['Açık', 'Light', 'Светлый'],
   themeDark: ['Koyu', 'Dark', 'Тёмный'],
   themeRomantic: ['Romantik', 'Romantic', 'Романтика'],
@@ -18,9 +23,9 @@ const copy = {
   heroFirst: ['İyi kahve.', 'Good coffee.', 'Хороший кофе.'],
   heroSecond: ['Güzel anlar.', 'Beautiful moments.', 'Приятные моменты.'],
   heroBody: [
-    'Gazipaşa’da kahve ve brunch. Çılbırdan taze focaccia’ya, sabahın tadını çıkarın.',
-    'Coffee and brunch in Gazipaşa. Start with çılbır, try a fresh focaccia, and stay for a good cup of coffee.',
-    'Кофе и бранч в Газипаше. Начните с чылбыра или попробуйте свежую фокаччу с чашкой кофе.',
+    'Gazipaşa’da kahvaltı, taze focaccia ve kahve.',
+    'Breakfast, fresh focaccia and coffee in Gazipaşa.',
+    'Завтраки, свежая фокачча и кофе в Газипаше.',
   ],
   seeMenu: ['Menüyü keşfet', 'Explore the menu', 'Посмотреть меню'],
   findUs: ['Bizi bulun', 'Find us', 'Как добраться'],
@@ -34,8 +39,8 @@ const copy = {
   quickSavings: ['Tasarruf', 'You save', 'Экономия'],
   quickAdd: ['Eşleşmeyi ekle', 'Add pairing', 'Добавить комбо'],
   menuKicker: ['Poçitel Coffee & Brunch', 'Poçitel Coffee & Brunch', 'Poçitel Coffee & Brunch'],
-  feedTitle: ['Menü akışı', 'The menu feed', 'Лента меню'],
-  menuBody: ['Fotoğraflara göz atın, favorilerinizi kaydedin ve seçiminizi ekibimize gösterin.', 'Browse the photos, save your favourites and show your selection to our team.', 'Листайте блюда, сохраняйте любимое и показывайте свой выбор официанту.'],
+  feedTitle: ['Menü', 'Menu', 'Меню'],
+  menuBody: ['Beğendiğinizi ekleyin. Sipariş ve ödeme kafede.', 'Add what you like. Order and pay at the café.', 'Добавляйте то, что нравится. Заказ и оплата в кафе.'],
   search: ['Menüde ara', 'Search the menu', 'Поиск по меню'],
   clearSearch: ['Aramayı temizle', 'Clear search', 'Очистить поиск'],
   illustration: ['Yapay zekâ görseli', 'AI illustration', 'ИИ-иллюстрация'],
@@ -99,7 +104,7 @@ const copy = {
   route: ['Yol tarifi', 'Get directions', 'Построить маршрут'],
   cart: ['Siparişim', 'My order', 'Мой заказ'],
   checkoutTitle: ['Güzel bir mola zamanı.', 'Time for something good.', 'Самое время попробовать.'],
-  checkoutIntro: ['Seçtikleriniz bir arada. Son dokunuş sizin.', 'Your favourites, together. Add your finishing touch.', 'Ваши любимые вкусы вместе. Осталось выбрать детали.'],
+  checkoutIntro: ['Seçiminiz hazır. Sipariş ve ödeme kafede.', 'Your selection is ready. Order and pay at the café.', 'Ваш выбор готов. Оформление и оплата в кафе.'],
   checkoutAction: ['Kafede sipariş ver', 'Order at the café', 'Заказать в кафе'],
   checkoutHelp: ['Sonraki adım: ekibimize gösterin, kafede ödeyin.', 'Next: show our team and pay at the café.', 'Дальше — покажите заказ официанту и оплатите в кафе.'],
   checkoutItems: ['Seçtikleriniz', 'Your selection', 'В вашем заказе'],
@@ -162,12 +167,6 @@ const takeawayItems = Object.keys(takeawaySuggestions).map(sourceId => {
   categoryByItem.set(id, categoryByItem.get(sourceId));
   return entry;
 });
-const stories = {
-  breakfast: ['cilbir', 'menemen', 'breakfast-plate'],
-  coffee: ['cappuccino', 'turkish-coffee', 'latte'],
-  cold: ['iced-latte', 'iced-matcha', 'iced-americano'],
-  combos: combos.map(entry => entry.id),
-};
 const pairedWith = new Map([
   ['cilbir', 'turkish-classic'], ['tea', 'turkish-classic'],
   ['pancake', 'sweet-morning'], ['cappuccino', 'sweet-morning'],
@@ -180,7 +179,10 @@ const results = $('#results');
 const cart = $('#cart');
 const cartItems = $('#cart-items');
 const waiter = $('#waiter');
-const quickResult = $('#quick-result');
+const settings = $('#settings');
+let lastAddedId;
+let lastAddedOpener;
+let noticeTimer;
 const viewer = $('#post-viewer');
 const viewerContent = $('#viewer-content');
 const shareDialog = $('#share-dialog');
@@ -231,7 +233,6 @@ let takeawayMode = Boolean(items.get(params.get('item'))?.sourceId);
 if (takeawayMode) activeCategory = 'all';
 let savedOnly = false;
 let visibleLimit = pageSize;
-let quickPick = null;
 let openedPost;
 let postOpener;
 let shareOpener;
@@ -341,30 +342,20 @@ function confirmConfiguration() {
   }
   persistSelection();
   configure.close('saved');
-  if (viewer.open) viewer.close();
-  if (!cart.open) openCart(postOpener?.isConnected && configureOpener?.closest('#post-viewer') ? postOpener : configureOpener);
-  else renderCart();
-  $('#show-waiter').focus({ preventScroll: true });
+  if (cart.open) {
+    renderCart();
+    cartItems.querySelector(`[data-edit="${entry.id}"]`)?.focus({ preventScroll: true });
+  } else {
+    if (viewer.open) viewer.close();
+    const opener = configureOpener?.closest('#post-viewer') ? postOpener : configureOpener;
+    opener?.focus({ preventScroll: true });
+    showAdded(entry, opener, Boolean(draft.editId));
+  }
   $('#announcement').textContent = `${name(entry)} · ${draft.quantity} · ${price(entry.price * draft.quantity)}`;
 }
 
-function renderQuickChoice() {
-  document.querySelectorAll('[data-quick-pick]').forEach(button => {
-    button.setAttribute('aria-pressed', button.dataset.quickPick === quickPick?.id);
-  });
-  quickResult.hidden = !quickPick;
-  quickResult.innerHTML = quickPick ? `
-    <img src="assets/${quickPick.image}.webp" alt="" decoding="async">
-    <div>
-      <h3>${name(quickPick)}</h3>
-      <p>${description(quickPick)}</p>
-      <div class="quick-price">${priceMarkup(quickPick)}<span>${t('quickSavings')} ${price(quickPick.before - quickPick.price)}</span></div>
-      <button type="button" class="button primary" data-quick-add="${quickPick.id}">${icon('plus')}${t('quickAdd')}</button>
-    </div>` : '';
-}
-
 function addButton(entry) {
-  return `<button type="button" class="button primary post-add" data-add="${entry.id}" aria-label="${t('choose')} · ${name(entry)}">${icon('plus')}${t('choose')}</button>`;
+  return `<button type="button" class="button primary post-add" data-add="${entry.id}" aria-label="${t('add')} · ${name(entry)}">${icon('plus')}${t('add')}</button>`;
 }
 
 function postActions(entry) {
@@ -383,7 +374,7 @@ function illustrationLabel(entry) {
   return entry.sourceId || entry.image.startsWith('illustrations/') ? `<span class="illustration-label">${t('illustration')}</span>` : '';
 }
 
-function menuPost(entry) {
+function menuPost(entry, index = 8) {
   const category = categoryByItem.get(entry.id);
   return `<article class="feed-post${entry.sourceId ? ' take-post' : ''}" id="post-${entry.id}">
     <div class="post-top">
@@ -392,7 +383,7 @@ function menuPost(entry) {
       ${entry.sourceId ? `<span class="pinned">${t('takeaway')}</span>` : entry.before ? `<span class="pinned">${t('pinned')}</span>` : ''}
     </div>
     <button type="button" class="post-media" data-post="${entry.id}" aria-label="${t('details')} · ${name(entry)}">
-      ${itemImage(entry)}
+      ${itemImage(entry, index > 1)}
       ${illustrationLabel(entry)}
     </button>
     <div class="post-body">
@@ -401,14 +392,6 @@ function menuPost(entry) {
       ${postActions(entry)}
     </div>
   </article>`;
-}
-
-function renderStories() {
-  $('#stories').innerHTML = Object.keys(stories).map(id => `
-    <button type="button" data-story="${id}" class="story">
-      <span class="story-ring"><img src="assets/story-${id}.webp" width="144" height="144" alt="" loading="lazy" decoding="async"></span>
-      <span>${categoryById.get(id).labels[language]}</span>
-    </button>`).join('');
 }
 
 function renderFilters() {
@@ -424,7 +407,6 @@ function renderServiceMode() {
     button.setAttribute('aria-pressed', (button.dataset.mode === 'takeaway') === takeawayMode);
   });
   $('#menu-title').textContent = t(takeawayMode ? 'takeTitle' : 'feedTitle');
-  $('#stories').hidden = takeawayMode;
   $('#take-note').hidden = !takeawayMode;
   renderFilters();
 }
@@ -438,7 +420,7 @@ function renderResults(append = false) {
   );
   const shown = matching.slice(0, visibleLimit);
   const count = matching.length;
-  $('#result-meta').textContent = [`${count} ürün`, `${count} ${count === 1 ? 'item' : 'items'}`, `Позиций: ${count}`][language];
+  $('#result-meta').textContent = `${savedOnly ? `${t('saved')} · ` : ''}${[`${count} ürün`, `${count} ${count === 1 ? 'item' : 'items'}`, `Позиций: ${count}`][language]}`;
   $('#clear-search').hidden = !search.value;
   const categoryNote = categoryById.get(activeCategory)?.note?.[language];
   $('#category-note').hidden = !count || !categoryNote;
@@ -488,6 +470,7 @@ function renderViewer() {
       <div class="post-heading"><h2 id="post-title">${name(entry)}</h2>${priceMarkup(entry)}</div>
       ${description(entry) ? `<p class="post-description">${description(entry)}</p>` : ''}
       ${postActions(entry)}
+      <button type="button" class="customize-item" data-customize="${entry.id}">${t('customize')}</button>
       ${related ? `<button type="button" class="related-post" data-related="${related.id}">
         ${itemImage(related)}
         <span><small>${t('paired')}</small><strong>${name(related)} · ${price(related.price)}</strong></span>
@@ -604,6 +587,32 @@ async function copyPostLink() {
   }
 }
 
+function showAdded(entry, opener, updated = false) {
+  lastAddedId = entry.id;
+  lastAddedOpener = opener;
+  $('#added-message').textContent = `${t(updated ? 'updated' : 'added')} · ${name(entry)}`;
+  $('#added-notice').hidden = false;
+  clearTimeout(noticeTimer);
+  noticeTimer = setTimeout(() => {
+    const notice = $('#added-notice');
+    if (!notice.contains(document.activeElement)) notice.hidden = true;
+  }, 6000);
+}
+
+function addToSelection(id, opener) {
+  if ((selection.get(id) ?? 0) >= maxQuantity) {
+    $('#announcement').textContent = t('quantityLimit');
+    return;
+  }
+  changeSelection(id, 1);
+  if (viewer.open) {
+    viewer.close();
+    opener = postOpener;
+  }
+  opener?.focus({ preventScroll: true });
+  showAdded(orderItem(id), opener);
+}
+
 function renderCounts() {
   const count = [...selection.values()].reduce((sum, quantity) => sum + quantity, 0);
   document.querySelectorAll('[data-count]').forEach(node => { node.textContent = count; });
@@ -678,6 +687,7 @@ function renderCart() {
     </article>`;
   }).join('');
   cartItems.innerHTML = rows || `<p class="empty">${t('emptyCart')}</p>`;
+  $('#cart .checkout-intro').hidden = !selection.size;
   renderCartSuggestion();
   $('#cart-total').hidden = !selection.size;
   $('#show-waiter').hidden = !selection.size;
@@ -689,7 +699,7 @@ function renderCart() {
   $('#checkout-before-price').textContent = price(selectionTotal() + savings);
   $('#checkout-help').hidden = !selection.size;
   $('#checkout-items-label').hidden = !selection.size;
-  $('#checkout-picture-note').hidden = !selection.size;
+  $('#checkout-picture-note').hidden = ![...selection.keys()].some(id => { const entry = orderItem(id); return entry.sourceId || entry.image.startsWith('illustrations/'); });
 }
 
 function renderWaiter() {
@@ -730,8 +740,7 @@ function applyLanguage() {
   for (const [attribute, key] of [['aria-label', 'aria'], ['placeholder', 'placeholder'], ['alt', 'alt']]) {
     document.querySelectorAll(`[data-${key}]`).forEach(node => node.setAttribute(attribute, t(node.dataset[key])));
   }
-  renderStories();
-  renderQuickChoice();
+  $('#current-language').textContent = languages[language].toUpperCase();
   renderServiceMode();
   renderResults();
   renderCounts();
@@ -745,11 +754,13 @@ let cartOpener;
 
 function openCart(opener) {
   cartOpener = opener;
+  $('#added-notice').hidden = true;
   renderCart();
   cart.showModal();
 }
 
 document.addEventListener('click', event => {
+  if (event.target.closest('.settings-visit')) settings.close();
   const jump = event.target.closest('[data-jump]');
   if (jump) {
     event.preventDefault();
@@ -770,7 +781,23 @@ document.addEventListener('click', event => {
   const button = event.target.closest('button');
   if (!button) return;
   const { lang, category, add, quantity, item, post, story, save, share, related, mode, edit } = button.dataset;
-  if (lang) {
+  if (button.id === 'open-settings') {
+    settings.showModal();
+  } else if (button.id === 'close-settings' || button.id === 'done-settings') {
+    settings.close();
+  } else if (button.id === 'toggle-search') {
+    const panel = $('#search-panel');
+    panel.hidden = !panel.hidden;
+    button.setAttribute('aria-expanded', !panel.hidden);
+    if (panel.hidden) { search.value = ''; filterResults(); }
+    else search.focus({ preventScroll: true });
+  } else if (button.id === 'edit-added') {
+    if (selection.has(lastAddedId)) openConfigurator(lastAddedId, lastAddedOpener, lastAddedId);
+    $('#added-notice').hidden = true;
+  } else if (button.id === 'dismiss-added') {
+    $('#added-notice').hidden = true;
+    lastAddedOpener?.focus({ preventScroll: true });
+  } else if (lang) {
     language = languages.indexOf(lang);
     writeSetting(languageKey, lang);
     applyLanguage();
@@ -797,8 +824,6 @@ document.addEventListener('click', event => {
   } else if (button.id === 'more-posts') {
     visibleLimit += pageSize;
     renderResults(true);
-  } else if (story) {
-    openPost(stories[story], button, story);
   } else if (post) {
     openPost([post], button);
   } else if (related) {
@@ -821,18 +846,10 @@ document.addEventListener('click', event => {
     viewer.close();
   } else if (button.id === 'previous-story' || button.id === 'next-story') {
     stepStory(button.id === 'previous-story' ? -1 : 1);
-  } else if (button.dataset.quickPick) {
-    const entry = items.get(button.dataset.quickPick);
-    quickPick = quickPick === entry ? null : entry;
-    renderQuickChoice();
-    if (quickPick) {
-      $('#announcement').textContent = `${name(quickPick)} · ${price(quickPick.price)}`;
-      quickResult.scrollIntoView({ block: 'nearest' });
-    }
-  } else if (button.dataset.quickAdd) {
-    openConfigurator(button.dataset.quickAdd, button);
   } else if (add) {
-    openConfigurator(add, button);
+    addToSelection(add, button);
+  } else if (button.dataset.customize) {
+    openConfigurator(button.dataset.customize, button);
   } else if (edit) {
     openConfigurator(edit, button, edit);
   } else if (button.id === 'close-configure') {
@@ -867,6 +884,8 @@ document.addEventListener('click', event => {
     clearSearch();
   }
 });
+
+settings.addEventListener('close', () => $('#open-settings').focus({ preventScroll: true }));
 
 cart.addEventListener('change', event => {
   if (event.target.id === 'checkout-offer-toggle') toggleCheckoutOffer();
@@ -910,7 +929,7 @@ search.addEventListener('keydown', event => {
 cart.addEventListener('close', () => {
   if (cart.returnValue === 'menu') {
     cart.returnValue = '';
-    search.focus({ preventScroll: true });
+    $('#filters button[aria-pressed="true"]')?.focus({ preventScroll: true });
     scrollToMenuStart();
   } else {
     cartOpener?.focus();
@@ -948,7 +967,6 @@ viewerContent.addEventListener('touchend', event => {
 }, { passive: true });
 
 applyLanguage();
-$('#quick-choice').hidden = false;
 $('#service-picker').hidden = false;
 const linkedItem = params.get('item');
 if (items.has(linkedItem)) openPost([linkedItem], results.querySelector(`[data-post="${linkedItem}"]`) ?? search);
