@@ -56,6 +56,9 @@ const copy = {
   previous: ['Önceki', 'Previous', 'Назад'],
   next: ['Sonraki', 'Next', 'Дальше'],
   details: ['Ürünü incele', 'View item', 'Открыть карточку'],
+  nutrition: ['İçerik · kalori · vitaminler', 'Ingredients · calories · vitamins', 'Состав · калории · витамины'],
+  nutritionLoading: ['Besin bilgisi yükleniyor…', 'Loading nutrition…', 'Загружаем пищевую ценность…'],
+  nutritionRetry: ['Besin bilgisini yeniden yükle', 'Retry nutrition information', 'Загрузить пищевую ценность ещё раз'],
   pinned: ['Poçitel’in seçimi', 'Poçitel’s pick', 'Выбор Poçitel'],
   more: ['Daha fazla göster', 'Show more', 'Показать ещё'],
   paired: ['Bu eşleşmeyi deneyin', 'Try it in this pairing', 'Попробуйте в комбо'],
@@ -178,6 +181,25 @@ const savedKey = 'pocitel-saved-v1';
 const pageSize = 8;
 const maxQuantity = 99;
 let draft;
+let nutritionSequence = 0;
+
+async function fillNutrition(container, entry, options = {}) {
+  if (!container) return;
+  const sequence = String(++nutritionSequence);
+  const languageAtStart = language;
+  const open = options.open ?? Boolean(container.querySelector('.nutrition-panel[open]'));
+  container.dataset.nutritionSequence = sequence;
+  container.innerHTML = `<p class="nutrition-loading" role="status">${t('nutritionLoading')}</p>`;
+  try {
+    // Nutrition is only fetched when someone opens a product, keeping the feed light.
+    const { nutritionMarkup } = await import('./nutrition.js?v=20261104-nutrition');
+    if (!container.isConnected || container.dataset.nutritionSequence !== sequence || language !== languageAtStart) return;
+    container.innerHTML = nutritionMarkup(entry, language, items, { ...options, open });
+  } catch {
+    if (!container.isConnected || container.dataset.nutritionSequence !== sequence) return;
+    container.innerHTML = `<button type="button" class="nutrition-link" data-nutrition-retry="${entry.id}">${t('nutritionRetry')}</button>`;
+  }
+}
 let configureOpener;
 let suggestionsDismissed = false;
 let checkoutOffer;
@@ -266,7 +288,7 @@ function renderConfigurator() {
     <div class="configure-photo">${itemImage(entry, false)}${illustrationLabel(entry)}</div>
     <div><p class="eyebrow">${t(entry.sourceId ? 'takeaway' : 'dineIn')}</p><h2 id="configure-title">${name(entry)}</h2>
       ${description(entry) ? `<p>${description(entry)}</p>` : ''}${priceMarkup(entry)}</div>
-  </div>`;
+  </div><div id="configure-nutrition"></div>`;
   const fields = [];
   const toGo = items.get(`to-go-${draft.singleId}`);
   if (toGo) {
@@ -302,6 +324,7 @@ function updateConfigurationTotal() {
   $('#configure-total').textContent = price(entry.price * draft.quantity);
   $('#confirm-configure').textContent = t(draft.editId ? 'saveChanges' : 'add');
   $('#configure-error').hidden = true;
+  fillNutrition($('#configure-nutrition'), entry, { changed: draft.milk !== 'standard' || draft.syrup !== 'none' });
 }
 
 function openConfigurator(id, opener, editId) {
@@ -374,6 +397,7 @@ function menuPost(entry, index = 8) {
     <div class="post-body">
       <div class="post-heading"><h3>${name(entry)}</h3>${priceMarkup(entry)}</div>
       ${description(entry) ? `<p class="post-description">${description(entry)}</p>` : ''}
+      <button type="button" class="nutrition-link" data-post="${entry.id}" data-open-nutrition="true" aria-label="${t('nutrition')} · ${name(entry)}">${t('nutrition')} ${icon('chevron')}</button>
       ${postActions(entry)}
     </div>
   </article>`;
@@ -455,6 +479,7 @@ function renderViewer() {
       <div class="post-heading"><h2 id="post-title">${name(entry)}</h2>${priceMarkup(entry)}</div>
       ${description(entry) ? `<p class="post-description">${description(entry)}</p>` : ''}
       ${postActions(entry)}
+      <div id="viewer-nutrition"></div>
       <button type="button" class="customize-item" data-customize="${entry.id}">${t('customize')}</button>
       ${related ? `<button type="button" class="related-post" data-related="${related.id}">
         ${itemImage(related)}
@@ -462,10 +487,11 @@ function renderViewer() {
         ${icon('chevron')}
       </button>` : ''}
     </div>`;
+  fillNutrition($('#viewer-nutrition'), entry, { open: Boolean(openedPost.nutritionOpen) });
 }
 
 function openPost(ids, opener, story) {
-  openedPost = { ids, index: 0, story };
+  openedPost = { ids, index: 0, story, nutritionOpen: opener?.dataset.openNutrition === 'true' };
   postOpener = opener;
   touchOrigin = null;
   renderViewer();
@@ -782,7 +808,10 @@ document.addEventListener('click', event => {
   const button = event.target.closest('button');
   if (!button) return;
   const { lang, category, add, quantity, item, post, story, save, share, related, mode, edit } = button.dataset;
-  if (button.id === 'open-settings') {
+  if (button.dataset.nutritionRetry) {
+    const entry = orderItem(button.dataset.nutritionRetry);
+    fillNutrition(button.parentElement, entry, { open: true, changed: (entry.milk && entry.milk !== 'standard') || (entry.syrup && entry.syrup !== 'none') });
+  } else if (button.id === 'open-settings') {
     settings.showModal();
   } else if (button.id === 'close-settings' || button.id === 'done-settings') {
     settings.close();
