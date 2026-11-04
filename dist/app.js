@@ -1,4 +1,4 @@
-import { categories } from './menu.js';
+import { categories } from './menu.js?v=20261104-drinks';
 import { milkOptions, syrupOptions, customization, configurationId, resolveOrderItem, optionLabels, replaceOrderLine } from './order-options.js';
 import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOffer, undoCheckoutOffer } from './checkout-offers.js';
 

@@ -1,0 +1,42 @@
+{
+  "created": "2026-11-04",
+  "method": "built-in image_gen",
+  "purpose": "Replacement drink imagery for Poçitel's digital menu; generated product illustrations, not documentary café photography.",
+  "referenceFiles": [
+    "dist/assets/pocitel-logo.webp",
+    "dist/assets/illustrations/branded/flat-white.webp"
+  ],
+  "sharedPrompt": "Use case: product-mockup. Create one premium photorealistic café beverage menu photograph for Poçitel Coffee & Brunch, Gazipaşa, Turkey. References are branding and photographic style only; make a new shot of the specified drink. Reference 1 is the exact burgundy wordmark with olive-green leaf, reproduce the distinctive lowercase 'poçitel' accurately on the vessel; do not introduce other branding or decorative text. Reference 2 is the established café style: pale warm travertine tabletop, natural morning window light from left, soft leaf shadows, creamy muted background. Elevated editorial food photography, real ceramic pores, authentic liquid texture, appetizing but believable, soft depth of field, no artificial plastic or 3D render look. Landscape 3:2, 1536x1024. Three-quarter view slightly above the rim so we see the drink AND the front logo. One centered vessel and its entire handle and saucer inside the frame, filling about 60% of width and 76% of height, at least 12% clear margin above and below. Compose to stay intact in both a centered square crop and 3:2 web card. Sharp on the drink and wordmark; warm highlights with accurate whites. No collage, no panels, no border, no watermark, no price, no captions, no people. This is a single drink, no other beverage.",
+  "images": [
+    {
+      "id": "iced-latte",
+      "subject": "Iced caffè latte, one tall clear straight-sided café tumbler with natural clear ice, creamy ivory milk at bottom transitioning in delicate real espresso ribbons to a deep caramel-brown top. Condensation droplets, no whipped cream, no syrup, no straw and no lid. Small printed burgundy Poçitel logo on the middle of the glass, fully legible.",
+      "asset": "dist/assets/illustrations/drinks-v2/iced-latte.webp"
+    },
+    {
+      "id": "hot-chocolate",
+      "subject": "Hot chocolate in one generous ivory speckled ceramic café cup with handle and matching saucer. Rich glossy dark cocoa visible around a modest soft swirl of whipped cream and a few fine chocolate curls. One small dark chocolate square on the saucer. The burgundy Poçitel logo naturally printed on the front of the ceramic cup, fully legible.",
+      "asset": "dist/assets/illustrations/drinks-v2/hot-chocolate.webp"
+    },
+    {
+      "id": "chai",
+      "subject": "Chai tea latte in one ivory speckled ceramic café cup with handle and matching saucer. Warm beige milky chai surface with a delicate silky foam and a very light cinnamon dusting. One cinnamon stick and a star anise placed beside the saucer as subtle styling. The burgundy Poçitel logo naturally printed on the front of the ceramic cup, fully legible.",
+      "asset": "dist/assets/illustrations/drinks-v2/chai.webp"
+    },
+    {
+      "id": "salep",
+      "subject": "Traditional Turkish salep in one ivory speckled ceramic café cup with handle and matching saucer. Thick velvety white milk-based drink, very lightly dusted with finely ground cinnamon, realistic soft creamy surface, no coffee and no latte art. A tiny scattering of cinnamon on the side of the saucer. The burgundy Poçitel logo naturally printed on the front of the ceramic cup, fully legible.",
+      "asset": "dist/assets/illustrations/drinks-v2/salep.webp"
+    },
+    {
+      "id": "toffee",
+      "subject": "Toffee nut latte in one ivory speckled ceramic café cup with handle and matching saucer. Glossy golden latte with silky pale microfoam, a restrained caramel swirl and a small appetizing sprinkle of finely chopped toasted hazelnut. Two whole hazelnuts beside the saucer, not a dessert tower. The burgundy Poçitel logo naturally printed on the front of the ceramic cup, fully legible.",
+      "asset": "dist/assets/illustrations/drinks-v2/toffee.webp"
+    },
+    {
+      "id": "caramel",
+      "subject": "Caramel drizzle latte in one ivory speckled ceramic café cup with handle and matching saucer. Silky creamy microfoam with a neat thin crosshatch of glossy golden caramel sauce and a golden espresso ring. No nuts, no whipped cream tower. One small caramel cube beside the saucer. The burgundy Poçitel logo naturally printed on the front of the ceramic cup, fully legible.",
+      "asset": "dist/assets/illustrations/drinks-v2/caramel.webp"
+    }
+  ]
+}
