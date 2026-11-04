@@ -1,0 +1,955 @@
+import { categories } from './menu.js';
+import { milkOptions, syrupOptions, customization, configurationId, resolveOrderItem, optionLabels, replaceOrderLine } from './order-options.js';
+import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOffer, undoCheckoutOffer } from './checkout-offers.js';
+
+const copy = {
+  skip: ['Menüye geç', 'Skip to menu', 'Перейти к меню'],
+  navigation: ['Gezinme', 'Navigation', 'Навигация'],
+  navPair: ['Eşleşmeler', 'Pairings', 'Комбо'],
+  navMenu: ['Menü', 'Menu', 'Меню'],
+  navVisit: ['Ziyaret', 'Visit', 'Как добраться'],
+  language: ['Dil', 'Language', 'Язык'],
+  appearance: ['Görünüm', 'Appearance', 'Оформление'],
+  appearanceMood: ['Molanızın havası', 'A mood for your coffee break', 'Настроение вашей кофейной паузы'],
+  themeLight: ['Açık', 'Light', 'Светлый'],
+  themeDark: ['Koyu', 'Dark', 'Тёмный'],
+  themeRomantic: ['Romantik', 'Romantic', 'Романтика'],
+  themeKids: ['Çocuk', 'Kids', 'Детский'],
+  heroFirst: ['İyi kahve.', 'Good coffee.', 'Хороший кофе.'],
+  heroSecond: ['Güzel anlar.', 'Beautiful moments.', 'Приятные моменты.'],
+  heroBody: [
+    'Gazipaşa’da kahve ve brunch. Çılbırdan taze focaccia’ya, sabahın tadını çıkarın.',
+    'Coffee and brunch in Gazipaşa. Start with çılbır, try a fresh focaccia, and stay for a good cup of coffee.',
+    'Кофе и бранч в Газипаше. Начните с чылбыра или попробуйте свежую фокаччу с чашкой кофе.',
+  ],
+  seeMenu: ['Menüyü keşfet', 'Explore the menu', 'Посмотреть меню'],
+  findUs: ['Bizi bulun', 'Find us', 'Как добраться'],
+  heroAlt: ['Yoğurt, poşe yumurta ve ekmekle çılbır', 'Çılbır with yogurt, poached eggs and bread', 'Чылбыр с йогуртом, яйцами пашот и хлебом'],
+  heroDish: ['Çılbır', 'Çılbır', 'Чылбыр'],
+  heroCaption: ['Pocitel’in seçimi', 'Pocitel’s choice', 'Выбор Pocitel'],
+  quickTitle: ['Canınız ne çekiyor?', 'What are you in the mood for?', 'Чего хочется?'],
+  quickBreakfast: ['Kahvaltı', 'Breakfast', 'Хочу завтрак'],
+  quickSweet: ['Kahve ve tatlı', 'Coffee & something sweet', 'Кофе и сладкое'],
+  quickLunch: ['Atıştırmalık', 'A quick bite', 'Перекусить'],
+  quickSavings: ['Tasarruf', 'You save', 'Экономия'],
+  quickAdd: ['Eşleşmeyi ekle', 'Add pairing', 'Добавить комбо'],
+  menuKicker: ['Poçitel Coffee & Brunch', 'Poçitel Coffee & Brunch', 'Poçitel Coffee & Brunch'],
+  feedTitle: ['Menü akışı', 'The menu feed', 'Лента меню'],
+  menuBody: ['Fotoğraflara göz atın, favorilerinizi kaydedin ve seçiminizi ekibimize gösterin.', 'Browse the photos, save your favourites and show your selection to our team.', 'Листайте блюда, сохраняйте любимое и показывайте свой выбор официанту.'],
+  search: ['Menüde ara', 'Search the menu', 'Поиск по меню'],
+  clearSearch: ['Aramayı temizle', 'Clear search', 'Очистить поиск'],
+  illustration: ['Yapay zekâ görseli', 'AI illustration', 'ИИ-иллюстрация'],
+  filters: ['Kategoriler', 'Categories', 'Категории'],
+  all: ['Tümü', 'All', 'Всё'],
+  noResults: ['Sonuç bulunamadı. Başka bir kelime veya kategori deneyin.', 'Nothing found. Try a different word or category.', 'Ничего не найдено. Попробуйте другой запрос или категорию.'],
+  noSaved: ['Beğendiğiniz ürünleri yer imi simgesiyle kaydedebilirsiniz.', 'Tap the bookmark on a dish to save it here.', 'Нажмите на закладку на карточке блюда, чтобы сохранить его здесь.'],
+  saved: ['Kaydedilenler', 'Saved', 'Сохранённое'],
+  save: ['Kaydet', 'Save', 'Сохранить'],
+  stories: ['Menü hikâyeleri', 'Menu stories', 'Истории меню'],
+  previous: ['Önceki', 'Previous', 'Назад'],
+  next: ['Sonraki', 'Next', 'Дальше'],
+  details: ['Ürünü incele', 'View item', 'Открыть карточку'],
+  pinned: ['Poçitel’in seçimi', 'Poçitel’s pick', 'Выбор Poçitel'],
+  more: ['Daha fazla göster', 'Show more', 'Показать ещё'],
+  paired: ['Bu eşleşmeyi deneyin', 'Try it in this pairing', 'Попробуйте в комбо'],
+  share: ['Paylaş', 'Share', 'Поделиться'],
+  sharePhoto: ['Fotoğrafla paylaş', 'Share with photo', 'Поделиться с фото'],
+  savePhoto: ['Fotoğrafı kaydet', 'Save photo', 'Сохранить фото'],
+  preparingPhoto: ['Fotoğraf hazırlanıyor…', 'Preparing your photo…', 'Готовим фото…'],
+  photoReady: ['Ürünün fotoğrafı ve bağlantısı paylaşılmaya hazır.', 'The item’s photo and link are ready to share.', 'Фото блюда и ссылка готовы к отправке.'],
+  photoFallback: ['Fotoğrafı kaydedip bağlantıyla birlikte gönderebilirsiniz.', 'Save the photo and send it together with the link.', 'Сохраните фото и отправьте его вместе со ссылкой.'],
+  photoFailed: ['Fotoğraf yüklenemedi. Tekrar açmayı deneyin veya bağlantıyı kopyalayın.', 'The photo couldn’t load. Try opening this again or copy the link.', 'Фото не загрузилось. Откройте это окно ещё раз или скопируйте ссылку.'],
+  linkLabel: ['Ürün bağlantısı', 'Link to this item', 'Ссылка на блюдо'],
+  copyLink: ['Bağlantıyı kopyala', 'Copy link', 'Скопировать ссылку'],
+  copied: ['Bağlantı kopyalandı.', 'Link copied.', 'Ссылка скопирована.'],
+  manualCopy: ['Seçili bağlantıyı kopyalayabilirsiniz.', 'You can copy the selected link.', 'Можно скопировать выделенную ссылку.'],
+  serviceMode: ['Servis şekli', 'Serving preference', 'Формат подачи'],
+  dineIn: ['Kafede', 'Dine in', 'В кафе'],
+  takeaway: ['Al götür', 'To go', 'С собой'],
+  takeInvite: ['Yanınızda götürün', 'Take it to go', 'Возьмите с собой'],
+  takeHint: ['Kahve, matcha ve atıştırmalıklar bardakta.', 'Coffee, matcha and snacks in a cup.', 'Кофе, матча и закуски в стакане.'],
+  takeTitle: ['Al götür menüsü', 'The to-go menu', 'Меню с собой'],
+  takeNote: ['Paket servis için menü önerileri. Bardak ve uygunluğu ekibimizle teyit edin.', 'Menu suggestions to take with you. Check packaging and availability with our team.', 'Идеи для заказа с собой. Упаковку и наличие уточняйте у команды кафе.'],
+  addOn: ['Yanına ne gider?', 'Something to go with it?', 'Что добавить к заказу?'],
+  totalWith: ['Birlikte', 'Together', 'Вместе'],
+  choose: ['Seç', 'Choose', 'Выбрать'],
+  orderSteps: ['Sipariş adımları', 'Order steps', 'Шаги выбора'],
+  stepChoose: ['Seç', 'Choose', 'Выбрать'],
+  stepReview: ['Kontrol et', 'Review', 'Проверить'],
+  stepShow: ['Sipariş', 'Order', 'Заказать'],
+  readyToShow: ['3 · Siparişi ekibimizle tamamlayın', '3 · Place your order with our team', '3 · Закажите у официанта'],
+  yourVersion: ['Nasıl olsun?', 'Make it yours', 'Ваш вариант'],
+  single: ['Tek ürün', 'Just this item', 'Одна позиция'],
+  combo: ['Eşleşme', 'Make it a pairing', 'Взять комбо'],
+  milk: ['Süt tercihi', 'Milk preference', 'Молоко'],
+  syrup: ['Kahve şurubu', 'Coffee syrup', 'Сироп для кофе'],
+  included: ['Dahil', 'Included', 'Включено'],
+  comboDrink: ['İçeceğiniz için', 'For the drink in your pairing', 'Для напитка в комбо'],
+  quantity: ['Adet', 'Quantity', 'Количество'],
+  increase: ['Bir ekle', 'Add one', 'Добавить одну порцию'],
+  edit: ['Düzenle', 'Edit', 'Изменить'],
+  saveChanges: ['Değişiklikleri kaydet', 'Save changes', 'Сохранить изменения'],
+  quantityLimit: ['Bu seçimden en fazla 99 adet ekleyebilirsiniz.', 'You can add up to 99 of this selection.', 'Можно выбрать до 99 порций одного варианта.'],
+  skipExtras: ['Şimdilik yeterli', 'That’s everything', 'Пока без дополнений'],
+  menuNote: ['Fiyatlar paylaşılan basılı menüdendir. Güncel fiyat ve içerik için ekibimize danışabilirsiniz.', 'Prices are from the printed menu. Please check with our team for current prices and ingredients.', 'Цены взяты из печатного меню. Актуальные цены и состав можно уточнить у команды кафе.'],
+  visitTitle: ['Kahveye bekleriz.', 'Come by for coffee.', 'Заходите на кофе.'],
+  hours: ['Pazartesi–Cumartesi 07.00–22.00 · Pazar kapalı', 'Mon–Sat 07:00–22:00 · Closed Sunday', 'Пн–сб 07:00–22:00 · Вс закрыто'],
+  hoursSource: ['Saatleri Google Haritalar’da kontrol edin', 'Check hours on Google Maps', 'Сверить график в Google Maps'],
+  visitArt: ['Menü illüstrasyonu', 'Illustration from the menu', 'Иллюстрация из меню'],
+  route: ['Yol tarifi', 'Get directions', 'Построить маршрут'],
+  cart: ['Siparişim', 'My order', 'Мой заказ'],
+  checkoutTitle: ['Güzel bir mola zamanı.', 'Time for something good.', 'Самое время попробовать.'],
+  checkoutIntro: ['Seçtikleriniz bir arada. Son dokunuş sizin.', 'Your favourites, together. Add your finishing touch.', 'Ваши любимые вкусы вместе. Осталось выбрать детали.'],
+  checkoutAction: ['Kafede sipariş ver', 'Order at the café', 'Заказать в кафе'],
+  checkoutHelp: ['Sonraki adım: ekibimize gösterin, kafede ödeyin.', 'Next: show our team and pay at the café.', 'Дальше — покажите заказ официанту и оплатите в кафе.'],
+  checkoutItems: ['Seçtikleriniz', 'Your selection', 'В вашем заказе'],
+  separately: ['Ayrı ayrı', 'Bought separately', 'По отдельности'],
+  comboSavings: ['Eşleşme avantajınız', 'Your pairing savings', 'Выгода комбо'],
+  oneMoreTouch: ['Küçük bir dokunuş', 'The finishing touch', 'Последний вкусный штрих'],
+  combineTitle: ['Birlikte daha avantajlı', 'Better together', 'Вместе выгоднее'],
+  upgradeTitle: ['Eşleşmeye tamamlayın', 'Make it a pairing', 'Добавьте пару к любимому'],
+  addOffer: ['Siparişime ekle', 'Add to my order', 'Добавить к заказу'],
+  upgradeOffer: ['Eşleşmeyi seç', 'Choose the pairing', 'Взять комбо'],
+  combineOffer: ['Eşleşmeyle tasarruf et', 'Bundle and save', 'Объединить в комбо'],
+  offerAdded: ['Siparişinizde · kaldırmak için dokunun', 'In your order · tap to undo', 'В заказе · нажмите, чтобы отменить'],
+  offerReplaces: ['Birer adet yerine', 'Replaces one of each', 'Заменит по одной порции'],
+  offerReplacesSingle: ['Bir porsiyon yerine', 'Replaces one portion', 'Заменит одну порцию'],
+  offerPriceAfter: ['Yeni toplam', 'New total', 'Новый итог'],
+  offerApplied: ['Sipariş güncellendi.', 'Order updated.', 'Заказ обновлён.'],
+  offerUndone: ['Önceki seçiminiz geri yüklendi.', 'Your previous selection is restored.', 'Прежний выбор восстановлен.'],
+  combineReason: ['Seçtiğiniz lezzetler, menüdeki eşleşme fiyatıyla.', 'The same favourites at the menu’s pairing price.', 'Те же блюда и напитки по цене комбо из меню.'],
+  drinkWithFoodReason: ['Yemeğinizin yanına, menüden bir içecek eşleşmesi.', 'A drink from the menu to complete your meal.', 'Добавьте напиток к блюду по цене комбо.'],
+  foodWithDrinkReason: ['İçeceğinizin yanına bir lezzet daha.', 'Something delicious to enjoy with your drink.', 'Любимый напиток и ещё кое-что вкусное к нему.'],
+  teaWithBreakfastReason: ['Kahvaltınızın yanına bir bardak Türk çayı.', 'A glass of Turkish tea alongside your breakfast.', 'Стакан турецкого чая к вашему завтраку.'],
+  coffeeForWalkReason: ['Brunch burada, cappuccino yolda. Molayı yanınızda götürün.', 'Brunch here, cappuccino on your walk. Take the moment with you.', 'Бранч здесь, капучино на прогулку. Возьмите настроение с собой.'],
+  breakfastToGoReason: ['Kahvenizin yanına meyve, yoğurt ve granola — bardakta.', 'Fruit, yogurt and granola to go with your coffee — in a cup.', 'Фрукты, йогурт и гранола к кофе — тоже в стакане.'],
+  sweetWithCoffeeReason: ['Kahvenizin yanına meyveli, Nutellalı pancake.', 'Fruit and Nutella pancakes to enjoy with your coffee.', 'Панкейки с фруктами и Nutella к вашему кофе.'],
+  handoffTitle: ['Sipariş vermek istiyorum', 'Let’s order this.', 'Хочу заказать это.'],
+  handoffHelp: ['Bu ekranı ekibimize gösterin. Sipariş ve ödeme kafede tamamlanır.', 'Show this screen to our team. Your order and payment are completed at the café.', 'Покажите экран официанту. Он оформит заказ и примет оплату в кафе.'],
+  handoffTurkish: ['Sipariş detayları', 'Order details · in Turkish for our team', 'Детали заказа · на турецком для официанта'],
+  cartNote: ['Bu listeyi ekibimize gösterin. Sipariş ve ödeme kafede yapılır.', 'Show this list to our team. Order and pay at the café.', 'Покажите список официанту. Оформление и оплата в кафе.'],
+  emptyCart: ['Listeniz henüz boş.', 'Your list is empty.', 'Ваш список пока пуст.'],
+  total: ['Toplam', 'Total', 'Итого'],
+  backToMenu: ['Menüye dön', 'Back to menu', 'Вернуться к меню'],
+  showWaiter: ['Garsona göster', 'Show the waiter', 'Показать официанту'],
+  backToSelection: ['Seçime dön', 'Back to selection', 'Вернуться к выбору'],
+  add: ['Ekle', 'Add', 'Добавить'],
+  remove: ['Bir azalt', 'Remove one', 'Убрать одну порцию'],
+  close: ['Kapat', 'Close', 'Закрыть'],
+};
+
+const languages = ['tr', 'en', 'ru'];
+const locales = ['tr-TR', 'en-GB', 'ru-RU'];
+const items = new Map(categories.flatMap(category => category.items.map(entry => [entry.id, entry])));
+const categoryByItem = new Map(categories.flatMap(category => category.items.map(entry => [entry.id, category])));
+const categoryById = new Map(categories.map(category => [category.id, category]));
+const combos = categoryById.get('combos').items;
+const feedOrder = [...combos, ...categories.filter(category => category.id !== 'combos').flatMap(category => category.items)];
+const takeawaySuggestions = {
+  cappuccino: 'granola',
+  'iced-latte': 'granola',
+  'hot-chocolate': 'granola',
+  'iced-matcha': 'granola',
+  chai: 'granola',
+  matcha: 'granola',
+  granola: 'cappuccino',
+  fries: 'iced-latte',
+};
+const takeawayItems = Object.keys(takeawaySuggestions).map(sourceId => {
+  const id = `to-go-${sourceId}`;
+  const entry = { ...items.get(sourceId), id, sourceId, image: `takeaway/${sourceId}` };
+  items.set(id, entry);
+  categoryByItem.set(id, categoryByItem.get(sourceId));
+  return entry;
+});
+const stories = {
+  breakfast: ['cilbir', 'menemen', 'breakfast-plate'],
+  coffee: ['cappuccino', 'turkish-coffee', 'latte'],
+  cold: ['iced-latte', 'iced-matcha', 'iced-americano'],
+  combos: combos.map(entry => entry.id),
+};
+const pairedWith = new Map([
+  ['cilbir', 'turkish-classic'], ['tea', 'turkish-classic'],
+  ['pancake', 'sweet-morning'], ['cappuccino', 'sweet-morning'],
+  ['granola', 'fresh-energy'], ['iced-matcha', 'fresh-energy'],
+  ['smoked-turkey', 'lunch-favourite'], ['iced-americano', 'lunch-favourite'],
+]);
+const $ = selector => document.querySelector(selector);
+const search = $('#search');
+const results = $('#results');
+const cart = $('#cart');
+const cartItems = $('#cart-items');
+const waiter = $('#waiter');
+const quickResult = $('#quick-result');
+const viewer = $('#post-viewer');
+const viewerContent = $('#viewer-content');
+const shareDialog = $('#share-dialog');
+const shareLink = $('#share-link');
+const savedFilter = $('#saved-filter');
+const configure = $('#configure');
+const selectionKey = 'pocitel-selection-v1';
+const languageKey = 'pocitel-language';
+const savedKey = 'pocitel-saved-v1';
+const pageSize = 8;
+const maxQuantity = 99;
+let draft;
+let configureOpener;
+let suggestionsDismissed = false;
+let checkoutOffer;
+let offerTransaction;
+
+function orderItem(id) {
+  return resolveOrderItem(id, items);
+}
+
+function readSetting(key) {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+
+function writeSetting(key, value) {
+  try { localStorage.setItem(key, value); } catch { /* Keep the current session usable. */ }
+}
+
+function restoreSelection() {
+  try {
+    const saved = JSON.parse(readSetting(selectionKey));
+    if (!Array.isArray(saved)) return new Map();
+    return new Map(saved.filter(entry =>
+      Array.isArray(entry) && orderItem(entry[0]) &&
+      Number.isInteger(entry[1]) && entry[1] >= 1 && entry[1] <= maxQuantity
+    ));
+  } catch {
+    return new Map();
+  }
+}
+
+const params = new URLSearchParams(location.search);
+let language = languages.indexOf(params.get('lang'));
+if (language < 0) language = Math.max(0, languages.indexOf(readSetting(languageKey)));
+let activeCategory = location.hash === '#pairings' ? 'combos' : 'all';
+let takeawayMode = Boolean(items.get(params.get('item'))?.sourceId);
+if (takeawayMode) activeCategory = 'all';
+let savedOnly = false;
+let visibleLimit = pageSize;
+let quickPick = null;
+let openedPost;
+let postOpener;
+let shareOpener;
+let sharedPost;
+let shareSequence = 0;
+let sharePhotoUrl;
+let touchOrigin;
+const selection = restoreSelection();
+const saved = new Set();
+try {
+  const stored = JSON.parse(readSetting(savedKey));
+  if (Array.isArray(stored)) stored.filter(id => items.has(id)).forEach(id => saved.add(id));
+} catch { /* Ignore invalid saved data. */ }
+
+const t = key => copy[key][language];
+const name = entry => entry.names[language];
+const description = entry => entry.descriptions[language];
+const price = (value, locale = locales[language]) => `${value.toLocaleString(locale)} ₺`;
+const icon = key => `<svg class="icon" aria-hidden="true"><use href="#i-${key}"/></svg>`;
+const normalize = value => value.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replaceAll('ı', 'i').replace(/[-‐‑–]/gu, ' ').trim();
+
+function priceMarkup(entry) {
+  return `<span class="prices">${entry.before ? `<del>${price(entry.before)}</del>` : ''}<strong>${price(entry.price)}</strong></span>`;
+}
+
+function choiceField(field, title, options, selected) {
+  return `<fieldset class="choice-field"><legend>${title}</legend><div class="choice-options">
+    ${options.map(option => `<label class="choice-option">
+      <input type="radio" name="${field}" value="${option.id}" ${option.id === selected ? 'checked' : ''}>
+      <span><strong>${option.label}</strong>${option.detail ? `<small>${option.detail}</small>` : ''}</span>
+      ${option.price ? `<b>${option.price}</b>` : ''}
+    </label>`).join('')}
+  </div></fieldset>`;
+}
+
+function draftItem() {
+  return orderItem(configurationId(draft.itemId, draft.milk, draft.syrup));
+}
+
+function renderConfigurator() {
+  const entry = items.get(draft.itemId);
+  const supported = customization(entry);
+  if (!supported.milk) draft.milk = 'standard';
+  if (!supported.syrup) draft.syrup = 'none';
+  $('#configure-product').innerHTML = `<div class="configure-product">
+    <div class="configure-photo">${itemImage(entry, false)}${illustrationLabel(entry)}</div>
+    <div><p class="eyebrow">${t(entry.sourceId ? 'takeaway' : 'dineIn')}</p><h2 id="configure-title">${name(entry)}</h2>
+      ${description(entry) ? `<p>${description(entry)}</p>` : ''}${priceMarkup(entry)}</div>
+  </div>`;
+  const fields = [];
+  const toGo = items.get(`to-go-${draft.singleId}`);
+  if (toGo) {
+    fields.push(choiceField('serving', t('serviceMode'), [
+      { id: 'cafe', label: t('dineIn') },
+      { id: 'takeaway', label: t('takeaway') },
+    ], entry.sourceId ? 'takeaway' : 'cafe'));
+  }
+  const pair = items.get(pairedWith.get(draft.singleId));
+  if (pair && !entry.sourceId) {
+    const single = items.get(draft.singleId);
+    fields.push(choiceField('version', t('yourVersion'), [
+      { id: single.id, label: t('single'), detail: name(single), price: price(single.price) },
+      { id: pair.id, label: `${t('combo')} · +${price(pair.price - single.price)}`, detail: `${description(pair)} · ${t('quickSavings')} ${price(pair.before - pair.price)}`, price: price(pair.price) },
+    ], entry.id));
+  }
+  if (entry.before && (supported.milk || supported.syrup)) fields.push(`<p class="option-note">${t('comboDrink')}</p>`);
+  if (supported.milk) fields.push(choiceField('milk', t('milk'), milkOptions.map(option => ({
+    id: option.id, label: option.labels[language], price: option.id === 'standard' ? t('included') : `+${price(items.get('plant-milk').price)}`,
+  })), draft.milk));
+  if (supported.syrup) fields.push(choiceField('syrup', t('syrup'), syrupOptions.map(option => ({
+    id: option.id, label: option.labels[language], price: option.id === 'none' ? t('included') : `+${price(items.get('syrup').price)}`,
+  })), draft.syrup));
+  $('#configure-choices').innerHTML = fields.join('');
+  updateConfigurationTotal();
+}
+
+function updateConfigurationTotal() {
+  const entry = draftItem();
+  $('#configure-quantity').textContent = draft.quantity;
+  $('#configure-minus').disabled = draft.quantity === 1;
+  $('#configure-plus').disabled = draft.quantity === maxQuantity;
+  $('#configure-total').textContent = price(entry.price * draft.quantity);
+  $('#confirm-configure').textContent = t(draft.editId ? 'saveChanges' : 'add');
+  $('#configure-error').hidden = true;
+}
+
+function openConfigurator(id, opener, editId) {
+  const entry = orderItem(id);
+  const baseId = entry.baseId ?? entry.id;
+  draft = {
+    singleId: entry.sourceId ?? baseId, itemId: baseId,
+    milk: entry.milk ?? 'standard', syrup: entry.syrup ?? 'none',
+    quantity: editId ? selection.get(editId) : 1, editId,
+  };
+  configureOpener = opener;
+  renderConfigurator();
+  configure.scrollTop = 0;
+  configure.showModal();
+}
+
+function confirmConfiguration() {
+  const entry = draftItem();
+  if (!replaceOrderLine(selection, draft.editId, entry.id, draft.quantity, maxQuantity)) {
+    $('#configure-error').textContent = t('quantityLimit');
+    $('#configure-error').hidden = false;
+    return;
+  }
+  persistSelection();
+  configure.close('saved');
+  if (viewer.open) viewer.close();
+  if (!cart.open) openCart(postOpener?.isConnected && configureOpener?.closest('#post-viewer') ? postOpener : configureOpener);
+  else renderCart();
+  $('#show-waiter').focus({ preventScroll: true });
+  $('#announcement').textContent = `${name(entry)} · ${draft.quantity} · ${price(entry.price * draft.quantity)}`;
+}
+
+function renderQuickChoice() {
+  document.querySelectorAll('[data-quick-pick]').forEach(button => {
+    button.setAttribute('aria-pressed', button.dataset.quickPick === quickPick?.id);
+  });
+  quickResult.hidden = !quickPick;
+  quickResult.innerHTML = quickPick ? `
+    <img src="assets/${quickPick.image}.webp" alt="" decoding="async">
+    <div>
+      <h3>${name(quickPick)}</h3>
+      <p>${description(quickPick)}</p>
+      <div class="quick-price">${priceMarkup(quickPick)}<span>${t('quickSavings')} ${price(quickPick.before - quickPick.price)}</span></div>
+      <button type="button" class="button primary" data-quick-add="${quickPick.id}">${icon('plus')}${t('quickAdd')}</button>
+    </div>` : '';
+}
+
+function addButton(entry) {
+  return `<button type="button" class="button primary post-add" data-add="${entry.id}" aria-label="${t('choose')} · ${name(entry)}">${icon('plus')}${t('choose')}</button>`;
+}
+
+function postActions(entry) {
+  return `<div class="post-actions">
+    <button type="button" class="icon-button save-post" data-save="${entry.id}" aria-label="${t('save')} · ${name(entry)}" aria-pressed="${saved.has(entry.id)}">${icon('bookmark')}</button>
+    <button type="button" class="icon-button" data-share="${entry.id}" aria-label="${t('share')} · ${name(entry)}">${icon('share')}</button>
+    ${addButton(entry)}
+  </div>`;
+}
+
+function itemImage(entry, lazy = true) {
+  return `<img src="assets/${entry.image}.webp" alt="" ${lazy ? 'loading="lazy"' : ''} decoding="async">`;
+}
+
+function illustrationLabel(entry) {
+  return entry.sourceId || entry.image.startsWith('illustrations/') ? `<span class="illustration-label">${t('illustration')}</span>` : '';
+}
+
+function menuPost(entry) {
+  const category = categoryByItem.get(entry.id);
+  return `<article class="feed-post${entry.sourceId ? ' take-post' : ''}" id="post-${entry.id}">
+    <div class="post-top">
+      <span class="post-mark"><svg aria-hidden="true"><use href="#i-sprig"/></svg></span>
+      <span>${category.labels[language]}</span>
+      ${entry.sourceId ? `<span class="pinned">${t('takeaway')}</span>` : entry.before ? `<span class="pinned">${t('pinned')}</span>` : ''}
+    </div>
+    <button type="button" class="post-media" data-post="${entry.id}" aria-label="${t('details')} · ${name(entry)}">
+      ${itemImage(entry)}
+      ${illustrationLabel(entry)}
+    </button>
+    <div class="post-body">
+      <div class="post-heading"><h3>${name(entry)}</h3>${priceMarkup(entry)}</div>
+      ${description(entry) ? `<p class="post-description">${description(entry)}</p>` : ''}
+      ${postActions(entry)}
+    </div>
+  </article>`;
+}
+
+function renderStories() {
+  $('#stories').innerHTML = Object.keys(stories).map(id => `
+    <button type="button" data-story="${id}" class="story">
+      <span class="story-ring"><img src="assets/story-${id}.webp" width="144" height="144" alt="" loading="lazy" decoding="async"></span>
+      <span>${categoryById.get(id).labels[language]}</span>
+    </button>`).join('');
+}
+
+function renderFilters() {
+  const available = takeawayMode ? new Set(takeawayItems.map(entry => categoryByItem.get(entry.id).id)) : null;
+  const groups = available ? categories.filter(category => available.has(category.id)) : [categoryById.get('combos'), ...categories.filter(category => category.id !== 'combos')];
+  const filters = [{ id: 'all', labels: copy.all }, ...groups];
+  $('#filters').innerHTML = filters.map(filter => `<button type="button" data-category="${filter.id}" aria-pressed="${filter.id === activeCategory}">${filter.labels[language]}</button>`).join('');
+}
+
+function renderServiceMode() {
+  $('#service-picker').dataset.activeMode = takeawayMode ? 'takeaway' : 'cafe';
+  document.querySelectorAll('[data-mode]').forEach(button => {
+    button.setAttribute('aria-pressed', (button.dataset.mode === 'takeaway') === takeawayMode);
+  });
+  $('#menu-title').textContent = t(takeawayMode ? 'takeTitle' : 'feedTitle');
+  $('#stories').hidden = takeawayMode;
+  $('#take-note').hidden = !takeawayMode;
+  renderFilters();
+}
+
+function renderResults(append = false) {
+  const terms = normalize(search.value).split(/\s+/u).filter(Boolean);
+  const matching = (takeawayMode ? takeawayItems : feedOrder).filter(entry =>
+    (activeCategory === 'all' || categoryByItem.get(entry.id).id === activeCategory) &&
+    (!savedOnly || saved.has(entry.id)) &&
+    terms.every(term => entry.searchText.includes(term))
+  );
+  const shown = matching.slice(0, visibleLimit);
+  const count = matching.length;
+  $('#result-meta').textContent = [`${count} ürün`, `${count} ${count === 1 ? 'item' : 'items'}`, `Позиций: ${count}`][language];
+  $('#clear-search').hidden = !search.value;
+  const categoryNote = categoryById.get(activeCategory)?.note?.[language];
+  $('#category-note').hidden = !count || !categoryNote;
+  $('#category-note').textContent = categoryNote ?? '';
+  $('#more-posts').hidden = shown.length >= count;
+  if (append) {
+    const newPosts = shown.slice(visibleLimit - pageSize);
+    results.insertAdjacentHTML('beforeend', newPosts.map(menuPost).join(''));
+    results.querySelector(`[data-post="${newPosts[0].id}"]`).focus();
+  } else {
+    results.innerHTML = count ? shown.map(menuPost).join('') : `<p class="empty">${t(savedOnly && !saved.size ? 'noSaved' : 'noResults')}</p>`;
+  }
+}
+
+function filterResults() {
+  visibleLimit = pageSize;
+  document.querySelectorAll('[data-category]').forEach(button => button.setAttribute('aria-pressed', button.dataset.category === activeCategory));
+  savedFilter.setAttribute('aria-pressed', savedOnly);
+  renderResults();
+}
+
+function scrollToMenuStart(smooth = false) {
+  requestAnimationFrame(() => {
+    const tools = $('.menu-tools');
+    const style = getComputedStyle(tools);
+    const offset = style.position === 'sticky' ? parseFloat(style.top) + tools.offsetHeight : 0;
+    const top = $('#result-meta').getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top: Math.max(0, top), behavior: smooth && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'instant' });
+  });
+}
+
+function renderViewer() {
+  const { ids, index, story } = openedPost;
+  const entry = items.get(ids[index]);
+  const related = items.get(pairedWith.get(entry.id));
+  const viewerSteps = $('#viewer-steps');
+  viewerSteps.innerHTML = story ? `
+    <p class="eyebrow">${categoryById.get(story).labels[language]} · ${index + 1}/${ids.length}</p>
+    <div class="story-progress" aria-hidden="true">${ids.map((_, step) => `<span class="${step <= index ? 'read' : ''}"></span>`).join('')}</div>` :
+    `<p class="eyebrow">${entry.sourceId ? `${t('takeaway')} · ` : ''}${categoryByItem.get(entry.id).labels[language]}</p>`;
+  viewerContent.innerHTML = `
+    <div class="viewer-photo${entry.sourceId ? ' take-photo' : ''}">
+      ${itemImage(entry, false)}
+      ${illustrationLabel(entry)}
+    </div>
+    <div class="viewer-body">
+      <div class="post-heading"><h2 id="post-title">${name(entry)}</h2>${priceMarkup(entry)}</div>
+      ${description(entry) ? `<p class="post-description">${description(entry)}</p>` : ''}
+      ${postActions(entry)}
+      ${related ? `<button type="button" class="related-post" data-related="${related.id}">
+        ${itemImage(related)}
+        <span><small>${t('paired')}</small><strong>${name(related)} · ${price(related.price)}</strong></span>
+        ${icon('chevron')}
+      </button>` : ''}
+    </div>`;
+}
+
+function openPost(ids, opener, story) {
+  openedPost = { ids, index: 0, story };
+  postOpener = opener;
+  touchOrigin = null;
+  renderViewer();
+  const controls = $('#story-controls');
+  controls.hidden = !story;
+  updateStoryControls();
+  viewer.scrollTop = 0;
+  viewer.showModal();
+}
+
+function updateStoryControls() {
+  $('#previous-story').disabled = openedPost.index === 0;
+  $('#next-story').disabled = openedPost.index >= openedPost.ids.length - 1;
+}
+
+function stepStory(delta) {
+  const next = openedPost.index + delta;
+  if (!openedPost.story || next < 0 || next >= openedPost.ids.length) return;
+  openedPost.index = next;
+  renderViewer();
+  updateStoryControls();
+  if (document.activeElement?.disabled) {
+    (delta > 0 ? $('#previous-story') : $('#next-story')).focus();
+  }
+}
+
+function toggleSaved(id) {
+  if (!saved.delete(id)) saved.add(id);
+  writeSetting(savedKey, JSON.stringify([...saved]));
+  document.querySelectorAll(`[data-save="${id}"]`).forEach(node => node.setAttribute('aria-pressed', saved.has(id)));
+  if (savedOnly && !saved.has(id)) {
+    renderResults();
+    if (!viewer.open) (results.querySelector('.save-post') ?? savedFilter).focus();
+  }
+}
+
+async function sharePost(button, id) {
+  const entry = items.get(id);
+  // Share only public item parameters, never preview/access query parameters.
+  const url = new URL(location.pathname, location.origin);
+  url.searchParams.set('item', id);
+  url.searchParams.set('lang', languages[language]);
+  url.hash = 'menu';
+  const sequence = ++shareSequence;
+  if (sharePhotoUrl) URL.revokeObjectURL(sharePhotoUrl);
+  sharePhotoUrl = undefined;
+  sharedPost = null;
+  shareOpener = button;
+  shareLink.value = url.href;
+  $('#share-photo').src = `assets/${entry.image}.webp`;
+  $('#share-photo').alt = name(entry);
+  $('#share-caption').textContent = `${name(entry)}${entry.sourceId ? ` · ${t('takeaway')}` : ''}`;
+  $('#share-photo-button').hidden = !navigator.share || !navigator.canShare;
+  $('#share-photo-button').disabled = true;
+  $('#save-photo').hidden = true;
+  $('#save-photo').removeAttribute('href');
+  $('#share-status').textContent = t('preparingPhoto');
+  shareDialog.showModal();
+  shareDialog.scrollTop = 0;
+  try {
+    const { prepareSharePhoto } = await import('./share-photo.js');
+    if (sequence !== shareSequence || !shareDialog.open) return;
+    const file = await prepareSharePhoto(`assets/${entry.image}.webp`, id);
+    if (sequence !== shareSequence || !shareDialog.open) return;
+    sharedPost = { files: [file], title: name(entry), text: `${$('#share-caption').textContent} · Poçitel Coffee & Brunch`, url: url.href };
+    sharePhotoUrl = URL.createObjectURL(file);
+    $('#save-photo').href = sharePhotoUrl;
+    $('#save-photo').download = file.name;
+    $('#save-photo').hidden = false;
+    let supported = false;
+    try { supported = Boolean(navigator.share && navigator.canShare?.({ files: [file] })); } catch { /* Use download instead. */ }
+    $('#share-photo-button').hidden = !supported;
+    $('#share-photo-button').disabled = !supported;
+    $('#share-status').textContent = t(supported ? 'photoReady' : 'photoFallback');
+  } catch {
+    if (sequence !== shareSequence || !shareDialog.open) return;
+    $('#share-photo-button').hidden = true;
+    $('#share-status').textContent = t('photoFailed');
+  }
+}
+
+async function sharePreparedPhoto() {
+  if (!sharedPost) return;
+  const sequence = shareSequence;
+  $('#share-photo-button').disabled = true;
+  try {
+    // No fetch/decode awaits here: the tap must reach navigator.share directly.
+    await navigator.share(sharedPost);
+    if (sequence === shareSequence && shareDialog.open) shareDialog.close();
+  } catch (error) {
+    if (sequence === shareSequence && error.name !== 'AbortError') $('#share-status').textContent = t('photoFallback');
+  } finally {
+    if (sequence === shareSequence) $('#share-photo-button').disabled = false;
+  }
+}
+
+async function copyPostLink() {
+  try {
+    await navigator.clipboard.writeText(shareLink.value);
+    $('#share-status').textContent = t('copied');
+  } catch {
+    shareLink.select();
+    $('#share-status').textContent = t('manualCopy');
+  }
+}
+
+function renderCounts() {
+  const count = [...selection.values()].reduce((sum, quantity) => sum + quantity, 0);
+  document.querySelectorAll('[data-count]').forEach(node => { node.textContent = count; });
+  document.querySelectorAll('[data-open-cart]').forEach(node => node.setAttribute('aria-label', `${t('cart')} (${count})`));
+  $('#selection-bar').hidden = count === 0;
+  $('#bar-total').textContent = price(selectionTotal());
+}
+
+function selectionTotal() {
+  return [...selection].reduce((sum, [id, quantity]) => sum + orderItem(id).price * quantity, 0);
+}
+
+function renderCartSuggestion() {
+  const offer = $('#cart-suggestion');
+  if (offerTransaction && offerTransaction.after !== selectionSignature(selection)) {
+    offerTransaction = null;
+    suggestionsDismissed = true;
+  }
+  if (!offerTransaction) checkoutOffer = suggestionsDismissed ? null : recommendCheckout(selection, items, orderItem);
+  offer.hidden = !checkoutOffer;
+  if (!checkoutOffer) { offer.innerHTML = ''; return; }
+  const next = orderItem(checkoutOffer.addId);
+  const applied = Boolean(offerTransaction);
+  const titleKey = checkoutOffer.kind === 'combine' ? 'combineTitle' : checkoutOffer.kind === 'upgrade' ? 'upgradeTitle' : 'oneMoreTouch';
+  const actionKey = checkoutOffer.kind === 'combine' ? 'combineOffer' : checkoutOffer.kind === 'upgrade' ? 'upgradeOffer' : 'addOffer';
+  const delta = checkoutOffer.delta < 0 ? `−${price(-checkoutOffer.delta)}` : `+${price(checkoutOffer.delta)}`;
+  offer.classList.toggle('offer-selected', applied);
+  offer.innerHTML = `
+    <p class="eyebrow">${t(titleKey)}</p>
+    <div class="checkout-offer-product">
+      <div class="checkout-offer-photo">${itemImage(next, false)}${illustrationLabel(next)}</div>
+      <div><h3>${name(next)}</h3><p>${t(`${checkoutOffer.reason}Reason`)}</p>
+        ${description(next) ? `<small>${description(next)}</small>` : ''}
+        ${optionLabels(next, language) ? `<small>${optionLabels(next, language)}</small>` : ''}
+      </div>
+    </div>
+    ${checkoutOffer.remove.length ? `<p class="offer-replacement">${t(checkoutOffer.remove.length === 1 ? 'offerReplacesSingle' : 'offerReplaces')}: ${checkoutOffer.remove.map(([id]) => name(orderItem(id))).join(' + ')}.</p>` : ''}
+    <label class="checkout-offer-toggle">
+      <input type="checkbox" id="checkout-offer-toggle" ${applied ? 'checked' : ''}>
+      <span>${t(applied ? 'offerAdded' : actionKey)}</span><strong>${delta}</strong>
+    </label>
+    <div class="offer-bottom"><small>${t(applied ? 'total' : 'offerPriceAfter')} <b>${price(selectionTotal() + (applied ? 0 : checkoutOffer.delta))}</b></small>
+    ${applied ? '' : `<button type="button" class="skip-extras" id="skip-extras">${t('skipExtras')}</button>`}</div>`;
+}
+
+function toggleCheckoutOffer() {
+  const removing = Boolean(offerTransaction);
+  const next = removing ? undoCheckoutOffer(selection, offerTransaction) : applyCheckoutOffer(selection, checkoutOffer, orderItem, maxQuantity);
+  if (!next) { renderCart(); return; }
+  offerTransaction = removing ? null : { before: [...selection], after: selectionSignature(next) };
+  selection.clear();
+  next.forEach((quantity, id) => selection.set(id, quantity));
+  persistSelection();
+  $('#checkout-offer-toggle')?.focus({ preventScroll: true });
+  $('#announcement').textContent = `${t(removing ? 'offerUndone' : 'offerApplied')} ${t('total')} ${price(selectionTotal())}`;
+}
+
+function renderCart() {
+  const rows = [...selection].map(([id, quantity]) => {
+    const entry = orderItem(id);
+    return `<article class="cart-row">
+      <div class="cart-product-image">${itemImage(entry)}</div>
+      <div class="cart-product-copy"><h3>${name(entry)}</h3><small class="service-tag">${t(entry.sourceId ? 'takeaway' : 'dineIn')}</small>${entry.before ? `<p class="cart-description">${description(entry)}</p>` : ''}${optionLabels(entry, language) ? `<small class="line-options">${optionLabels(entry, language)}</small>` : ''}
+        <button type="button" class="edit-line" data-edit="${id}" aria-label="${t('edit')} · ${name(entry)}">${t('edit')}</button>
+      </div>
+      <div class="quantity cart-quantity">
+        <button type="button" class="icon-button" data-quantity="-1" data-item="${id}" aria-label="${t('remove')} · ${name(entry)}">${icon('minus')}</button>
+        <span>${quantity}</span>
+        <button type="button" class="icon-button" data-quantity="1" data-item="${id}" aria-label="${t('add')} · ${name(entry)}" ${quantity === maxQuantity ? 'disabled' : ''}>${icon('plus')}</button>
+      </div>
+      <strong>${price(quantity * entry.price)}</strong>
+    </article>`;
+  }).join('');
+  cartItems.innerHTML = rows || `<p class="empty">${t('emptyCart')}</p>`;
+  renderCartSuggestion();
+  $('#cart-total').hidden = !selection.size;
+  $('#show-waiter').hidden = !selection.size;
+  $('#total-price').textContent = price(selectionTotal());
+  $('#checkout-button-total').textContent = price(selectionTotal());
+  const savings = checkoutSavings(selection, items, orderItem);
+  $('#checkout-savings').hidden = !savings;
+  $('#checkout-saving-price').textContent = `−${price(savings)}`;
+  $('#checkout-before-price').textContent = price(selectionTotal() + savings);
+  $('#checkout-help').hidden = !selection.size;
+  $('#checkout-items-label').hidden = !selection.size;
+  $('#checkout-picture-note').hidden = !selection.size;
+}
+
+function renderWaiter() {
+  $('#waiter-items').innerHTML = [...selection].map(([id, quantity]) => {
+    const entry = orderItem(id);
+    return `<li><div class="waiter-photo">${itemImage(entry, false)}<span class="waiter-quantity">${quantity}×</span></div>
+      <div class="waiter-item-copy"><strong>${entry.names[0]}</strong>${language ? `<small lang="${languages[language]}">${name(entry)}</small>` : ''}<p class="service-tag">${copy[entry.sourceId ? 'takeaway' : 'dineIn'][0]}</p>${optionLabels(entry, 0) ? `<p class="line-options">${optionLabels(entry, 0)}</p>` : ''}${entry.before ? `<p>${entry.descriptions[0]}</p>` : ''}
+      <span class="waiter-price">${price(entry.price * quantity, locales[0])}</span></div></li>`;
+  }).join('');
+  $('#waiter-total').textContent = price(selectionTotal(), locales[0]);
+  $('#waiter-take-note').hidden = ![...selection.keys()].some(id => orderItem(id).sourceId);
+  const savings = checkoutSavings(selection, items, orderItem);
+  $('#waiter-savings').hidden = !savings;
+  $('#waiter-savings').textContent = `Eşleşme avantajınız: ${price(savings, locales[0])}`;
+}
+
+function persistSelection() {
+  writeSetting(selectionKey, JSON.stringify([...selection]));
+  if (!selection.size) { suggestionsDismissed = false; offerTransaction = null; checkoutOffer = null; }
+  renderCounts();
+  if (cart.open) renderCart();
+}
+
+function changeSelection(id, delta) {
+  const previous = selection.get(id) ?? 0;
+  const next = Math.min(previous + delta, maxQuantity);
+  if (next < 0 || next === previous) return;
+  if (next) selection.set(id, next);
+  else selection.delete(id);
+  persistSelection();
+  $('#announcement').textContent = `${name(orderItem(id))} · ${next}`;
+}
+
+function applyLanguage() {
+  document.documentElement.lang = languages[language];
+  document.querySelectorAll('[data-lang]').forEach(button => button.setAttribute('aria-pressed', button.dataset.lang === languages[language]));
+  document.querySelectorAll('[data-copy]').forEach(node => { node.textContent = t(node.dataset.copy); });
+  for (const [attribute, key] of [['aria-label', 'aria'], ['placeholder', 'placeholder'], ['alt', 'alt']]) {
+    document.querySelectorAll(`[data-${key}]`).forEach(node => node.setAttribute(attribute, t(node.dataset[key])));
+  }
+  renderStories();
+  renderQuickChoice();
+  renderServiceMode();
+  renderResults();
+  renderCounts();
+}
+
+for (const entry of items.values()) {
+  entry.searchText = normalize([...entry.names, ...entry.descriptions].join(' '));
+}
+
+let cartOpener;
+
+function openCart(opener) {
+  cartOpener = opener;
+  renderCart();
+  cart.showModal();
+}
+
+document.addEventListener('click', event => {
+  const jump = event.target.closest('[data-jump]');
+  if (jump) {
+    event.preventDefault();
+    takeawayMode = false;
+    activeCategory = jump.dataset.jump;
+    savedOnly = false;
+    search.value = '';
+    renderServiceMode();
+    filterResults();
+    scrollToMenuStart(true);
+    return;
+  }
+  if (event.target.closest('a[href="#menu"]:not(.skip)')) {
+    event.preventDefault();
+    scrollToMenuStart(true);
+    return;
+  }
+  const button = event.target.closest('button');
+  if (!button) return;
+  const { lang, category, add, quantity, item, post, story, save, share, related, mode, edit } = button.dataset;
+  if (lang) {
+    language = languages.indexOf(lang);
+    writeSetting(languageKey, lang);
+    applyLanguage();
+  } else if (category) {
+    activeCategory = category;
+    filterResults();
+    scrollToMenuStart();
+  } else if (mode && (mode === 'takeaway') !== takeawayMode) {
+    takeawayMode = mode === 'takeaway';
+    activeCategory = 'all';
+    savedOnly = false;
+    search.value = '';
+    renderServiceMode();
+    filterResults();
+    scrollToMenuStart();
+  } else if (button === savedFilter) {
+    savedOnly = !savedOnly;
+    if (savedOnly) {
+      activeCategory = 'all';
+      search.value = '';
+    }
+    filterResults();
+    scrollToMenuStart();
+  } else if (button.id === 'more-posts') {
+    visibleLimit += pageSize;
+    renderResults(true);
+  } else if (story) {
+    openPost(stories[story], button, story);
+  } else if (post) {
+    openPost([post], button);
+  } else if (related) {
+    openedPost = { ids: [related], index: 0 };
+    $('#story-controls').hidden = true;
+    renderViewer();
+    viewer.scrollTop = 0;
+    $('#close-post').focus();
+  } else if (save) {
+    toggleSaved(save);
+  } else if (share) {
+    sharePost(button, share);
+  } else if (button.id === 'copy-link') {
+    copyPostLink();
+  } else if (button.id === 'share-photo-button') {
+    sharePreparedPhoto();
+  } else if (button.id === 'close-share') {
+    shareDialog.close();
+  } else if (button.id === 'close-post') {
+    viewer.close();
+  } else if (button.id === 'previous-story' || button.id === 'next-story') {
+    stepStory(button.id === 'previous-story' ? -1 : 1);
+  } else if (button.dataset.quickPick) {
+    const entry = items.get(button.dataset.quickPick);
+    quickPick = quickPick === entry ? null : entry;
+    renderQuickChoice();
+    if (quickPick) {
+      $('#announcement').textContent = `${name(quickPick)} · ${price(quickPick.price)}`;
+      quickResult.scrollIntoView({ block: 'nearest' });
+    }
+  } else if (button.dataset.quickAdd) {
+    openConfigurator(button.dataset.quickAdd, button);
+  } else if (add) {
+    openConfigurator(add, button);
+  } else if (edit) {
+    openConfigurator(edit, button, edit);
+  } else if (button.id === 'close-configure') {
+    configure.close();
+  } else if (button.id === 'confirm-configure') {
+    confirmConfiguration();
+  } else if (button.id === 'configure-minus' || button.id === 'configure-plus') {
+    draft.quantity += button.id === 'configure-minus' ? -1 : 1;
+    updateConfigurationTotal();
+    if (button.disabled) (button.id === 'configure-minus' ? $('#configure-plus') : $('#configure-minus')).focus();
+  } else if (button.id === 'skip-extras') {
+    suggestionsDismissed = true;
+    renderCartSuggestion();
+    $('#show-waiter').focus();
+  } else if (quantity) {
+    changeSelection(item, Number(quantity));
+    const replacement = cartItems.querySelector(`[data-item="${item}"][data-quantity="${quantity}"]:not(:disabled)`);
+    (replacement ?? cartItems.querySelector('button') ?? $('#close-cart')).focus();
+  } else if (button.hasAttribute('data-open-cart')) {
+    openCart(button);
+  } else if (button.id === 'show-waiter' && selection.size) {
+    renderWaiter();
+    waiter.showModal();
+    waiter.scrollTop = 0;
+  } else if (button.id === 'close-waiter') {
+    waiter.close();
+  } else if (button.id === 'close-cart') {
+    cart.close();
+  } else if (button.id === 'back-to-menu') {
+    cart.close('menu');
+  } else if (button.id === 'clear-search') {
+    clearSearch();
+  }
+});
+
+cart.addEventListener('change', event => {
+  if (event.target.id === 'checkout-offer-toggle') toggleCheckoutOffer();
+});
+waiter.addEventListener('close', () => $('#show-waiter').focus({ preventScroll: true }));
+
+configure.addEventListener('change', event => {
+  const input = event.target;
+  if (input.name === 'milk' || input.name === 'syrup') {
+    draft[input.name] = input.value;
+    updateConfigurationTotal();
+    return;
+  }
+  if (input.name === 'serving') draft.itemId = input.value === 'takeaway' ? `to-go-${draft.singleId}` : draft.singleId;
+  else if (input.name === 'version') draft.itemId = input.value;
+  else return;
+  renderConfigurator();
+  configure.querySelector(`input[name="${input.name}"][value="${input.value}"]`)?.focus({ preventScroll: true });
+});
+configure.addEventListener('close', () => {
+  if (configure.returnValue === 'saved') {
+    configure.returnValue = '';
+    return;
+  }
+  if (configureOpener?.isConnected) configureOpener.focus({ preventScroll: true });
+});
+
+function clearSearch() {
+  search.value = '';
+  filterResults();
+  search.focus();
+}
+
+search.addEventListener('input', filterResults);
+search.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && search.value) {
+    event.preventDefault();
+    clearSearch();
+  }
+});
+cart.addEventListener('close', () => {
+  if (cart.returnValue === 'menu') {
+    cart.returnValue = '';
+    search.focus({ preventScroll: true });
+    scrollToMenuStart();
+  } else {
+    cartOpener?.focus();
+  }
+});
+
+viewer.addEventListener('close', () => {
+  if (!cart.open) (postOpener?.isConnected ? postOpener : savedFilter).focus({ preventScroll: true });
+});
+shareDialog.addEventListener('close', () => {
+  shareSequence++;
+  sharedPost = null;
+  if (sharePhotoUrl) URL.revokeObjectURL(sharePhotoUrl);
+  sharePhotoUrl = undefined;
+  if (shareOpener?.isConnected) shareOpener.focus({ preventScroll: true });
+});
+viewer.addEventListener('keydown', event => {
+  if (openedPost.story && ['ArrowLeft', 'ArrowRight'].includes(event.key)) {
+    event.preventDefault();
+    stepStory(event.key === 'ArrowLeft' ? -1 : 1);
+  }
+});
+viewerContent.addEventListener('touchstart', event => {
+  touchOrigin = event.target.closest('.viewer-photo') && event.touches.length === 1
+    ? event.touches[0]
+    : null;
+}, { passive: true });
+viewerContent.addEventListener('touchend', event => {
+  if (!touchOrigin) return;
+  const { clientX, clientY } = event.changedTouches[0];
+  const dx = clientX - touchOrigin.clientX;
+  const dy = clientY - touchOrigin.clientY;
+  touchOrigin = null;
+  if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) stepStory(dx < 0 ? 1 : -1);
+}, { passive: true });
+
+applyLanguage();
+$('#quick-choice').hidden = false;
+$('#service-picker').hidden = false;
+const linkedItem = params.get('item');
+if (items.has(linkedItem)) openPost([linkedItem], results.querySelector(`[data-post="${linkedItem}"]`) ?? search);
+else if (location.hash === '#pairings') scrollToMenuStart();
