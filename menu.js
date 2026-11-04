@@ -57,11 +57,11 @@ export const categories = [
     item('matcha', 220, ['Matcha', 'Matcha', 'Матча'], [], 'illustrations/branded/matcha'),
   ] },
   { id: 'hot', labels: ['Sıcak içecekler', 'Hot drinks', 'Горячие напитки'], items: [
-    item('hot-chocolate', 200, ['Sıcak Çikolata', 'Hot Chocolate', 'Горячий шоколад'], [], 'hot-chocolate'),
-    item('chai', 200, ['Chai Tea Latte', 'Chai Tea Latte', 'Чай латте'], [], 'chai'),
-    item('salep', 180, ['Salep', 'Salep', 'Салеп'], [], 'salep'),
-    item('toffee', 220, ['Toffee Nut Latte', 'Toffee Nut Latte', 'Латте «Ореховая ириска»'], [], 'toffee'),
-    item('caramel', 220, ['Caramel Drizzle', 'Caramel Drizzle', 'Карамельный напиток Caramel Drizzle'], [], 'caramel'),
+    item('hot-chocolate', 200, ['Sıcak Çikolata', 'Hot Chocolate', 'Горячий шоколад'], [], 'illustrations/drinks-v2/hot-chocolate'),
+    item('chai', 200, ['Chai Tea Latte', 'Chai Tea Latte', 'Чай латте'], [], 'illustrations/drinks-v2/chai'),
+    item('salep', 180, ['Salep', 'Salep', 'Салеп'], [], 'illustrations/drinks-v2/salep'),
+    item('toffee', 220, ['Toffee Nut Latte', 'Toffee Nut Latte', 'Латте «Ореховая ириска»'], [], 'illustrations/drinks-v2/toffee'),
+    item('caramel', 220, ['Caramel Drizzle', 'Caramel Drizzle', 'Карамельный напиток Caramel Drizzle'], [], 'illustrations/drinks-v2/caramel'),
   ] },
   { id: 'cold', labels: ['Soğuk kahveler', 'Iced drinks', 'Холодные напитки'], note: [
     'Soğuk kahvelerimiz çift shot espresso ile hazırlanır.',
@@ -69,7 +69,7 @@ export const categories = [
     'Холодный кофе готовим на двойном эспрессо.',
   ], items: [
     item('iced-americano', 175, ['Buzlu Americano', 'Iced Americano', 'Айс-американо'], [], 'illustrations/branded/iced-americano'),
-    item('iced-latte', 195, ['Buzlu Latte', 'Iced Latte', 'Айс-латте'], [], 'iced-latte'),
+    item('iced-latte', 195, ['Buzlu Latte', 'Iced Latte', 'Айс-латте'], [], 'illustrations/drinks-v2/iced-latte'),
     item('iced-mocha', 235, ['Buzlu Mocha', 'Iced Mocha', 'Айс-мокко'], [], 'illustrations/branded/iced-mocha'),
     item('frappe', 270, ['Frappé', 'Frappé', 'Фраппе'], [], 'illustrations/branded/frappe'),
     item('iced-matcha', 235, ['Buzlu Matcha', 'Iced Matcha', 'Айс-матча'], [], 'illustrations/branded/iced-matcha'),
