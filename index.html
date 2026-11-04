@@ -7,19 +7,36 @@
   <meta name="color-scheme" content="only light">
   <link rel="preload" as="image" media="(width > 760px)" imagesrcset="assets/hero-wide-640.webp 640w, assets/hero-wide-960.webp 960w" imagesizes="(min-width: 1344px) 596px, (min-width: 1001px) calc(49.35vw - 71px), calc(49.35vw - 50px)" fetchpriority="high">
   <script src="appearance.js?v=20261104-simple"></script>
-  <meta name="description" content="Gazipaşa’da Pocitel Coffee & Brunch. Kahvaltı, focaccia, kahve ve menüden favori eşleşmeler.">
-  <meta property="og:title" content="Pocitel Coffee & Brunch · Gazipaşa">
-  <meta property="og:description" content="İyi kahve, güzel anlar. Menü, kahvaltı ve favori eşleşmeler.">
-  <meta property="og:image" content="https://pocitel-coffee-gazipasa.safalex.chatgpt.site/assets/cilbir.webp">
+  <!-- social-meta:start -->
+  <title>Poçitel Coffee &amp; Brunch · Gazipaşa</title>
+  <link rel="canonical" href="https://safal207.github.io/pocitel-coffee-gazipasa/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Poçitel Coffee &amp; Brunch">
+  <meta property="og:title" content="Poçitel Coffee &amp; Brunch · Gazipaşa">
+  <meta property="og:description" content="İyi kahve, güzel anlar. Kahvaltı, focaccia, kahve ve favori eşleşmeler. Menüyü keşfedin.">
+  <meta property="og:url" content="https://safal207.github.io/pocitel-coffee-gazipasa/">
+  <meta property="og:locale" content="tr_TR">
+  <meta property="og:image" content="https://safal207.github.io/pocitel-coffee-gazipasa/assets/social/menu-1eaec85476a3.jpg">
+  <meta property="og:image:secure_url" content="https://safal207.github.io/pocitel-coffee-gazipasa/assets/social/menu-1eaec85476a3.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="960">
+  <meta property="og:image:height" content="582">
+  <meta property="og:image:alt" content="Poçitel Coffee &amp; Brunch · Çılbır">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Poçitel Coffee &amp; Brunch · Gazipaşa">
+  <meta name="twitter:description" content="İyi kahve, güzel anlar. Kahvaltı, focaccia, kahve ve favori eşleşmeler. Menüyü keşfedin.">
+  <meta name="twitter:image" content="https://safal207.github.io/pocitel-coffee-gazipasa/assets/social/menu-1eaec85476a3.jpg">
+  <meta name="twitter:image:alt" content="Poçitel Coffee &amp; Brunch · Çılbır">
+  <meta name="description" content="İyi kahve, güzel anlar. Kahvaltı, focaccia, kahve ve favori eşleşmeler. Menüyü keşfedin.">
+  <!-- social-meta:end -->
   <meta name="robots" content="noindex">
-  <title>Pocitel Coffee &amp; Brunch · Gazipaşa</title>
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20261104-simple">
+  <link rel="stylesheet" href="style.css?v=20261104-share">
   <link rel="stylesheet" href="appearance.css?v=20261104-simple">
   <link rel="modulepreload" href="menu.js?v=20261104-drinks">
   <link rel="modulepreload" href="order-options.js">
   <link rel="modulepreload" href="checkout-offers.js">
-  <script src="app.js?v=20261104-drinks" type="module"></script>
+  <script src="app.js?v=20261104-share" type="module"></script>
 </head>
 <body>
   <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -192,16 +209,23 @@
     </div>
     <figure class="share-preview">
       <img id="share-photo" alt="">
+      <small class="share-brand">POÇİTEL COFFEE &amp; BRUNCH · GAZİPAŞA</small>
       <figcaption id="share-caption"></figcaption>
     </figure>
     <p id="share-status" role="status"></p>
     <div class="share-actions">
-      <button class="button primary" id="share-photo-button" type="button" data-copy="sharePhoto" disabled>Fotoğrafla paylaş</button>
+      <button class="button primary" id="share-link-button" type="button" data-copy="shareLink" hidden>Bağlantıyı paylaş</button>
+      <button class="button primary" id="copy-link" type="button" data-copy="copyLink">Bağlantıyı kopyala</button>
+    </div>
+    <details id="share-extras">
+    <summary data-copy="photoSeparately">Fotoğrafı ayrıca gönder</summary>
+    <div class="share-actions">
+      <button class="button quiet" id="share-photo-button" type="button" data-copy="sharePhoto" disabled>Fotoğrafla paylaş</button>
       <a class="button quiet" id="save-photo" data-copy="savePhoto" hidden>Fotoğrafı kaydet</a>
     </div>
+    </details>
     <label for="share-link" data-copy="linkLabel">Ürün bağlantısı</label>
     <input id="share-link" type="url" readonly>
-    <button class="button quiet" id="copy-link" type="button" data-copy="copyLink">Bağlantıyı kopyala</button>
   </dialog>
   <dialog id="configure" aria-labelledby="configure-title">
     <div class="configure-header">

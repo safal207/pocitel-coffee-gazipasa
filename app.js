@@ -1,4 +1,6 @@
 import { categories } from './menu.js?v=20261104-drinks';
+import { items, categoryByItem, categoryById, combos, feedOrder, takeawaySuggestions, takeawayItems } from './catalog.js?v=20261104-share';
+import { shareUrl } from './share-links.js?v=20261104-share';
 import { milkOptions, syrupOptions, customization, configurationId, resolveOrderItem, optionLabels, replaceOrderLine } from './order-options.js';
 import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOffer, undoCheckoutOffer } from './checkout-offers.js';
 
@@ -58,11 +60,14 @@ const copy = {
   more: ['Daha fazla göster', 'Show more', 'Показать ещё'],
   paired: ['Bu eşleşmeyi deneyin', 'Try it in this pairing', 'Попробуйте в комбо'],
   share: ['Paylaş', 'Share', 'Поделиться'],
+  shareLink: ['Bağlantıyı paylaş', 'Send link', 'Отправить ссылку'],
+  photoSeparately: ['Fotoğrafı ayrıca gönder', 'Send photo separately', 'Фото отдельно'],
+  linkPreviewHint: ['Bağlantıda ürünün fotoğrafı, adı ve fiyatı bulunur.', 'The link includes this item’s photo, name and price.', 'В превью ссылки — фото, название и цена этой позиции.'],
   sharePhoto: ['Fotoğrafla paylaş', 'Share with photo', 'Поделиться с фото'],
   savePhoto: ['Fotoğrafı kaydet', 'Save photo', 'Сохранить фото'],
   preparingPhoto: ['Fotoğraf hazırlanıyor…', 'Preparing your photo…', 'Готовим фото…'],
   photoReady: ['Ürünün fotoğrafı ve bağlantısı paylaşılmaya hazır.', 'The item’s photo and link are ready to share.', 'Фото блюда и ссылка готовы к отправке.'],
-  photoFallback: ['Fotoğrafı kaydedip bağlantıyla birlikte gönderebilirsiniz.', 'Save the photo and send it together with the link.', 'Сохраните фото и отправьте его вместе со ссылкой.'],
+  photoFallback: ['Bağlantıyı kopyalayıp mesajınıza yapıştırın.', 'Copy the link and paste it into your message.', 'Скопируйте ссылку и вставьте её в сообщение.'],
   photoFailed: ['Fotoğraf yüklenemedi. Tekrar açmayı deneyin veya bağlantıyı kopyalayın.', 'The photo couldn’t load. Try opening this again or copy the link.', 'Фото не загрузилось. Откройте это окно ещё раз или скопируйте ссылку.'],
   linkLabel: ['Ürün bağlantısı', 'Link to this item', 'Ссылка на блюдо'],
   copyLink: ['Bağlantıyı kopyala', 'Copy link', 'Скопировать ссылку'],
@@ -145,28 +150,6 @@ const copy = {
 
 const languages = ['tr', 'en', 'ru'];
 const locales = ['tr-TR', 'en-GB', 'ru-RU'];
-const items = new Map(categories.flatMap(category => category.items.map(entry => [entry.id, entry])));
-const categoryByItem = new Map(categories.flatMap(category => category.items.map(entry => [entry.id, category])));
-const categoryById = new Map(categories.map(category => [category.id, category]));
-const combos = categoryById.get('combos').items;
-const feedOrder = [...combos, ...categories.filter(category => category.id !== 'combos').flatMap(category => category.items)];
-const takeawaySuggestions = {
-  cappuccino: 'granola',
-  'iced-latte': 'granola',
-  'hot-chocolate': 'granola',
-  'iced-matcha': 'granola',
-  chai: 'granola',
-  matcha: 'granola',
-  granola: 'cappuccino',
-  fries: 'iced-latte',
-};
-const takeawayItems = Object.keys(takeawaySuggestions).map(sourceId => {
-  const id = `to-go-${sourceId}`;
-  const entry = { ...items.get(sourceId), id, sourceId, image: `takeaway/${sourceId}` };
-  items.set(id, entry);
-  categoryByItem.set(id, categoryByItem.get(sourceId));
-  return entry;
-});
 const pairedWith = new Map([
   ['cilbir', 'turkish-classic'], ['tea', 'turkish-classic'],
   ['pancake', 'sweet-morning'], ['cappuccino', 'sweet-morning'],
@@ -226,10 +209,11 @@ function restoreSelection() {
 }
 
 const params = new URLSearchParams(location.search);
-let language = languages.indexOf(params.get('lang'));
+const linkedItem = document.documentElement.dataset.shareItem || params.get('item');
+let language = languages.indexOf(document.documentElement.dataset.shareLang || params.get('lang'));
 if (language < 0) language = Math.max(0, languages.indexOf(readSetting(languageKey)));
 let activeCategory = location.hash === '#pairings' ? 'combos' : 'all';
-let takeawayMode = Boolean(items.get(params.get('item'))?.sourceId);
+let takeawayMode = Boolean(items.get(linkedItem)?.sourceId);
 if (takeawayMode) activeCategory = 'all';
 let savedOnly = false;
 let visibleLimit = pageSize;
@@ -237,6 +221,7 @@ let openedPost;
 let postOpener;
 let shareOpener;
 let sharedPost;
+let sharedLink;
 let shareSequence = 0;
 let sharePhotoUrl;
 let touchOrigin;
@@ -519,25 +504,28 @@ function toggleSaved(id) {
 
 async function sharePost(button, id) {
   const entry = items.get(id);
-  // Share only public item parameters, never preview/access query parameters.
-  const url = new URL(location.pathname, location.origin);
-  url.searchParams.set('item', id);
-  url.searchParams.set('lang', languages[language]);
-  url.hash = 'menu';
+  if (!entry) return;
+  const url = shareUrl(id, languages[language]);
   const sequence = ++shareSequence;
   if (sharePhotoUrl) URL.revokeObjectURL(sharePhotoUrl);
   sharePhotoUrl = undefined;
   sharedPost = null;
   shareOpener = button;
-  shareLink.value = url.href;
+  shareLink.value = url;
+  sharedLink = { title: `${name(entry)} · ${price(entry.price)} · Poçitel`, url };
+  $('#share-link-button').hidden = !navigator.share;
+  $('#share-link-button').disabled = false;
+  $('#copy-link').classList.toggle('primary', !navigator.share);
+  $('#copy-link').classList.toggle('quiet', Boolean(navigator.share));
+  $('#share-extras').open = false;
   $('#share-photo').src = `assets/${entry.image}.webp`;
   $('#share-photo').alt = name(entry);
-  $('#share-caption').textContent = `${name(entry)}${entry.sourceId ? ` · ${t('takeaway')}` : ''}`;
+  $('#share-caption').textContent = `${name(entry)}${entry.sourceId ? ` · ${t('takeaway')}` : ''} · ${price(entry.price)}`;
   $('#share-photo-button').hidden = !navigator.share || !navigator.canShare;
   $('#share-photo-button').disabled = true;
   $('#save-photo').hidden = true;
   $('#save-photo').removeAttribute('href');
-  $('#share-status').textContent = t('preparingPhoto');
+  $('#share-status').textContent = t('linkPreviewHint');
   shareDialog.showModal();
   shareDialog.scrollTop = 0;
   try {
@@ -545,7 +533,7 @@ async function sharePost(button, id) {
     if (sequence !== shareSequence || !shareDialog.open) return;
     const file = await prepareSharePhoto(`assets/${entry.image}.webp`, id);
     if (sequence !== shareSequence || !shareDialog.open) return;
-    sharedPost = { files: [file], title: name(entry), text: `${$('#share-caption').textContent} · Poçitel Coffee & Brunch`, url: url.href };
+    sharedPost = { files: [file], title: name(entry), text: `${$('#share-caption').textContent} · Poçitel Coffee & Brunch`, url };
     sharePhotoUrl = URL.createObjectURL(file);
     $('#save-photo').href = sharePhotoUrl;
     $('#save-photo').download = file.name;
@@ -554,11 +542,24 @@ async function sharePost(button, id) {
     try { supported = Boolean(navigator.share && navigator.canShare?.({ files: [file] })); } catch { /* Use download instead. */ }
     $('#share-photo-button').hidden = !supported;
     $('#share-photo-button').disabled = !supported;
-    $('#share-status').textContent = t(supported ? 'photoReady' : 'photoFallback');
   } catch {
     if (sequence !== shareSequence || !shareDialog.open) return;
     $('#share-photo-button').hidden = true;
-    $('#share-status').textContent = t('photoFailed');
+    // A photo download failure must not disable the already-ready public link.
+  }
+}
+
+async function sharePreparedLink() {
+  if (!sharedLink || !navigator.share) return;
+  const sequence = shareSequence;
+  $('#share-link-button').disabled = true;
+  try {
+    await navigator.share(sharedLink);
+    if (sequence === shareSequence && shareDialog.open) shareDialog.close();
+  } catch (error) {
+    if (sequence === shareSequence && error.name !== 'AbortError') $('#share-status').textContent = t('photoFallback');
+  } finally {
+    if (sequence === shareSequence) $('#share-link-button').disabled = false;
   }
 }
 
@@ -838,6 +839,8 @@ document.addEventListener('click', event => {
     sharePost(button, share);
   } else if (button.id === 'copy-link') {
     copyPostLink();
+  } else if (button.id === 'share-link-button') {
+    sharePreparedLink();
   } else if (button.id === 'share-photo-button') {
     sharePreparedPhoto();
   } else if (button.id === 'close-share') {
@@ -942,6 +945,7 @@ viewer.addEventListener('close', () => {
 shareDialog.addEventListener('close', () => {
   shareSequence++;
   sharedPost = null;
+  sharedLink = null;
   if (sharePhotoUrl) URL.revokeObjectURL(sharePhotoUrl);
   sharePhotoUrl = undefined;
   if (shareOpener?.isConnected) shareOpener.focus({ preventScroll: true });
@@ -968,6 +972,5 @@ viewerContent.addEventListener('touchend', event => {
 
 applyLanguage();
 $('#service-picker').hidden = false;
-const linkedItem = params.get('item');
 if (items.has(linkedItem)) openPost([linkedItem], results.querySelector(`[data-post="${linkedItem}"]`) ?? search);
 else if (location.hash === '#pairings') scrollToMenuStart();

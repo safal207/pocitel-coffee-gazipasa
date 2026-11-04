@@ -1,0 +1,1795 @@
+{
+  "publicSiteUrl": "https://safal207.github.io/pocitel-coffee-gazipasa/",
+  "images": {
+    "menu": {
+      "path": "assets/social/menu-1eaec85476a3.jpg",
+      "width": 960,
+      "height": 582,
+      "bytes": 91507
+    },
+    "breakfast-plate": {
+      "path": "assets/social/breakfast-plate-b55173a9b147.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 62174
+    },
+    "omelet-plate": {
+      "path": "assets/social/omelet-plate-1aa02cef54a9.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 61212
+    },
+    "menemen": {
+      "path": "assets/social/menemen-cdb6c9a07c60.jpg",
+      "width": 735,
+      "height": 347,
+      "bytes": 68192
+    },
+    "cilbir": {
+      "path": "assets/social/cilbir-2fb4135b210d.jpg",
+      "width": 620,
+      "height": 924,
+      "bytes": 83536
+    },
+    "pancake": {
+      "path": "assets/social/pancake-a3e3abeb9e3c.jpg",
+      "width": 460,
+      "height": 388,
+      "bytes": 41775
+    },
+    "sucuk": {
+      "path": "assets/social/sucuk-0e8eca3a242a.jpg",
+      "width": 458,
+      "height": 361,
+      "bytes": 39667
+    },
+    "fries": {
+      "path": "assets/social/fries-e910ce2a0188.jpg",
+      "width": 458,
+      "height": 291,
+      "bytes": 30732
+    },
+    "granola": {
+      "path": "assets/social/granola-65ed174cb9d1.jpg",
+      "width": 537,
+      "height": 498,
+      "bytes": 57212
+    },
+    "beetroot": {
+      "path": "assets/social/beetroot-6c060571d0e4.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 62389
+    },
+    "smoked-turkey": {
+      "path": "assets/social/smoked-turkey-5df8a772d8dc.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 59278
+    },
+    "zucchini": {
+      "path": "assets/social/zucchini-cd68e5fe75e8.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 63070
+    },
+    "turkish-coffee": {
+      "path": "assets/social/turkish-coffee-2bac2af63b15.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 54040
+    },
+    "espresso": {
+      "path": "assets/social/espresso-9c4703deaf11.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 36144
+    },
+    "americano": {
+      "path": "assets/social/americano-6144d2caff0f.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 40093
+    },
+    "flat-white": {
+      "path": "assets/social/flat-white-f9a4fc7df0ca.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 42576
+    },
+    "cappuccino": {
+      "path": "assets/social/cappuccino-4992256ebd82.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 44195
+    },
+    "latte": {
+      "path": "assets/social/latte-6a5e87991cf7.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 44138
+    },
+    "cortado": {
+      "path": "assets/social/cortado-847389ca3ed8.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 37118
+    },
+    "mocha": {
+      "path": "assets/social/mocha-581ce2711a07.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 51345
+    },
+    "matcha": {
+      "path": "assets/social/matcha-5126235b67bf.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 42377
+    },
+    "hot-chocolate": {
+      "path": "assets/social/hot-chocolate-6936f5a20f0c.jpg",
+      "width": 960,
+      "height": 640,
+      "bytes": 98770
+    },
+    "chai": {
+      "path": "assets/social/chai-667566a9807c.jpg",
+      "width": 960,
+      "height": 640,
+      "bytes": 103378
+    },
+    "salep": {
+      "path": "assets/social/salep-f21999ec75bb.jpg",
+      "width": 960,
+      "height": 640,
+      "bytes": 98499
+    },
+    "toffee": {
+      "path": "assets/social/toffee-4ca8cc766c1b.jpg",
+      "width": 960,
+      "height": 640,
+      "bytes": 94887
+    },
+    "caramel": {
+      "path": "assets/social/caramel-8947d7f7c332.jpg",
+      "width": 960,
+      "height": 640,
+      "bytes": 93084
+    },
+    "iced-americano": {
+      "path": "assets/social/iced-americano-87bd1a458595.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 50228
+    },
+    "iced-latte": {
+      "path": "assets/social/iced-latte-9c643b02999f.jpg",
+      "width": 960,
+      "height": 640,
+      "bytes": 87110
+    },
+    "iced-mocha": {
+      "path": "assets/social/iced-mocha-299a197ec4a2.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 47788
+    },
+    "frappe": {
+      "path": "assets/social/frappe-f456152e24b0.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 46366
+    },
+    "iced-matcha": {
+      "path": "assets/social/iced-matcha-e42b633d1c62.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 43441
+    },
+    "tea": {
+      "path": "assets/social/tea-3c93df86d805.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 40417
+    },
+    "relax": {
+      "path": "assets/social/relax-3acae8767317.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 47292
+    },
+    "maroc": {
+      "path": "assets/social/maroc-2eef4f42b463.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 43443
+    },
+    "balance": {
+      "path": "assets/social/balance-35fbd2a65b9e.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 41699
+    },
+    "syrup": {
+      "path": "assets/social/syrup-bb4f2a936bb3.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 37994
+    },
+    "plant-milk": {
+      "path": "assets/social/plant-milk-095fed270f01.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 36419
+    },
+    "tomato-cucumber": {
+      "path": "assets/social/tomato-cucumber-310032a649a8.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 47230
+    },
+    "olives": {
+      "path": "assets/social/olives-b59f1ecaeaa8.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 45722
+    },
+    "cheese": {
+      "path": "assets/social/cheese-699711248d7a.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 41203
+    },
+    "egg": {
+      "path": "assets/social/egg-04d66be23842.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 39559
+    },
+    "nutella": {
+      "path": "assets/social/nutella-4296dd868e57.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 40368
+    },
+    "chocolate-sauce": {
+      "path": "assets/social/chocolate-sauce-44b39f44b8d0.jpg",
+      "width": 640,
+      "height": 427,
+      "bytes": 38193
+    },
+    "turkish-classic": {
+      "path": "assets/social/turkish-classic-8b65902e0cfc.jpg",
+      "width": 442,
+      "height": 301,
+      "bytes": 33232
+    },
+    "sweet-morning": {
+      "path": "assets/social/sweet-morning-6ec91bedac49.jpg",
+      "width": 439,
+      "height": 301,
+      "bytes": 29426
+    },
+    "fresh-energy": {
+      "path": "assets/social/fresh-energy-f1f44c76f40f.jpg",
+      "width": 442,
+      "height": 302,
+      "bytes": 32366
+    },
+    "lunch-favourite": {
+      "path": "assets/social/lunch-favourite-3a550cb56b48.jpg",
+      "width": 439,
+      "height": 302,
+      "bytes": 29582
+    },
+    "to-go-cappuccino": {
+      "path": "assets/social/to-go-cappuccino-f4cf0576b640.jpg",
+      "width": 512,
+      "height": 512,
+      "bytes": 39976
+    },
+    "to-go-iced-latte": {
+      "path": "assets/social/to-go-iced-latte-fcb97d73248f.jpg",
+      "width": 512,
+      "height": 512,
+      "bytes": 39813
+    },
+    "to-go-hot-chocolate": {
+      "path": "assets/social/to-go-hot-chocolate-170a7e65c195.jpg",
+      "width": 512,
+      "height": 512,
+      "bytes": 40637
+    },
+    "to-go-iced-matcha": {
+      "path": "assets/social/to-go-iced-matcha-cd39b2e2d556.jpg",
+      "width": 512,
+      "height": 512,
+      "bytes": 41193
+    },
+    "to-go-chai": {
+      "path": "assets/social/to-go-chai-ef4f9785481c.jpg",
+      "width": 512,
+      "height": 512,
+      "bytes": 41703
+    },
+    "to-go-matcha": {
+      "path": "assets/social/to-go-matcha-e488eb5e2d11.jpg",
+      "width": 512,
+      "height": 512,
+      "bytes": 38635
+    },
+    "to-go-granola": {
+      "path": "assets/social/to-go-granola-6f2c0d4070cd.jpg",
+      "width": 640,
+      "height": 640,
+      "bytes": 71867
+    },
+    "to-go-fries": {
+      "path": "assets/social/to-go-fries-aa371f8ec8fd.jpg",
+      "width": 640,
+      "height": 640,
+      "bytes": 59352
+    }
+  },
+  "pages": [
+    {
+      "id": "breakfast-plate",
+      "language": "tr",
+      "path": "share-tr-breakfast-plate.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-breakfast-plate.html",
+      "title": "Kahvaltı Tabağı · 300 ₺ · Poçitel",
+      "description": "2 yumurta (sade omlet veya haşlanmış), peynir, zeytin, salata, reçel, ekmek. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/breakfast-plate-b55173a9b147.jpg"
+    },
+    {
+      "id": "breakfast-plate",
+      "language": "en",
+      "path": "share-en-breakfast-plate.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-breakfast-plate.html",
+      "title": "Breakfast Plate · 300 ₺ · Poçitel",
+      "description": "2 eggs (plain omelet or boiled), cheese, olives, salad, jam, bread. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/breakfast-plate-b55173a9b147.jpg"
+    },
+    {
+      "id": "breakfast-plate",
+      "language": "ru",
+      "path": "share-ru-breakfast-plate.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-breakfast-plate.html",
+      "title": "Тарелка на завтрак · 300 ₺ · Poçitel",
+      "description": "2 яйца (простой омлет или варёные), сыр, оливки, салат, варенье, хлеб. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/breakfast-plate-b55173a9b147.jpg"
+    },
+    {
+      "id": "omelet-plate",
+      "language": "tr",
+      "path": "share-tr-omelet-plate.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-omelet-plate.html",
+      "title": "Omlet Tabağı · 320 ₺ · Poçitel",
+      "description": "2 yumurtalı omlet (mantarlı veya kaşarlı), peynir, zeytin, salata, reçel, ekmek. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/omelet-plate-1aa02cef54a9.jpg"
+    },
+    {
+      "id": "omelet-plate",
+      "language": "en",
+      "path": "share-en-omelet-plate.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-omelet-plate.html",
+      "title": "Omelet Plate · 320 ₺ · Poçitel",
+      "description": "2-egg omelet (mushroom or kaşar cheese), cheese, olives, salad, jam, bread. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/omelet-plate-1aa02cef54a9.jpg"
+    },
+    {
+      "id": "omelet-plate",
+      "language": "ru",
+      "path": "share-ru-omelet-plate.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-omelet-plate.html",
+      "title": "Тарелка с омлетом · 320 ₺ · Poçitel",
+      "description": "Омлет из 2 яиц (с грибами или сыром кашар), сыр, оливки, салат, варенье, хлеб. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/omelet-plate-1aa02cef54a9.jpg"
+    },
+    {
+      "id": "menemen",
+      "language": "tr",
+      "path": "share-tr-menemen.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-menemen.html",
+      "title": "Menemen · 330 ₺ · Poçitel",
+      "description": "2 yumurta, soğan, biber, domates, ekmek, salata. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/menemen-cdb6c9a07c60.jpg"
+    },
+    {
+      "id": "menemen",
+      "language": "en",
+      "path": "share-en-menemen.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-menemen.html",
+      "title": "Menemen · 330 ₺ · Poçitel",
+      "description": "2 eggs, onion, peppers, tomato, bread, salad. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/menemen-cdb6c9a07c60.jpg"
+    },
+    {
+      "id": "menemen",
+      "language": "ru",
+      "path": "share-ru-menemen.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-menemen.html",
+      "title": "Менемен · 330 ₺ · Poçitel",
+      "description": "2 яйца, лук, перец, томаты, хлеб, салат. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/menemen-cdb6c9a07c60.jpg"
+    },
+    {
+      "id": "cilbir",
+      "language": "tr",
+      "path": "share-tr-cilbir.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-cilbir.html",
+      "title": "Çılbır · 330 ₺ · Poçitel",
+      "description": "2 poşe yumurta, yoğurt, acı biberli zeytinyağı, ekmek. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/cilbir-2fb4135b210d.jpg"
+    },
+    {
+      "id": "cilbir",
+      "language": "en",
+      "path": "share-en-cilbir.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-cilbir.html",
+      "title": "Çılbır · 330 ₺ · Poçitel",
+      "description": "2 poached eggs, yogurt, chili olive oil, bread. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/cilbir-2fb4135b210d.jpg"
+    },
+    {
+      "id": "cilbir",
+      "language": "ru",
+      "path": "share-ru-cilbir.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-cilbir.html",
+      "title": "Чылбыр · 330 ₺ · Poçitel",
+      "description": "2 яйца пашот, йогурт, оливковое масло с чили, хлеб. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/cilbir-2fb4135b210d.jpg"
+    },
+    {
+      "id": "pancake",
+      "language": "tr",
+      "path": "share-tr-pancake.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-pancake.html",
+      "title": "Pancake · 300 ₺ · Poçitel",
+      "description": "5 pancake, meyve, Nutella. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/pancake-a3e3abeb9e3c.jpg"
+    },
+    {
+      "id": "pancake",
+      "language": "en",
+      "path": "share-en-pancake.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-pancake.html",
+      "title": "Pancake · 300 ₺ · Poçitel",
+      "description": "5 pancakes, fruit, Nutella. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/pancake-a3e3abeb9e3c.jpg"
+    },
+    {
+      "id": "pancake",
+      "language": "ru",
+      "path": "share-ru-pancake.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-pancake.html",
+      "title": "Панкейки · 300 ₺ · Poçitel",
+      "description": "5 панкейков, фрукты, Nutella. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/pancake-a3e3abeb9e3c.jpg"
+    },
+    {
+      "id": "sucuk",
+      "language": "tr",
+      "path": "share-tr-sucuk.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-sucuk.html",
+      "title": "Sucuklu Yumurta · 300 ₺ · Poçitel",
+      "description": "2 yumurta, sucuk, ekmek, salata. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/sucuk-0e8eca3a242a.jpg"
+    },
+    {
+      "id": "sucuk",
+      "language": "en",
+      "path": "share-en-sucuk.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-sucuk.html",
+      "title": "Eggs with Sucuk · 300 ₺ · Poçitel",
+      "description": "2 eggs, sucuk, bread, salad. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/sucuk-0e8eca3a242a.jpg"
+    },
+    {
+      "id": "sucuk",
+      "language": "ru",
+      "path": "share-ru-sucuk.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-sucuk.html",
+      "title": "Яйца с суджуком · 300 ₺ · Poçitel",
+      "description": "2 яйца, суджук, хлеб, салат. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/sucuk-0e8eca3a242a.jpg"
+    },
+    {
+      "id": "fries",
+      "language": "tr",
+      "path": "share-tr-fries.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-fries.html",
+      "title": "Patates Kızartması · 150 ₺ · Poçitel",
+      "description": "Çıtır patates kızartması. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/fries-e910ce2a0188.jpg"
+    },
+    {
+      "id": "fries",
+      "language": "en",
+      "path": "share-en-fries.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-fries.html",
+      "title": "French Fries · 150 ₺ · Poçitel",
+      "description": "Crispy fries. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/fries-e910ce2a0188.jpg"
+    },
+    {
+      "id": "fries",
+      "language": "ru",
+      "path": "share-ru-fries.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-fries.html",
+      "title": "Картофель фри · 150 ₺ · Poçitel",
+      "description": "Хрустящий картофель фри. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/fries-e910ce2a0188.jpg"
+    },
+    {
+      "id": "granola",
+      "language": "tr",
+      "path": "share-tr-granola.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-granola.html",
+      "title": "Meyveli Granola Bowl · 300 ₺ · Poçitel",
+      "description": "Yoğurt, karışık meyve, granola, ceviz. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/granola-65ed174cb9d1.jpg"
+    },
+    {
+      "id": "granola",
+      "language": "en",
+      "path": "share-en-granola.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-granola.html",
+      "title": "Fruity Granola Bowl · 300 ₺ · Poçitel",
+      "description": "Yogurt, mixed fruit, granola, walnut. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/granola-65ed174cb9d1.jpg"
+    },
+    {
+      "id": "granola",
+      "language": "ru",
+      "path": "share-ru-granola.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-granola.html",
+      "title": "Гранола с фруктами · 300 ₺ · Poçitel",
+      "description": "Йогурт, фрукты, гранола, грецкий орех. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/granola-65ed174cb9d1.jpg"
+    },
+    {
+      "id": "beetroot",
+      "language": "tr",
+      "path": "share-tr-beetroot.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-beetroot.html",
+      "title": "Pancarlı Focaccia Sandviç · 220 ₺ · Poçitel",
+      "description": "Beyaz peynir, pancar, roka, humus, avokado sosu. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/beetroot-6c060571d0e4.jpg"
+    },
+    {
+      "id": "beetroot",
+      "language": "en",
+      "path": "share-en-beetroot.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-beetroot.html",
+      "title": "Beetroot Focaccia Sandwich · 220 ₺ · Poçitel",
+      "description": "White cheese, beetroot, arugula, hummus, avocado sauce. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/beetroot-6c060571d0e4.jpg"
+    },
+    {
+      "id": "beetroot",
+      "language": "ru",
+      "path": "share-ru-beetroot.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-beetroot.html",
+      "title": "Фокачча со свёклой · 220 ₺ · Poçitel",
+      "description": "Белый сыр, свёкла, руккола, хумус, соус из авокадо. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/beetroot-6c060571d0e4.jpg"
+    },
+    {
+      "id": "smoked-turkey",
+      "language": "tr",
+      "path": "share-tr-smoked-turkey.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-smoked-turkey.html",
+      "title": "Hindi Fümeli Focaccia Sandviç · 240 ₺ · Poçitel",
+      "description": "Hindi füme, domates, roka, avokado sosu. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/smoked-turkey-5df8a772d8dc.jpg"
+    },
+    {
+      "id": "smoked-turkey",
+      "language": "en",
+      "path": "share-en-smoked-turkey.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-smoked-turkey.html",
+      "title": "Smoked Turkey Focaccia Sandwich · 240 ₺ · Poçitel",
+      "description": "Smoked turkey, tomato, arugula, avocado sauce. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/smoked-turkey-5df8a772d8dc.jpg"
+    },
+    {
+      "id": "smoked-turkey",
+      "language": "ru",
+      "path": "share-ru-smoked-turkey.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-smoked-turkey.html",
+      "title": "Фокачча с копчёной индейкой · 240 ₺ · Poçitel",
+      "description": "Копчёная индейка, томаты, руккола, соус из авокадо. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/smoked-turkey-5df8a772d8dc.jpg"
+    },
+    {
+      "id": "zucchini",
+      "language": "tr",
+      "path": "share-tr-zucchini.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-zucchini.html",
+      "title": "Kabaklı Focaccia Sandviç · 240 ₺ · Poçitel",
+      "description": "Kırmızı pesto, ricotta peyniri, ızgara kabak, roka. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/zucchini-cd68e5fe75e8.jpg"
+    },
+    {
+      "id": "zucchini",
+      "language": "en",
+      "path": "share-en-zucchini.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-zucchini.html",
+      "title": "Zucchini Focaccia Sandwich · 240 ₺ · Poçitel",
+      "description": "Red pesto, ricotta cheese, grilled zucchini, arugula. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/zucchini-cd68e5fe75e8.jpg"
+    },
+    {
+      "id": "zucchini",
+      "language": "ru",
+      "path": "share-ru-zucchini.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-zucchini.html",
+      "title": "Фокачча с цукини · 240 ₺ · Poçitel",
+      "description": "Красный песто, рикотта, цукини на гриле, руккола. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/zucchini-cd68e5fe75e8.jpg"
+    },
+    {
+      "id": "turkish-coffee",
+      "language": "tr",
+      "path": "share-tr-turkish-coffee.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-turkish-coffee.html",
+      "title": "Türk Kahvesi · 100 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/turkish-coffee-2bac2af63b15.jpg"
+    },
+    {
+      "id": "turkish-coffee",
+      "language": "en",
+      "path": "share-en-turkish-coffee.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-turkish-coffee.html",
+      "title": "Turkish Coffee · 100 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/turkish-coffee-2bac2af63b15.jpg"
+    },
+    {
+      "id": "turkish-coffee",
+      "language": "ru",
+      "path": "share-ru-turkish-coffee.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-turkish-coffee.html",
+      "title": "Турецкий кофе · 100 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/turkish-coffee-2bac2af63b15.jpg"
+    },
+    {
+      "id": "espresso",
+      "language": "tr",
+      "path": "share-tr-espresso.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-espresso.html",
+      "title": "Espresso · 130 ₺ · Poçitel",
+      "description": "30 ml. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/espresso-9c4703deaf11.jpg"
+    },
+    {
+      "id": "espresso",
+      "language": "en",
+      "path": "share-en-espresso.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-espresso.html",
+      "title": "Espresso · 130 ₺ · Poçitel",
+      "description": "30 ml. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/espresso-9c4703deaf11.jpg"
+    },
+    {
+      "id": "espresso",
+      "language": "ru",
+      "path": "share-ru-espresso.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-espresso.html",
+      "title": "Эспрессо · 130 ₺ · Poçitel",
+      "description": "30 мл. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/espresso-9c4703deaf11.jpg"
+    },
+    {
+      "id": "americano",
+      "language": "tr",
+      "path": "share-tr-americano.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-americano.html",
+      "title": "Americano · 165 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/americano-6144d2caff0f.jpg"
+    },
+    {
+      "id": "americano",
+      "language": "en",
+      "path": "share-en-americano.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-americano.html",
+      "title": "Americano · 165 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/americano-6144d2caff0f.jpg"
+    },
+    {
+      "id": "americano",
+      "language": "ru",
+      "path": "share-ru-americano.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-americano.html",
+      "title": "Американо · 165 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/americano-6144d2caff0f.jpg"
+    },
+    {
+      "id": "flat-white",
+      "language": "tr",
+      "path": "share-tr-flat-white.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-flat-white.html",
+      "title": "Flat White · 185 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/flat-white-f9a4fc7df0ca.jpg"
+    },
+    {
+      "id": "flat-white",
+      "language": "en",
+      "path": "share-en-flat-white.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-flat-white.html",
+      "title": "Flat White · 185 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/flat-white-f9a4fc7df0ca.jpg"
+    },
+    {
+      "id": "flat-white",
+      "language": "ru",
+      "path": "share-ru-flat-white.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-flat-white.html",
+      "title": "Флэт уайт · 185 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/flat-white-f9a4fc7df0ca.jpg"
+    },
+    {
+      "id": "cappuccino",
+      "language": "tr",
+      "path": "share-tr-cappuccino.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-cappuccino.html",
+      "title": "Cappuccino · 185 ₺ · Poçitel",
+      "description": "180 ml. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/cappuccino-4992256ebd82.jpg"
+    },
+    {
+      "id": "cappuccino",
+      "language": "en",
+      "path": "share-en-cappuccino.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-cappuccino.html",
+      "title": "Cappuccino · 185 ₺ · Poçitel",
+      "description": "180 ml. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/cappuccino-4992256ebd82.jpg"
+    },
+    {
+      "id": "cappuccino",
+      "language": "ru",
+      "path": "share-ru-cappuccino.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-cappuccino.html",
+      "title": "Капучино · 185 ₺ · Poçitel",
+      "description": "180 мл. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/cappuccino-4992256ebd82.jpg"
+    },
+    {
+      "id": "latte",
+      "language": "tr",
+      "path": "share-tr-latte.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-latte.html",
+      "title": "Caffè Latte · 185 ₺ · Poçitel",
+      "description": "250 ml. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/latte-6a5e87991cf7.jpg"
+    },
+    {
+      "id": "latte",
+      "language": "en",
+      "path": "share-en-latte.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-latte.html",
+      "title": "Caffè Latte · 185 ₺ · Poçitel",
+      "description": "250 ml. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/latte-6a5e87991cf7.jpg"
+    },
+    {
+      "id": "latte",
+      "language": "ru",
+      "path": "share-ru-latte.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-latte.html",
+      "title": "Латте · 185 ₺ · Poçitel",
+      "description": "250 мл. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/latte-6a5e87991cf7.jpg"
+    },
+    {
+      "id": "cortado",
+      "language": "tr",
+      "path": "share-tr-cortado.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-cortado.html",
+      "title": "Cortado · 165 ₺ · Poçitel",
+      "description": "120 ml. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/cortado-847389ca3ed8.jpg"
+    },
+    {
+      "id": "cortado",
+      "language": "en",
+      "path": "share-en-cortado.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-cortado.html",
+      "title": "Cortado · 165 ₺ · Poçitel",
+      "description": "120 ml. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/cortado-847389ca3ed8.jpg"
+    },
+    {
+      "id": "cortado",
+      "language": "ru",
+      "path": "share-ru-cortado.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-cortado.html",
+      "title": "Кортадо · 165 ₺ · Poçitel",
+      "description": "120 мл. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/cortado-847389ca3ed8.jpg"
+    },
+    {
+      "id": "mocha",
+      "language": "tr",
+      "path": "share-tr-mocha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-mocha.html",
+      "title": "Dark Mocha · 225 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/mocha-581ce2711a07.jpg"
+    },
+    {
+      "id": "mocha",
+      "language": "en",
+      "path": "share-en-mocha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-mocha.html",
+      "title": "Dark Mocha · 225 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/mocha-581ce2711a07.jpg"
+    },
+    {
+      "id": "mocha",
+      "language": "ru",
+      "path": "share-ru-mocha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-mocha.html",
+      "title": "Тёмный мокко · 225 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/mocha-581ce2711a07.jpg"
+    },
+    {
+      "id": "matcha",
+      "language": "tr",
+      "path": "share-tr-matcha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-matcha.html",
+      "title": "Matcha · 220 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/matcha-5126235b67bf.jpg"
+    },
+    {
+      "id": "matcha",
+      "language": "en",
+      "path": "share-en-matcha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-matcha.html",
+      "title": "Matcha · 220 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/matcha-5126235b67bf.jpg"
+    },
+    {
+      "id": "matcha",
+      "language": "ru",
+      "path": "share-ru-matcha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-matcha.html",
+      "title": "Матча · 220 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/matcha-5126235b67bf.jpg"
+    },
+    {
+      "id": "hot-chocolate",
+      "language": "tr",
+      "path": "share-tr-hot-chocolate.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-hot-chocolate.html",
+      "title": "Sıcak Çikolata · 200 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/hot-chocolate-6936f5a20f0c.jpg"
+    },
+    {
+      "id": "hot-chocolate",
+      "language": "en",
+      "path": "share-en-hot-chocolate.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-hot-chocolate.html",
+      "title": "Hot Chocolate · 200 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/hot-chocolate-6936f5a20f0c.jpg"
+    },
+    {
+      "id": "hot-chocolate",
+      "language": "ru",
+      "path": "share-ru-hot-chocolate.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-hot-chocolate.html",
+      "title": "Горячий шоколад · 200 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/hot-chocolate-6936f5a20f0c.jpg"
+    },
+    {
+      "id": "chai",
+      "language": "tr",
+      "path": "share-tr-chai.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-chai.html",
+      "title": "Chai Tea Latte · 200 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/chai-667566a9807c.jpg"
+    },
+    {
+      "id": "chai",
+      "language": "en",
+      "path": "share-en-chai.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-chai.html",
+      "title": "Chai Tea Latte · 200 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/chai-667566a9807c.jpg"
+    },
+    {
+      "id": "chai",
+      "language": "ru",
+      "path": "share-ru-chai.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-chai.html",
+      "title": "Чай латте · 200 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/chai-667566a9807c.jpg"
+    },
+    {
+      "id": "salep",
+      "language": "tr",
+      "path": "share-tr-salep.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-salep.html",
+      "title": "Salep · 180 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/salep-f21999ec75bb.jpg"
+    },
+    {
+      "id": "salep",
+      "language": "en",
+      "path": "share-en-salep.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-salep.html",
+      "title": "Salep · 180 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/salep-f21999ec75bb.jpg"
+    },
+    {
+      "id": "salep",
+      "language": "ru",
+      "path": "share-ru-salep.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-salep.html",
+      "title": "Салеп · 180 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/salep-f21999ec75bb.jpg"
+    },
+    {
+      "id": "toffee",
+      "language": "tr",
+      "path": "share-tr-toffee.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-toffee.html",
+      "title": "Toffee Nut Latte · 220 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/toffee-4ca8cc766c1b.jpg"
+    },
+    {
+      "id": "toffee",
+      "language": "en",
+      "path": "share-en-toffee.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-toffee.html",
+      "title": "Toffee Nut Latte · 220 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/toffee-4ca8cc766c1b.jpg"
+    },
+    {
+      "id": "toffee",
+      "language": "ru",
+      "path": "share-ru-toffee.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-toffee.html",
+      "title": "Латте «Ореховая ириска» · 220 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/toffee-4ca8cc766c1b.jpg"
+    },
+    {
+      "id": "caramel",
+      "language": "tr",
+      "path": "share-tr-caramel.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-caramel.html",
+      "title": "Caramel Drizzle · 220 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/caramel-8947d7f7c332.jpg"
+    },
+    {
+      "id": "caramel",
+      "language": "en",
+      "path": "share-en-caramel.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-caramel.html",
+      "title": "Caramel Drizzle · 220 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/caramel-8947d7f7c332.jpg"
+    },
+    {
+      "id": "caramel",
+      "language": "ru",
+      "path": "share-ru-caramel.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-caramel.html",
+      "title": "Карамельный напиток Caramel Drizzle · 220 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/caramel-8947d7f7c332.jpg"
+    },
+    {
+      "id": "iced-americano",
+      "language": "tr",
+      "path": "share-tr-iced-americano.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-iced-americano.html",
+      "title": "Buzlu Americano · 175 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/iced-americano-87bd1a458595.jpg"
+    },
+    {
+      "id": "iced-americano",
+      "language": "en",
+      "path": "share-en-iced-americano.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-iced-americano.html",
+      "title": "Iced Americano · 175 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/iced-americano-87bd1a458595.jpg"
+    },
+    {
+      "id": "iced-americano",
+      "language": "ru",
+      "path": "share-ru-iced-americano.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-iced-americano.html",
+      "title": "Айс-американо · 175 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/iced-americano-87bd1a458595.jpg"
+    },
+    {
+      "id": "iced-latte",
+      "language": "tr",
+      "path": "share-tr-iced-latte.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-iced-latte.html",
+      "title": "Buzlu Latte · 195 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/iced-latte-9c643b02999f.jpg"
+    },
+    {
+      "id": "iced-latte",
+      "language": "en",
+      "path": "share-en-iced-latte.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-iced-latte.html",
+      "title": "Iced Latte · 195 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/iced-latte-9c643b02999f.jpg"
+    },
+    {
+      "id": "iced-latte",
+      "language": "ru",
+      "path": "share-ru-iced-latte.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-iced-latte.html",
+      "title": "Айс-латте · 195 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/iced-latte-9c643b02999f.jpg"
+    },
+    {
+      "id": "iced-mocha",
+      "language": "tr",
+      "path": "share-tr-iced-mocha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-iced-mocha.html",
+      "title": "Buzlu Mocha · 235 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/iced-mocha-299a197ec4a2.jpg"
+    },
+    {
+      "id": "iced-mocha",
+      "language": "en",
+      "path": "share-en-iced-mocha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-iced-mocha.html",
+      "title": "Iced Mocha · 235 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/iced-mocha-299a197ec4a2.jpg"
+    },
+    {
+      "id": "iced-mocha",
+      "language": "ru",
+      "path": "share-ru-iced-mocha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-iced-mocha.html",
+      "title": "Айс-мокко · 235 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/iced-mocha-299a197ec4a2.jpg"
+    },
+    {
+      "id": "frappe",
+      "language": "tr",
+      "path": "share-tr-frappe.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-frappe.html",
+      "title": "Frappé · 270 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/frappe-f456152e24b0.jpg"
+    },
+    {
+      "id": "frappe",
+      "language": "en",
+      "path": "share-en-frappe.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-frappe.html",
+      "title": "Frappé · 270 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/frappe-f456152e24b0.jpg"
+    },
+    {
+      "id": "frappe",
+      "language": "ru",
+      "path": "share-ru-frappe.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-frappe.html",
+      "title": "Фраппе · 270 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/frappe-f456152e24b0.jpg"
+    },
+    {
+      "id": "iced-matcha",
+      "language": "tr",
+      "path": "share-tr-iced-matcha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-iced-matcha.html",
+      "title": "Buzlu Matcha · 235 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/iced-matcha-e42b633d1c62.jpg"
+    },
+    {
+      "id": "iced-matcha",
+      "language": "en",
+      "path": "share-en-iced-matcha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-iced-matcha.html",
+      "title": "Iced Matcha · 235 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/iced-matcha-e42b633d1c62.jpg"
+    },
+    {
+      "id": "iced-matcha",
+      "language": "ru",
+      "path": "share-ru-iced-matcha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-iced-matcha.html",
+      "title": "Айс-матча · 235 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/iced-matcha-e42b633d1c62.jpg"
+    },
+    {
+      "id": "tea",
+      "language": "tr",
+      "path": "share-tr-tea.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-tea.html",
+      "title": "Çay · 30 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/tea-3c93df86d805.jpg"
+    },
+    {
+      "id": "tea",
+      "language": "en",
+      "path": "share-en-tea.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-tea.html",
+      "title": "Turkish Tea · 30 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/tea-3c93df86d805.jpg"
+    },
+    {
+      "id": "tea",
+      "language": "ru",
+      "path": "share-ru-tea.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-tea.html",
+      "title": "Турецкий чай · 30 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/tea-3c93df86d805.jpg"
+    },
+    {
+      "id": "relax",
+      "language": "tr",
+      "path": "share-tr-relax.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-relax.html",
+      "title": "Relax Çayı · 130 ₺ · Poçitel",
+      "description": "Lavantalı rooibos çayı. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/relax-3acae8767317.jpg"
+    },
+    {
+      "id": "relax",
+      "language": "en",
+      "path": "share-en-relax.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-relax.html",
+      "title": "Relax Tea · 130 ₺ · Poçitel",
+      "description": "Lavender rooibos tea. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/relax-3acae8767317.jpg"
+    },
+    {
+      "id": "relax",
+      "language": "ru",
+      "path": "share-ru-relax.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-relax.html",
+      "title": "Чай Relax · 130 ₺ · Poçitel",
+      "description": "Ройбуш с лавандой. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/relax-3acae8767317.jpg"
+    },
+    {
+      "id": "maroc",
+      "language": "tr",
+      "path": "share-tr-maroc.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-maroc.html",
+      "title": "Maroc Çayı · 130 ₺ · Poçitel",
+      "description": "Naneli yeşil çay. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/maroc-2eef4f42b463.jpg"
+    },
+    {
+      "id": "maroc",
+      "language": "en",
+      "path": "share-en-maroc.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-maroc.html",
+      "title": "Maroc Tea · 130 ₺ · Poçitel",
+      "description": "Mint green tea. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/maroc-2eef4f42b463.jpg"
+    },
+    {
+      "id": "maroc",
+      "language": "ru",
+      "path": "share-ru-maroc.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-maroc.html",
+      "title": "Чай Maroc · 130 ₺ · Poçitel",
+      "description": "Зелёный чай с мятой. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/maroc-2eef4f42b463.jpg"
+    },
+    {
+      "id": "balance",
+      "language": "tr",
+      "path": "share-tr-balance.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-balance.html",
+      "title": "Balance Çayı · 130 ₺ · Poçitel",
+      "description": "Yeşil çay. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/balance-35fbd2a65b9e.jpg"
+    },
+    {
+      "id": "balance",
+      "language": "en",
+      "path": "share-en-balance.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-balance.html",
+      "title": "Balance Tea · 130 ₺ · Poçitel",
+      "description": "Green tea. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/balance-35fbd2a65b9e.jpg"
+    },
+    {
+      "id": "balance",
+      "language": "ru",
+      "path": "share-ru-balance.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-balance.html",
+      "title": "Чай Balance · 130 ₺ · Poçitel",
+      "description": "Зелёный чай. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/balance-35fbd2a65b9e.jpg"
+    },
+    {
+      "id": "syrup",
+      "language": "tr",
+      "path": "share-tr-syrup.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-syrup.html",
+      "title": "Kahve Şurubu · 30 ₺ · Poçitel",
+      "description": "Vanilya, karamel, fındık, hindistan cevizi. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/syrup-bb4f2a936bb3.jpg"
+    },
+    {
+      "id": "syrup",
+      "language": "en",
+      "path": "share-en-syrup.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-syrup.html",
+      "title": "Coffee Syrup · 30 ₺ · Poçitel",
+      "description": "Vanilla, caramel, hazelnut, coconut. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/syrup-bb4f2a936bb3.jpg"
+    },
+    {
+      "id": "syrup",
+      "language": "ru",
+      "path": "share-ru-syrup.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-syrup.html",
+      "title": "Сироп для кофе · 30 ₺ · Poçitel",
+      "description": "Ваниль, карамель, фундук, кокос. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/syrup-bb4f2a936bb3.jpg"
+    },
+    {
+      "id": "plant-milk",
+      "language": "tr",
+      "path": "share-tr-plant-milk.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-plant-milk.html",
+      "title": "Bitkisel Süt · 50 ₺ · Poçitel",
+      "description": "Badem veya yulaf. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/plant-milk-095fed270f01.jpg"
+    },
+    {
+      "id": "plant-milk",
+      "language": "en",
+      "path": "share-en-plant-milk.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-plant-milk.html",
+      "title": "Plant-based Milk · 50 ₺ · Poçitel",
+      "description": "Almond or oat. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/plant-milk-095fed270f01.jpg"
+    },
+    {
+      "id": "plant-milk",
+      "language": "ru",
+      "path": "share-ru-plant-milk.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-plant-milk.html",
+      "title": "Растительное молоко · 50 ₺ · Poçitel",
+      "description": "Миндальное или овсяное. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/plant-milk-095fed270f01.jpg"
+    },
+    {
+      "id": "tomato-cucumber",
+      "language": "tr",
+      "path": "share-tr-tomato-cucumber.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-tomato-cucumber.html",
+      "title": "Domates & Salatalık · 40 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/tomato-cucumber-310032a649a8.jpg"
+    },
+    {
+      "id": "tomato-cucumber",
+      "language": "en",
+      "path": "share-en-tomato-cucumber.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-tomato-cucumber.html",
+      "title": "Tomato & Cucumber · 40 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/tomato-cucumber-310032a649a8.jpg"
+    },
+    {
+      "id": "tomato-cucumber",
+      "language": "ru",
+      "path": "share-ru-tomato-cucumber.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-tomato-cucumber.html",
+      "title": "Помидоры и огурцы · 40 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/tomato-cucumber-310032a649a8.jpg"
+    },
+    {
+      "id": "olives",
+      "language": "tr",
+      "path": "share-tr-olives.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-olives.html",
+      "title": "Zeytin · 30 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/olives-b59f1ecaeaa8.jpg"
+    },
+    {
+      "id": "olives",
+      "language": "en",
+      "path": "share-en-olives.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-olives.html",
+      "title": "Olives · 30 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/olives-b59f1ecaeaa8.jpg"
+    },
+    {
+      "id": "olives",
+      "language": "ru",
+      "path": "share-ru-olives.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-olives.html",
+      "title": "Оливки · 30 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/olives-b59f1ecaeaa8.jpg"
+    },
+    {
+      "id": "cheese",
+      "language": "tr",
+      "path": "share-tr-cheese.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-cheese.html",
+      "title": "Dilim Peynir · 60 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/cheese-699711248d7a.jpg"
+    },
+    {
+      "id": "cheese",
+      "language": "en",
+      "path": "share-en-cheese.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-cheese.html",
+      "title": "Sliced Cheese · 60 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/cheese-699711248d7a.jpg"
+    },
+    {
+      "id": "cheese",
+      "language": "ru",
+      "path": "share-ru-cheese.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-cheese.html",
+      "title": "Ломтики сыра · 60 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/cheese-699711248d7a.jpg"
+    },
+    {
+      "id": "egg",
+      "language": "tr",
+      "path": "share-tr-egg.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-egg.html",
+      "title": "Ekstra Yumurta · 30 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/egg-04d66be23842.jpg"
+    },
+    {
+      "id": "egg",
+      "language": "en",
+      "path": "share-en-egg.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-egg.html",
+      "title": "Extra Egg · 30 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/egg-04d66be23842.jpg"
+    },
+    {
+      "id": "egg",
+      "language": "ru",
+      "path": "share-ru-egg.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-egg.html",
+      "title": "Дополнительное яйцо · 30 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/egg-04d66be23842.jpg"
+    },
+    {
+      "id": "nutella",
+      "language": "tr",
+      "path": "share-tr-nutella.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-nutella.html",
+      "title": "Nutella · 50 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/nutella-4296dd868e57.jpg"
+    },
+    {
+      "id": "nutella",
+      "language": "en",
+      "path": "share-en-nutella.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-nutella.html",
+      "title": "Nutella · 50 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/nutella-4296dd868e57.jpg"
+    },
+    {
+      "id": "nutella",
+      "language": "ru",
+      "path": "share-ru-nutella.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-nutella.html",
+      "title": "Nutella · 50 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/nutella-4296dd868e57.jpg"
+    },
+    {
+      "id": "chocolate-sauce",
+      "language": "tr",
+      "path": "share-tr-chocolate-sauce.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-chocolate-sauce.html",
+      "title": "Belçika Çikolata Sosu · 70 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/chocolate-sauce-44b39f44b8d0.jpg"
+    },
+    {
+      "id": "chocolate-sauce",
+      "language": "en",
+      "path": "share-en-chocolate-sauce.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-chocolate-sauce.html",
+      "title": "Belgian Chocolate Sauce · 70 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/chocolate-sauce-44b39f44b8d0.jpg"
+    },
+    {
+      "id": "chocolate-sauce",
+      "language": "ru",
+      "path": "share-ru-chocolate-sauce.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-chocolate-sauce.html",
+      "title": "Соус из бельгийского шоколада · 70 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/chocolate-sauce-44b39f44b8d0.jpg"
+    },
+    {
+      "id": "turkish-classic",
+      "language": "tr",
+      "path": "share-tr-turkish-classic.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-turkish-classic.html",
+      "title": "Türk Klasiği · 345 ₺ · Poçitel",
+      "description": "Çılbır + Türk çayı. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/turkish-classic-8b65902e0cfc.jpg"
+    },
+    {
+      "id": "turkish-classic",
+      "language": "en",
+      "path": "share-en-turkish-classic.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-turkish-classic.html",
+      "title": "Turkish Classic · 345 ₺ · Poçitel",
+      "description": "Çılbır + Turkish tea. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/turkish-classic-8b65902e0cfc.jpg"
+    },
+    {
+      "id": "turkish-classic",
+      "language": "ru",
+      "path": "share-ru-turkish-classic.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-turkish-classic.html",
+      "title": "Турецкая классика · 345 ₺ · Poçitel",
+      "description": "Чылбыр + турецкий чай. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/turkish-classic-8b65902e0cfc.jpg"
+    },
+    {
+      "id": "sweet-morning",
+      "language": "tr",
+      "path": "share-tr-sweet-morning.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-sweet-morning.html",
+      "title": "Tatlı Sabah · 460 ₺ · Poçitel",
+      "description": "Pancake + Cappuccino. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/sweet-morning-6ec91bedac49.jpg"
+    },
+    {
+      "id": "sweet-morning",
+      "language": "en",
+      "path": "share-en-sweet-morning.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-sweet-morning.html",
+      "title": "Sweet Morning · 460 ₺ · Poçitel",
+      "description": "Pancakes + cappuccino. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/sweet-morning-6ec91bedac49.jpg"
+    },
+    {
+      "id": "sweet-morning",
+      "language": "ru",
+      "path": "share-ru-sweet-morning.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-sweet-morning.html",
+      "title": "Сладкое утро · 460 ₺ · Poçitel",
+      "description": "Панкейки + капучино. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/sweet-morning-6ec91bedac49.jpg"
+    },
+    {
+      "id": "fresh-energy",
+      "language": "tr",
+      "path": "share-tr-fresh-energy.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-fresh-energy.html",
+      "title": "Taze Enerji · 510 ₺ · Poçitel",
+      "description": "Meyveli Granola Bowl + Buzlu Matcha. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/fresh-energy-f1f44c76f40f.jpg"
+    },
+    {
+      "id": "fresh-energy",
+      "language": "en",
+      "path": "share-en-fresh-energy.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-fresh-energy.html",
+      "title": "Fresh Energy · 510 ₺ · Poçitel",
+      "description": "Fruity granola bowl + iced matcha. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/fresh-energy-f1f44c76f40f.jpg"
+    },
+    {
+      "id": "fresh-energy",
+      "language": "ru",
+      "path": "share-ru-fresh-energy.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-fresh-energy.html",
+      "title": "Бодрое утро · 510 ₺ · Poçitel",
+      "description": "Гранола с фруктами + айс-матча. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/fresh-energy-f1f44c76f40f.jpg"
+    },
+    {
+      "id": "lunch-favourite",
+      "language": "tr",
+      "path": "share-tr-lunch-favourite.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-lunch-favourite.html",
+      "title": "Öğle Favorisi · 395 ₺ · Poçitel",
+      "description": "Hindi Fümeli Focaccia Sandviç + Buzlu Americano. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/lunch-favourite-3a550cb56b48.jpg"
+    },
+    {
+      "id": "lunch-favourite",
+      "language": "en",
+      "path": "share-en-lunch-favourite.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-lunch-favourite.html",
+      "title": "Lunch Favourite · 395 ₺ · Poçitel",
+      "description": "Smoked turkey focaccia sandwich + iced americano. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/lunch-favourite-3a550cb56b48.jpg"
+    },
+    {
+      "id": "lunch-favourite",
+      "language": "ru",
+      "path": "share-ru-lunch-favourite.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-lunch-favourite.html",
+      "title": "Любимый обед · 395 ₺ · Poçitel",
+      "description": "Фокачча с копчёной индейкой + айс-американо. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/lunch-favourite-3a550cb56b48.jpg"
+    },
+    {
+      "id": "to-go-cappuccino",
+      "language": "tr",
+      "path": "share-tr-to-go-cappuccino.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-to-go-cappuccino.html",
+      "title": "Cappuccino · Al götür · 185 ₺ · Poçitel",
+      "description": "180 ml. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/to-go-cappuccino-f4cf0576b640.jpg"
+    },
+    {
+      "id": "to-go-cappuccino",
+      "language": "en",
+      "path": "share-en-to-go-cappuccino.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-to-go-cappuccino.html",
+      "title": "Cappuccino · To go · 185 ₺ · Poçitel",
+      "description": "180 ml. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/to-go-cappuccino-f4cf0576b640.jpg"
+    },
+    {
+      "id": "to-go-cappuccino",
+      "language": "ru",
+      "path": "share-ru-to-go-cappuccino.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-to-go-cappuccino.html",
+      "title": "Капучино · С собой · 185 ₺ · Poçitel",
+      "description": "180 мл. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/to-go-cappuccino-f4cf0576b640.jpg"
+    },
+    {
+      "id": "to-go-iced-latte",
+      "language": "tr",
+      "path": "share-tr-to-go-iced-latte.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-to-go-iced-latte.html",
+      "title": "Buzlu Latte · Al götür · 195 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/to-go-iced-latte-fcb97d73248f.jpg"
+    },
+    {
+      "id": "to-go-iced-latte",
+      "language": "en",
+      "path": "share-en-to-go-iced-latte.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-to-go-iced-latte.html",
+      "title": "Iced Latte · To go · 195 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/to-go-iced-latte-fcb97d73248f.jpg"
+    },
+    {
+      "id": "to-go-iced-latte",
+      "language": "ru",
+      "path": "share-ru-to-go-iced-latte.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-to-go-iced-latte.html",
+      "title": "Айс-латте · С собой · 195 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/to-go-iced-latte-fcb97d73248f.jpg"
+    },
+    {
+      "id": "to-go-hot-chocolate",
+      "language": "tr",
+      "path": "share-tr-to-go-hot-chocolate.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-to-go-hot-chocolate.html",
+      "title": "Sıcak Çikolata · Al götür · 200 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/to-go-hot-chocolate-170a7e65c195.jpg"
+    },
+    {
+      "id": "to-go-hot-chocolate",
+      "language": "en",
+      "path": "share-en-to-go-hot-chocolate.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-to-go-hot-chocolate.html",
+      "title": "Hot Chocolate · To go · 200 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/to-go-hot-chocolate-170a7e65c195.jpg"
+    },
+    {
+      "id": "to-go-hot-chocolate",
+      "language": "ru",
+      "path": "share-ru-to-go-hot-chocolate.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-to-go-hot-chocolate.html",
+      "title": "Горячий шоколад · С собой · 200 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/to-go-hot-chocolate-170a7e65c195.jpg"
+    },
+    {
+      "id": "to-go-iced-matcha",
+      "language": "tr",
+      "path": "share-tr-to-go-iced-matcha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-to-go-iced-matcha.html",
+      "title": "Buzlu Matcha · Al götür · 235 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/to-go-iced-matcha-cd39b2e2d556.jpg"
+    },
+    {
+      "id": "to-go-iced-matcha",
+      "language": "en",
+      "path": "share-en-to-go-iced-matcha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-to-go-iced-matcha.html",
+      "title": "Iced Matcha · To go · 235 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/to-go-iced-matcha-cd39b2e2d556.jpg"
+    },
+    {
+      "id": "to-go-iced-matcha",
+      "language": "ru",
+      "path": "share-ru-to-go-iced-matcha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-to-go-iced-matcha.html",
+      "title": "Айс-матча · С собой · 235 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/to-go-iced-matcha-cd39b2e2d556.jpg"
+    },
+    {
+      "id": "to-go-chai",
+      "language": "tr",
+      "path": "share-tr-to-go-chai.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-to-go-chai.html",
+      "title": "Chai Tea Latte · Al götür · 200 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/to-go-chai-ef4f9785481c.jpg"
+    },
+    {
+      "id": "to-go-chai",
+      "language": "en",
+      "path": "share-en-to-go-chai.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-to-go-chai.html",
+      "title": "Chai Tea Latte · To go · 200 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/to-go-chai-ef4f9785481c.jpg"
+    },
+    {
+      "id": "to-go-chai",
+      "language": "ru",
+      "path": "share-ru-to-go-chai.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-to-go-chai.html",
+      "title": "Чай латте · С собой · 200 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/to-go-chai-ef4f9785481c.jpg"
+    },
+    {
+      "id": "to-go-matcha",
+      "language": "tr",
+      "path": "share-tr-to-go-matcha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-to-go-matcha.html",
+      "title": "Matcha · Al götür · 220 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/to-go-matcha-e488eb5e2d11.jpg"
+    },
+    {
+      "id": "to-go-matcha",
+      "language": "en",
+      "path": "share-en-to-go-matcha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-to-go-matcha.html",
+      "title": "Matcha · To go · 220 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/to-go-matcha-e488eb5e2d11.jpg"
+    },
+    {
+      "id": "to-go-matcha",
+      "language": "ru",
+      "path": "share-ru-to-go-matcha.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-to-go-matcha.html",
+      "title": "Матча · С собой · 220 ₺ · Poçitel",
+      "description": "Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/to-go-matcha-e488eb5e2d11.jpg"
+    },
+    {
+      "id": "to-go-granola",
+      "language": "tr",
+      "path": "share-tr-to-go-granola.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-to-go-granola.html",
+      "title": "Meyveli Granola Bowl · Al götür · 300 ₺ · Poçitel",
+      "description": "Yoğurt, karışık meyve, granola, ceviz. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/to-go-granola-6f2c0d4070cd.jpg"
+    },
+    {
+      "id": "to-go-granola",
+      "language": "en",
+      "path": "share-en-to-go-granola.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-to-go-granola.html",
+      "title": "Fruity Granola Bowl · To go · 300 ₺ · Poçitel",
+      "description": "Yogurt, mixed fruit, granola, walnut. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/to-go-granola-6f2c0d4070cd.jpg"
+    },
+    {
+      "id": "to-go-granola",
+      "language": "ru",
+      "path": "share-ru-to-go-granola.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-to-go-granola.html",
+      "title": "Гранола с фруктами · С собой · 300 ₺ · Poçitel",
+      "description": "Йогурт, фрукты, гранола, грецкий орех. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/to-go-granola-6f2c0d4070cd.jpg"
+    },
+    {
+      "id": "to-go-fries",
+      "language": "tr",
+      "path": "share-tr-to-go-fries.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-to-go-fries.html",
+      "title": "Patates Kızartması · Al götür · 150 ₺ · Poçitel",
+      "description": "Çıtır patates kızartması. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/to-go-fries-aa371f8ec8fd.jpg"
+    },
+    {
+      "id": "to-go-fries",
+      "language": "en",
+      "path": "share-en-to-go-fries.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-to-go-fries.html",
+      "title": "French Fries · To go · 150 ₺ · Poçitel",
+      "description": "Crispy fries. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/to-go-fries-aa371f8ec8fd.jpg"
+    },
+    {
+      "id": "to-go-fries",
+      "language": "ru",
+      "path": "share-ru-to-go-fries.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-to-go-fries.html",
+      "title": "Картофель фри · С собой · 150 ₺ · Poçitel",
+      "description": "Хрустящий картофель фри. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/to-go-fries-aa371f8ec8fd.jpg"
+    }
+  ]
+}
