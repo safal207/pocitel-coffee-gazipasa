@@ -7,6 +7,7 @@
   <meta name="color-scheme" content="only light">
   <link rel="preload" as="image" media="(width > 760px)" imagesrcset="assets/hero-wide-640.webp 640w, assets/hero-wide-960.webp 960w" imagesizes="(min-width: 1344px) 596px, (min-width: 1001px) calc(49.35vw - 71px), calc(49.35vw - 50px)" fetchpriority="high">
   <script src="appearance.js?v=20261104-simple"></script>
+  <script src="startup.js?v=20261105-brunch"></script>
   <!-- social-meta:start -->
   <title>Менемен · 330 ₺ · Poçitel</title>
   <link rel="canonical" href="https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-menemen.html">
@@ -31,7 +32,7 @@
   <!-- social-meta:end -->
   <meta name="robots" content="noindex">
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20261105-visible">
+  <link rel="stylesheet" href="style.css?v=20261105-brunch">
   <link rel="stylesheet" href="appearance.css?v=20261104-simple">
   <link rel="modulepreload" href="menu.js?v=20261104-drinks">
   <link rel="modulepreload" href="order-options.js">
@@ -39,6 +40,19 @@
   <script src="app.js?v=20261105-visible" type="module"></script>
 </head>
 <body>
+  <div class="startup-screen" aria-hidden="true" hidden>
+    <div class="startup-inner">
+      <div class="startup-brand wordmark"><img src="assets/pocitel-logo-256.webp" width="256" height="136" alt="" fetchpriority="high"></div>
+      <div class="startup-art">
+        <div class="startup-dish"><img src="assets/cilbir-small.webp" width="620" height="924" alt="" fetchpriority="high"><span>Çılbır</span></div>
+        <div class="startup-cup"><img src="assets/takeaway/cappuccino.webp" width="512" height="512" alt="" fetchpriority="high"></div>
+        <span class="startup-pick"><span lang="tr">Poçitel’in seçimi</span><span lang="en">Poçitel’s pick</span><span lang="ru">Выбор Poçitel</span></span>
+      </div>
+      <p class="startup-title"><span lang="tr">Güzel bir mola başlıyor.</span><span lang="en">A lovely break starts here.</span><span lang="ru">Время приятной паузы.</span></p>
+      <p class="startup-subtitle"><span lang="tr">İyi kahve. Bir tabak mutluluk.</span><span lang="en">Good coffee. A plate of happiness.</span><span lang="ru">Хороший кофе. Любимый чылбыр.</span></p>
+      <div class="startup-status"><span class="startup-dots"><i></i><i></i><i></i></span><span lang="tr">Menü açılıyor</span><span lang="en">Opening the menu</span><span lang="ru">Открываем меню</span></div>
+    </div>
+  </div>
   <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
     <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
