@@ -23,3 +23,11 @@ export const takeawayItems = Object.keys(takeawaySuggestions).map(sourceId => {
   categoryByItem.set(id, categoryByItem.get(sourceId));
   return entry;
 });
+
+// A serving preference for the existing pairing, with its existing menu price.
+// Its photo illustrates the two menu items; packaging is confirmed at the café.
+const lunchPair = items.get('lunch-favourite');
+const takeawayLunch = { ...lunchPair, id: 'to-go-lunch-favourite', sourceId: lunchPair.id };
+takeawayItems.push(takeawayLunch);
+items.set(takeawayLunch.id, takeawayLunch);
+categoryByItem.set(takeawayLunch.id, categoryByItem.get(lunchPair.id));

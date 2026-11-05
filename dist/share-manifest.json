@@ -330,6 +330,12 @@
       "width": 640,
       "height": 640,
       "bytes": 59352
+    },
+    "to-go-lunch-favourite": {
+      "path": "assets/social/to-go-lunch-favourite-3a550cb56b48.jpg",
+      "width": 439,
+      "height": 302,
+      "bytes": 29582
     }
   },
   "pages": [
@@ -1790,6 +1796,33 @@
       "title": "Картофель фри · С собой · 150 ₺ · Poçitel",
       "description": "Хрустящий картофель фри. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
       "image": "assets/social/to-go-fries-aa371f8ec8fd.jpg"
+    },
+    {
+      "id": "to-go-lunch-favourite",
+      "language": "tr",
+      "path": "share-tr-to-go-lunch-favourite.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-tr-to-go-lunch-favourite.html",
+      "title": "Öğle Favorisi · Al götür · 395 ₺ · Poçitel",
+      "description": "Hindi Fümeli Focaccia Sandviç + Buzlu Americano. Poçitel Coffee & Brunch · Gazipaşa. Menüyü keşfedin.",
+      "image": "assets/social/to-go-lunch-favourite-3a550cb56b48.jpg"
+    },
+    {
+      "id": "to-go-lunch-favourite",
+      "language": "en",
+      "path": "share-en-to-go-lunch-favourite.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-en-to-go-lunch-favourite.html",
+      "title": "Lunch Favourite · To go · 395 ₺ · Poçitel",
+      "description": "Smoked turkey focaccia sandwich + iced americano. Poçitel Coffee & Brunch · Gazipaşa. Explore the menu.",
+      "image": "assets/social/to-go-lunch-favourite-3a550cb56b48.jpg"
+    },
+    {
+      "id": "to-go-lunch-favourite",
+      "language": "ru",
+      "path": "share-ru-to-go-lunch-favourite.html",
+      "url": "https://safal207.github.io/pocitel-coffee-gazipasa/share-ru-to-go-lunch-favourite.html",
+      "title": "Любимый обед · С собой · 395 ₺ · Poçitel",
+      "description": "Фокачча с копчёной индейкой + айс-американо. Poçitel Coffee & Brunch · Gazipaşa. Откройте меню.",
+      "image": "assets/social/to-go-lunch-favourite-3a550cb56b48.jpg"
     }
   ]
 }

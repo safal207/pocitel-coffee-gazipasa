@@ -32,12 +32,12 @@
   <!-- social-meta:end -->
   <meta name="robots" content="noindex">
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20261105-brunch">
+  <link rel="stylesheet" href="style.css?v=20261105-focaccia">
   <link rel="stylesheet" href="appearance.css?v=20261104-simple">
   <link rel="modulepreload" href="menu.js?v=20261104-drinks">
   <link rel="modulepreload" href="order-options.js">
   <link rel="modulepreload" href="checkout-offers.js">
-  <script src="app.js?v=20261105-visible" type="module"></script>
+  <script src="app.js?v=20261105-focaccia" type="module"></script>
 </head>
 <body>
   <div class="startup-screen" aria-hidden="true" hidden>
@@ -151,6 +151,7 @@
       <p class="take-note" id="take-note" data-copy="takeNote" hidden>Paket servis için menü önerileri. Bardak ve uygunluğu ekibimizle teyit edin.</p>
       <div class="result-meta" id="result-meta" role="status"></div>
       <p class="nutrition-feed-note" data-copy="caloriesNote">Kaloriler örnek porsiyon için tahmini değerlerdir. İçerik, beslenmeye katkı ve vitaminler için ürüne dokunun.</p>
+      <button type="button" id="focaccia-teaser" class="focaccia-teaser" aria-haspopup="dialog" hidden></button>
       <p class="group-note" id="category-note" hidden></p>
       <div class="feed-grid" id="results"></div>
       <button class="button quiet more-posts" id="more-posts" type="button" data-copy="more" hidden>Daha fazla göster</button>
@@ -265,6 +266,11 @@
       <button type="button" class="button primary" id="confirm-configure"></button>
     </div>
   </dialog>
+  <dialog id="focaccia-promo" aria-labelledby="focaccia-title">
+    <div class="focaccia-header"><p class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-cup"/></svg><span data-copy="takeaway">Al götür</span></p><button type="button" class="icon-button" id="close-focaccia" data-aria="close" aria-label="Kapat" autofocus><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+    <div id="focaccia-content" class="focaccia-scroll"></div>
+    <div class="focaccia-footer"><button type="button" id="accept-focaccia" class="button primary"></button><button type="button" id="focaccia-later" class="focaccia-later">Şimdilik değil</button></div>
+  </dialog>
   <dialog id="cart" aria-labelledby="cart-title">
     <div class="cart-scroll">
     <div class="cart-header">
@@ -275,6 +281,7 @@
       <button type="button" id="close-cart" class="icon-button" aria-label="Kapat" data-aria="close" autofocus><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
     </div>
     <p class="checkout-intro" data-copy="checkoutIntro">Seçiminiz hazır. Sipariş ve ödeme kafede.</p>
+    <div id="focaccia-undo" class="focaccia-undo" hidden><span data-copy="focacciaAdded">Al götür eşleşmesi siparişinde.</span><button type="button" id="undo-focaccia" data-copy="focacciaUndo">Geri al</button></div>
     <div class="checkout-section-label"><h3 id="checkout-items-label" data-copy="checkoutItems">Seçtikleriniz</h3><small id="checkout-picture-note" data-copy="illustration">Yapay zekâ görseli</small></div>
     <div id="cart-items"></div>
     <div id="cart-suggestion" hidden></div>

@@ -6,8 +6,8 @@ import { nutritionFor, recipeEnergy, nutritionMarkup, nutritionCopy } from '../d
 import { resolveOrderItem } from '../dist/order-options.js';
 import { energyRanges } from '../dist/nutrition-summary.js';
 
-test('all 54 catalog entries have complete localized ingredient and nutrition information', () => {
-  assert.equal(items.size, 54);
+test('all 55 catalog entries have complete localized ingredient and nutrition information', () => {
+  assert.equal(items.size, 55);
   for (const entry of items.values()) {
     const n = nutritionFor(entry, items);
     assert.ok(n, entry.id);

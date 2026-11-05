@@ -584,6 +584,69 @@ body:has(.selection-bar:not([hidden])) { padding-bottom: 65px; }
 #edit-added { border: 0; min-height: 44px; background: transparent; color: var(--wine); padding: 0 4px; font-size: .8rem; text-decoration: underline; text-underline-offset: 3px; }
 .added-notice .icon-button { flex: none; }
 body:has(dialog[open]) .added-notice { visibility: hidden; }
+
+.focaccia-teaser { display: flex; align-items: center; gap: .85rem; width: 100%; padding: .7rem .85rem; margin: .15rem 0 1rem; border: 1px solid var(--strong-line); border-radius: 12px; background: var(--surface-selected); text-align: start; }
+.focaccia-teaser:hover { border-color: var(--wine); }
+.focaccia-teaser-photo { flex: none; width: 84px; }
+.focaccia-teaser-photo img { height: 68px; object-fit: cover; border-radius: 8px; }
+.focaccia-teaser-copy { flex: 1; min-width: 0; }
+.focaccia-teaser-copy small, .focaccia-teaser-copy strong, .focaccia-teaser-copy > span { display: block; }
+.focaccia-teaser-copy small { color: var(--olive); font-size: .68rem; }
+.focaccia-teaser-copy strong { color: var(--wine); font: 1.2rem/1.2 var(--serif); margin-block: .15rem; }
+.focaccia-teaser-copy > span { color: var(--muted); font-size: .76rem; }
+.focaccia-teaser > .icon { color: var(--wine); }
+#focaccia-promo { width: min(480px, calc(100% - 24px)); height: fit-content; max-height: calc(100dvh - 24px); margin: auto; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); }
+#focaccia-promo[open] { display: flex; flex-direction: column; }
+.focaccia-header { display: flex; align-items: center; justify-content: space-between; gap: .6rem; flex: none; padding: .4rem .7rem .4rem 1rem; background: var(--paper); border-bottom: 1px solid var(--line); }
+.focaccia-header .eyebrow { font-size: .66rem; letter-spacing: .12em; }
+.focaccia-scroll { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.focaccia-hero { position: relative; display: grid; grid-template-columns: 1.6fr 1fr; gap: 3px; height: clamp(160px, 25dvh, 230px); background: var(--image-ground); }
+.focaccia-hero > div { position: relative; min-width: 0; overflow: hidden; }
+.focaccia-hero img { width: 100%; height: 100%; object-fit: cover; }
+.focaccia-food img { object-position: center; }
+.focaccia-drink img { object-position: 55% center; }
+.focaccia-drink > span { position: absolute; top: 9px; right: 7px; display: inline-flex; align-items: center; gap: .3rem; max-width: calc(100% - 14px); padding: .25rem .45rem; border-radius: 30px; background: var(--cream); color: var(--wine); font-size: .65rem; font-weight: 650; }
+.focaccia-illustration { position: absolute; bottom: 7px; left: 9px; padding: .15rem .4rem; border-radius: 4px; background: var(--cream); color: var(--muted); font-size: .57rem; }
+.focaccia-copy { padding: 1rem 1.1rem .85rem; }
+.focaccia-copy h2 { color: var(--wine); font-size: clamp(1.65rem, 6vw, 2.15rem); line-height: 1.05; letter-spacing: -.035em; }
+.focaccia-intro { margin-top: .65rem; color: var(--muted); font-size: .85rem; line-height: 1.45; }
+.focaccia-ingredients { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: .75rem; color: var(--olive); font-size: .74rem; line-height: 1.35; }
+.focaccia-ingredients > span { flex: 1; }
+.focaccia-ingredients > span:last-child { text-align: end; }
+.focaccia-ingredients > b { font-size: 1.1rem; }
+.focaccia-price { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .35rem .7rem; margin-top: .85rem; }
+.focaccia-price > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .6rem; }
+.focaccia-price small { flex-basis: 100%; color: var(--muted); font-size: .66rem; }
+.focaccia-price strong { color: var(--wine); font: 700 2rem/1.1 var(--serif); white-space: nowrap; }
+.focaccia-price del { color: var(--muted); font-size: .8rem; }
+.focaccia-price > span { color: var(--olive); background: var(--surface-selected); padding: .3rem .55rem; border-radius: 30px; font-size: .72rem; font-weight: 650; }
+.focaccia-note { margin-top: .7rem; color: var(--muted); font-size: .67rem; line-height: 1.4; }
+.focaccia-replacement { margin-top: .65rem; padding: .5rem .6rem; border-radius: 7px; background: var(--surface-selected); color: var(--olive); font-size: .72rem; line-height: 1.4; }
+.focaccia-footer { flex: none; padding: .75rem 1rem .35rem; border-top: 1px solid var(--line); background: var(--cream); }
+#accept-focaccia { width: 100%; min-height: 50px; gap: .55rem; font-size: .88rem; }
+#accept-focaccia strong { margin-inline-start: auto; white-space: nowrap; }
+.focaccia-later { display: block; min-height: 44px; width: 100%; padding: .35rem; border: 0; background: none; color: var(--muted); font-size: .79rem; text-decoration: underline; text-underline-offset: 3px; }
+.focaccia-undo { display: flex; align-items: center; gap: .8rem; padding: .4rem .6rem; margin-block: .7rem; background: var(--surface-selected); color: var(--olive); border-radius: 8px; font-size: .76rem; }
+.focaccia-undo > span { flex: 1; }
+.focaccia-undo > button { min-height: 44px; border: 0; background: none; color: var(--wine); font-weight: 650; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 350px) {
+  .focaccia-teaser { gap: .55rem; padding: .6rem; }
+  .focaccia-teaser-photo { width: 64px; }
+  .focaccia-teaser-copy strong { font-size: 1.08rem; }
+  .focaccia-copy { padding-inline: .85rem; }
+  .focaccia-footer { padding-inline: .8rem; }
+  #accept-focaccia { font-size: .78rem; }
+}
+@media (max-height: 700px) {
+  .focaccia-hero { height: 130px; }
+  .focaccia-copy { padding: .7rem .85rem; }
+  .focaccia-copy h2 { font-size: 1.55rem; }
+  .focaccia-intro { display: none; }
+  .focaccia-ingredients { margin-top: .5rem; font-size: .69rem; }
+  .focaccia-price { margin-top: .5rem; }
+  .focaccia-price strong { font-size: 1.7rem; }
+  .focaccia-note { margin-top: .45rem; font-size: .62rem; }
+}
 @media (max-width: 760px) {
   .hero { display: block; padding-block: 14px 12px; }
   .hero .eyebrow { display: none; }

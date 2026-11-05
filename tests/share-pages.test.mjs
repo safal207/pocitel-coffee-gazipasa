@@ -49,11 +49,12 @@ test('preview JPEGs are real, bounded files with declared dimensions', async () 
   }
 });
 
-test('takeaway links use distinct cup photos and preserve the source price', () => {
+test('takeaway links preserve the source price and declare their presentation', () => {
   for (const entry of takeawayItems) {
     assert.equal(entry.price, items.get(entry.sourceId).price);
     assert.notEqual(manifest.images[entry.id].path, manifest.images[entry.sourceId].path);
-    assert.ok(entry.image.startsWith('takeaway/'));
+    if (entry.id === 'to-go-lunch-favourite') assert.equal(entry.image, items.get(entry.sourceId).image); // Menu pairing photo; packaging is not asserted.
+    else assert.ok(entry.image.startsWith('takeaway/'));
     assert.ok(manifest.pages.find(p => p.id === entry.id && p.language === 'ru').title.includes('С собой'));
   }
 });
