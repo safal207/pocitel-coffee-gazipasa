@@ -6,7 +6,7 @@ const copy = {
   menu: ['Menüde belirtilen ana içerik', 'Main ingredients listed in the menu', 'Основной состав из меню'],
   typical: ['Tipik tarif varsayımı · ekibimizle teyit edin', 'Assumed typical recipe · confirm with our team', 'Типовой рецепт · уточните у команды'],
   label: ['Üretici etiketindeki içerik', 'Ingredients on the manufacturer’s label', 'Состав по этикетке производителя'],
-  benefits: ['Beslenmeye katkısı', 'Nutritional contribution', 'Что даёт организму'],
+  benefits: ['Beslenmeye katkısı', 'Benefits & nutritional notes', 'Польза и особенности'],
   vitamins: ['Malzemelerdeki vitaminler', 'Vitamins in the ingredients', 'Витамины в ингредиентах'],
   estimate: ['Tahmini', 'Estimated', 'Оценка'],
   base: ['Temel tarif', 'Base recipe', 'Базовый рецепт'],

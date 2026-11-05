@@ -4,12 +4,14 @@ import { items, takeawayItems } from '../dist/catalog.js';
 import { ingredients, nutritionData, vitaminProfiles, benefitProfiles, comboParts } from '../dist/nutrition-data.js';
 import { nutritionFor, recipeEnergy, nutritionMarkup, nutritionCopy } from '../dist/nutrition.js';
 import { resolveOrderItem } from '../dist/order-options.js';
+import { energyRanges } from '../dist/nutrition-summary.js';
 
 test('all 54 catalog entries have complete localized ingredient and nutrition information', () => {
   assert.equal(items.size, 54);
   for (const entry of items.values()) {
     const n = nutritionFor(entry, items);
     assert.ok(n, entry.id);
+    assert.deepEqual(energyRanges[entry.id], n.energy, `${entry.id}: feed calories must match the detailed recipe`);
     assert.ok(n.energy[0] >= 0 && n.energy[1] >= n.energy[0], entry.id);
     for (let lang = 0; lang < 3; lang++) {
       const html = nutritionMarkup(entry, lang, items);

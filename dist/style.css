@@ -232,6 +232,14 @@ dialog::backdrop { background: var(--overlay); }
 .post-description { color: var(--muted); font-size: .85rem; }
 .nutrition-link { display: inline-flex; align-items: center; gap: .4rem; width: fit-content; max-width: 100%; min-height: 44px; padding: .3rem 0; border: 0; background: transparent; color: var(--olive); text-align: start; font-size: .78rem; }
 .nutrition-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.nutrition-preview { width: 100%; justify-content: space-between; margin-block: .25rem; padding: .55rem .65rem; border-radius: 8px; background: var(--surface-muted); line-height: 1.4; }
+.nutrition-preview > span { min-width: 0; }
+.nutrition-preview .icon { flex: none; width: 16px; height: 16px; }
+.nutrition-kcal { display: block; color: var(--wine); font-size: .83rem; font-variant-numeric: tabular-nums; }
+.nutrition-kcal small { font-size: .7rem; font-weight: 400; color: var(--muted); }
+.nutrition-preview-label { display: block; margin-top: .12rem; font-size: .72rem; }
+.nutrition-feed-note { max-width: 72ch; margin: -.15rem 0 .9rem; color: var(--muted); font-size: .75rem; line-height: 1.45; }
+.nutrition-panel > summary { scroll-margin-top: 82px; }
 .nutrition-loading { color: var(--muted); font-size: .8rem; }
 .nutrition-panel { margin-block: .3rem; border: 1px solid var(--line); border-radius: 10px; background: var(--cream); color: var(--ink); overflow-wrap: anywhere; }
 .nutrition-panel > summary { display: flex; align-items: center; flex-wrap: wrap; gap: .35rem .7rem; min-height: 50px; padding: .7rem .8rem; cursor: pointer; color: var(--wine); font-size: .85rem; font-weight: 650; list-style: none; }
@@ -261,8 +269,9 @@ dialog::backdrop { background: var(--overlay); }
 .selection-bar strong { margin-inline-start: .45rem; white-space: nowrap; }
 body:has(.selection-bar:not([hidden])) { padding-bottom: 65px; }
 #post-viewer, #share-dialog { width: min(520px, calc(100% - 24px)); height: auto; max-height: calc(100% - 24px); margin: auto; padding: 0; border: 1px solid var(--line); border-radius: 16px; }
-.viewer-header { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: .56rem .9rem; }
+.viewer-header { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: .56rem .9rem; background: var(--paper); border-bottom: 1px solid var(--line); }
 #viewer-steps { flex: 1; }
+.viewer-item-name { color: var(--wine); font-family: var(--serif); font-size: 1.2rem; line-height: 1.2; }
 .story-progress { display: flex; gap: 4px; margin-top: 4px; }
 .story-progress span { height: 3px; flex: 1; border-radius: 3px; background: var(--line); }
 .story-progress span.read { background: var(--olive); }

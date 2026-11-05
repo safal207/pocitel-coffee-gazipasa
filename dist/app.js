@@ -3,6 +3,7 @@ import { items, categoryByItem, categoryById, combos, feedOrder, takeawaySuggest
 import { shareUrl } from './share-links.js?v=20261104-share';
 import { milkOptions, syrupOptions, customization, configurationId, resolveOrderItem, optionLabels, replaceOrderLine } from './order-options.js';
 import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOffer, undoCheckoutOffer } from './checkout-offers.js';
+import { energyRanges } from './nutrition-summary.js?v=20261105-visible';
 
 const copy = {
   skip: ['Menüye geç', 'Skip to menu', 'Перейти к меню'],
@@ -56,7 +57,11 @@ const copy = {
   previous: ['Önceki', 'Previous', 'Назад'],
   next: ['Sonraki', 'Next', 'Дальше'],
   details: ['Ürünü incele', 'View item', 'Открыть карточку'],
-  nutrition: ['İçerik · kalori · vitaminler', 'Ingredients · calories · vitamins', 'Состав · калории · витамины'],
+  nutrition: ['İçerik · katkı · vitaminler', 'Ingredients · benefits · vitamins', 'Состав · польза · витамины'],
+  kcal: ['kcal', 'kcal', 'ккал'],
+  perServing: ['porsiyon başına', 'per serving', 'на порцию'],
+  perPairing: ['tüm eşleşme', 'whole pairing', 'всё комбо'],
+  caloriesNote: ['Kaloriler örnek porsiyon için tahmini değerlerdir. İçerik, beslenmeye katkı ve vitaminler için ürüne dokunun.', 'Calories are estimates for an assumed serving. Tap an item for ingredients, nutritional benefits and vitamins.', 'Калории — примерная оценка на порцию. Нажмите на строку калорий, чтобы увидеть состав, пользу и витамины.'],
   nutritionLoading: ['Besin bilgisi yükleniyor…', 'Loading nutrition…', 'Загружаем пищевую ценность…'],
   nutritionRetry: ['Besin bilgisini yeniden yükle', 'Retry nutrition information', 'Загрузить пищевую ценность ещё раз'],
   pinned: ['Poçitel’in seçimi', 'Poçitel’s pick', 'Выбор Poçitel'],
@@ -192,9 +197,15 @@ async function fillNutrition(container, entry, options = {}) {
   container.innerHTML = `<p class="nutrition-loading" role="status">${t('nutritionLoading')}</p>`;
   try {
     // Nutrition is only fetched when someone opens a product, keeping the feed light.
-    const { nutritionMarkup } = await import('./nutrition.js?v=20261104-nutrition');
+    const { nutritionMarkup } = await import('./nutrition.js?v=20261105-visible');
     if (!container.isConnected || container.dataset.nutritionSequence !== sequence || language !== languageAtStart) return;
     container.innerHTML = nutritionMarkup(entry, language, items, { ...options, open });
+    if (options.scrollTo && open) requestAnimationFrame(() => {
+      if (!container.isConnected || container.dataset.nutritionSequence !== sequence || !viewer.open) return;
+      const summary = container.querySelector('.nutrition-panel > summary');
+      summary?.focus({ preventScroll: true });
+      summary?.scrollIntoView({ block: 'start', behavior: 'instant' });
+    });
   } catch {
     if (!container.isConnected || container.dataset.nutritionSequence !== sequence) return;
     container.innerHTML = `<button type="button" class="nutrition-link" data-nutrition-retry="${entry.id}">${t('nutritionRetry')}</button>`;
@@ -382,6 +393,14 @@ function illustrationLabel(entry) {
   return entry.sourceId || entry.image.startsWith('illustrations/') ? `<span class="illustration-label">${t('illustration')}</span>` : '';
 }
 
+function nutritionLink(entry) {
+  const energy = energyRanges[entry.id].join('–');
+  const serving = t(entry.before ? 'perPairing' : 'perServing');
+  return `<button type="button" class="nutrition-link nutrition-preview" data-post="${entry.id}" data-open-nutrition="true">
+    <span><strong class="nutrition-kcal">≈ ${energy} ${t('kcal')} <small>· ${serving}</small></strong><span class="nutrition-preview-label">${t('nutrition')}</span></span>${icon('chevron')}
+  </button>`;
+}
+
 function menuPost(entry, index = 8) {
   const category = categoryByItem.get(entry.id);
   return `<article class="feed-post${entry.sourceId ? ' take-post' : ''}" id="post-${entry.id}">
@@ -397,7 +416,7 @@ function menuPost(entry, index = 8) {
     <div class="post-body">
       <div class="post-heading"><h3>${name(entry)}</h3>${priceMarkup(entry)}</div>
       ${description(entry) ? `<p class="post-description">${description(entry)}</p>` : ''}
-      <button type="button" class="nutrition-link" data-post="${entry.id}" data-open-nutrition="true" aria-label="${t('nutrition')} · ${name(entry)}">${t('nutrition')} ${icon('chevron')}</button>
+      ${nutritionLink(entry)}
       ${postActions(entry)}
     </div>
   </article>`;
@@ -469,7 +488,7 @@ function renderViewer() {
   viewerSteps.innerHTML = story ? `
     <p class="eyebrow">${categoryById.get(story).labels[language]} · ${index + 1}/${ids.length}</p>
     <div class="story-progress" aria-hidden="true">${ids.map((_, step) => `<span class="${step <= index ? 'read' : ''}"></span>`).join('')}</div>` :
-    `<p class="eyebrow">${entry.sourceId ? `${t('takeaway')} · ` : ''}${categoryByItem.get(entry.id).labels[language]}</p>`;
+    (openedPost.nutritionOpen ? `<p class="viewer-item-name">${name(entry)}</p>` : `<p class="eyebrow">${entry.sourceId ? `${t('takeaway')} · ` : ''}${categoryByItem.get(entry.id).labels[language]}</p>`);
   viewerContent.innerHTML = `
     <div class="viewer-photo${entry.sourceId ? ' take-photo' : ''}">
       ${itemImage(entry, false)}
@@ -487,7 +506,7 @@ function renderViewer() {
         ${icon('chevron')}
       </button>` : ''}
     </div>`;
-  fillNutrition($('#viewer-nutrition'), entry, { open: Boolean(openedPost.nutritionOpen) });
+  fillNutrition($('#viewer-nutrition'), entry, { open: Boolean(openedPost.nutritionOpen), scrollTo: Boolean(openedPost.nutritionOpen) });
 }
 
 function openPost(ids, opener, story) {
