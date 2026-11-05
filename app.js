@@ -1,8 +1,10 @@
 import { categories } from './menu.js?v=20261104-drinks';
-import { items, categoryByItem, categoryById, combos, feedOrder, takeawaySuggestions, takeawayItems } from './catalog.js?v=20261104-share';
+import { items, categoryByItem, categoryById, combos, feedOrder, takeawaySuggestions, takeawayItems } from './catalog.js?v=20261105-focaccia';
 import { shareUrl } from './share-links.js?v=20261104-share';
 import { milkOptions, syrupOptions, customization, configurationId, resolveOrderItem, optionLabels, replaceOrderLine } from './order-options.js';
 import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOffer, undoCheckoutOffer } from './checkout-offers.js';
+import { energyRanges } from './nutrition-summary.js?v=20261105-focaccia';
+import { focacciaTakeawayOffer } from './focaccia-offer.js?v=20261105-focaccia';
 
 const copy = {
   skip: ['Menüye geç', 'Skip to menu', 'Перейти к меню'],
@@ -16,6 +18,20 @@ const copy = {
   settings: ['Dil ve görünüm', 'Language & appearance', 'Язык и оформление'],
   done: ['Tamam', 'Done', 'Готово'],
   added: ['Siparişe eklendi', 'Added to your order', 'Добавлено в заказ'],
+  focacciaKicker: ['Molanı yanında götür', 'Take your break with you', 'Возьмите паузу с собой'],
+  focacciaTitle: ['Focaccia + kahve, al götür?', 'Focaccia + coffee, to go?', 'Вкусную фокаччу с собой?'],
+  focacciaBody: ['Hindi fümeli, sebzeli focaccia. Yanına buzlu Americano. Güzel bir mola, nereye gidersen.', 'Golden focaccia with smoked turkey and vegetables, paired with an iced Americano. A lovely break, wherever you go.', 'Румяная фокачча с индейкой и овощами. А к ней — айс-американо. Всё для вкусной паузы на прогулке.'],
+  focacciaBanner: ['Focaccia + buzlu Americano', 'Focaccia + iced Americano', 'Фокачча + айс-американо'],
+  focacciaAction: ['Al götür istiyorum', 'I’ll take it to go', 'Хочу с собой'],
+  focacciaUpgrade: ['Siparişimi tamamla', 'Complete my order', 'Дополнить заказ'],
+  focacciaCombine: ['Al götür eşleşmesine çevir', 'Make it a to-go pairing', 'Собрать комбо с собой'],
+  focacciaLater: ['Şimdilik değil', 'Not right now', 'Пока нет'],
+  focacciaBoth: ['İki ürün birlikte', 'Both items together', 'За обе позиции'],
+  focacciaDelta: ['Sipariş tutarındaki değişim', 'Change to your order total', 'Изменение суммы заказа'],
+  focacciaReplace: ['Seçtiğin birer porsiyon yerine', 'Replaces one of each selected item', 'Заменит по одной выбранной порции'],
+  focacciaTakeNote: ['Paket servis uygunluğunu ekibimizle teyit edin. Sipariş ve ödeme kafede.', 'Confirm takeaway availability with our team. Order and pay at the café.', 'Возможность подачи с собой уточните у команды. Заказ и оплата в кафе.'],
+  focacciaAdded: ['Al götür eşleşmesi siparişinde.', 'Your to-go pairing is in the order.', 'Комбо с собой добавлено в заказ.'],
+  focacciaUndo: ['Geri al', 'Undo', 'Отменить'],
   updated: ['Seçim güncellendi', 'Selection updated', 'Выбор обновлён'],
   customize: ['Özelleştir', 'Customize', 'Настроить'],
   themeLight: ['Açık', 'Light', 'Светлый'],
@@ -56,6 +72,13 @@ const copy = {
   previous: ['Önceki', 'Previous', 'Назад'],
   next: ['Sonraki', 'Next', 'Дальше'],
   details: ['Ürünü incele', 'View item', 'Открыть карточку'],
+  nutrition: ['İçerik · katkı · vitaminler', 'Ingredients · benefits · vitamins', 'Состав · польза · витамины'],
+  kcal: ['kcal', 'kcal', 'ккал'],
+  perServing: ['porsiyon başına', 'per serving', 'на порцию'],
+  perPairing: ['tüm eşleşme', 'whole pairing', 'всё комбо'],
+  caloriesNote: ['Kaloriler örnek porsiyon için tahmini değerlerdir. İçerik, beslenmeye katkı ve vitaminler için ürüne dokunun.', 'Calories are estimates for an assumed serving. Tap an item for ingredients, nutritional benefits and vitamins.', 'Калории — примерная оценка на порцию. Нажмите на строку калорий, чтобы увидеть состав, пользу и витамины.'],
+  nutritionLoading: ['Besin bilgisi yükleniyor…', 'Loading nutrition…', 'Загружаем пищевую ценность…'],
+  nutritionRetry: ['Besin bilgisini yeniden yükle', 'Retry nutrition information', 'Загрузить пищевую ценность ещё раз'],
   pinned: ['Poçitel’in seçimi', 'Poçitel’s pick', 'Выбор Poçitel'],
   more: ['Daha fazla göster', 'Show more', 'Показать ещё'],
   paired: ['Bu eşleşmeyi deneyin', 'Try it in this pairing', 'Попробуйте в комбо'],
@@ -172,12 +195,44 @@ const shareDialog = $('#share-dialog');
 const shareLink = $('#share-link');
 const savedFilter = $('#saved-filter');
 const configure = $('#configure');
+const focacciaPromo = $('#focaccia-promo');
 const selectionKey = 'pocitel-selection-v1';
 const languageKey = 'pocitel-language';
 const savedKey = 'pocitel-saved-v1';
 const pageSize = 8;
 const maxQuantity = 99;
 let draft;
+let nutritionSequence = 0;
+let focacciaOffer;
+let focacciaTransaction;
+let focacciaOpener;
+let focacciaAutoTimer;
+let focacciaSeen = false;
+try { focacciaSeen = sessionStorage.getItem('pocitel-focaccia-offer-v1') === 'seen'; } catch { /* Keep the current visit usable. */ }
+
+async function fillNutrition(container, entry, options = {}) {
+  if (!container) return;
+  const sequence = String(++nutritionSequence);
+  const languageAtStart = language;
+  const open = options.open ?? Boolean(container.querySelector('.nutrition-panel[open]'));
+  container.dataset.nutritionSequence = sequence;
+  container.innerHTML = `<p class="nutrition-loading" role="status">${t('nutritionLoading')}</p>`;
+  try {
+    // Nutrition is only fetched when someone opens a product, keeping the feed light.
+    const { nutritionMarkup } = await import('./nutrition.js?v=20261105-visible');
+    if (!container.isConnected || container.dataset.nutritionSequence !== sequence || language !== languageAtStart) return;
+    container.innerHTML = nutritionMarkup(entry, language, items, { ...options, open });
+    if (options.scrollTo && open) requestAnimationFrame(() => {
+      if (!container.isConnected || container.dataset.nutritionSequence !== sequence || !viewer.open) return;
+      const summary = container.querySelector('.nutrition-panel > summary');
+      summary?.focus({ preventScroll: true });
+      summary?.scrollIntoView({ block: 'start', behavior: 'instant' });
+    });
+  } catch {
+    if (!container.isConnected || container.dataset.nutritionSequence !== sequence) return;
+    container.innerHTML = `<button type="button" class="nutrition-link" data-nutrition-retry="${entry.id}">${t('nutritionRetry')}</button>`;
+  }
+}
 let configureOpener;
 let suggestionsDismissed = false;
 let checkoutOffer;
@@ -266,7 +321,7 @@ function renderConfigurator() {
     <div class="configure-photo">${itemImage(entry, false)}${illustrationLabel(entry)}</div>
     <div><p class="eyebrow">${t(entry.sourceId ? 'takeaway' : 'dineIn')}</p><h2 id="configure-title">${name(entry)}</h2>
       ${description(entry) ? `<p>${description(entry)}</p>` : ''}${priceMarkup(entry)}</div>
-  </div>`;
+  </div><div id="configure-nutrition"></div>`;
   const fields = [];
   const toGo = items.get(`to-go-${draft.singleId}`);
   if (toGo) {
@@ -302,6 +357,7 @@ function updateConfigurationTotal() {
   $('#configure-total').textContent = price(entry.price * draft.quantity);
   $('#confirm-configure').textContent = t(draft.editId ? 'saveChanges' : 'add');
   $('#configure-error').hidden = true;
+  fillNutrition($('#configure-nutrition'), entry, { changed: draft.milk !== 'standard' || draft.syrup !== 'none' });
 }
 
 function openConfigurator(id, opener, editId) {
@@ -359,6 +415,14 @@ function illustrationLabel(entry) {
   return entry.sourceId || entry.image.startsWith('illustrations/') ? `<span class="illustration-label">${t('illustration')}</span>` : '';
 }
 
+function nutritionLink(entry) {
+  const energy = energyRanges[entry.id].join('–');
+  const serving = t(entry.before ? 'perPairing' : 'perServing');
+  return `<button type="button" class="nutrition-link nutrition-preview" data-post="${entry.id}" data-open-nutrition="true">
+    <span><strong class="nutrition-kcal">≈ ${energy} ${t('kcal')} <small>· ${serving}</small></strong><span class="nutrition-preview-label">${t('nutrition')}</span></span>${icon('chevron')}
+  </button>`;
+}
+
 function menuPost(entry, index = 8) {
   const category = categoryByItem.get(entry.id);
   return `<article class="feed-post${entry.sourceId ? ' take-post' : ''}" id="post-${entry.id}">
@@ -374,6 +438,7 @@ function menuPost(entry, index = 8) {
     <div class="post-body">
       <div class="post-heading"><h3>${name(entry)}</h3>${priceMarkup(entry)}</div>
       ${description(entry) ? `<p class="post-description">${description(entry)}</p>` : ''}
+      ${nutritionLink(entry)}
       ${postActions(entry)}
     </div>
   </article>`;
@@ -445,7 +510,7 @@ function renderViewer() {
   viewerSteps.innerHTML = story ? `
     <p class="eyebrow">${categoryById.get(story).labels[language]} · ${index + 1}/${ids.length}</p>
     <div class="story-progress" aria-hidden="true">${ids.map((_, step) => `<span class="${step <= index ? 'read' : ''}"></span>`).join('')}</div>` :
-    `<p class="eyebrow">${entry.sourceId ? `${t('takeaway')} · ` : ''}${categoryByItem.get(entry.id).labels[language]}</p>`;
+    (openedPost.nutritionOpen ? `<p class="viewer-item-name">${name(entry)}</p>` : `<p class="eyebrow">${entry.sourceId ? `${t('takeaway')} · ` : ''}${categoryByItem.get(entry.id).labels[language]}</p>`);
   viewerContent.innerHTML = `
     <div class="viewer-photo${entry.sourceId ? ' take-photo' : ''}">
       ${itemImage(entry, false)}
@@ -455,6 +520,7 @@ function renderViewer() {
       <div class="post-heading"><h2 id="post-title">${name(entry)}</h2>${priceMarkup(entry)}</div>
       ${description(entry) ? `<p class="post-description">${description(entry)}</p>` : ''}
       ${postActions(entry)}
+      <div id="viewer-nutrition"></div>
       <button type="button" class="customize-item" data-customize="${entry.id}">${t('customize')}</button>
       ${related ? `<button type="button" class="related-post" data-related="${related.id}">
         ${itemImage(related)}
@@ -462,10 +528,11 @@ function renderViewer() {
         ${icon('chevron')}
       </button>` : ''}
     </div>`;
+  fillNutrition($('#viewer-nutrition'), entry, { open: Boolean(openedPost.nutritionOpen), scrollTo: Boolean(openedPost.nutritionOpen) });
 }
 
 function openPost(ids, opener, story) {
-  openedPost = { ids, index: 0, story };
+  openedPost = { ids, index: 0, story, nutritionOpen: opener?.dataset.openNutrition === 'true' };
   postOpener = opener;
   touchOrigin = null;
   renderViewer();
@@ -600,6 +667,101 @@ function showAdded(entry, opener, updated = false) {
   }, 6000);
 }
 
+function renderFocacciaTeaser() {
+  const teaser = $('#focaccia-teaser');
+  const offer = focacciaTakeawayOffer(selection, items, orderItem);
+  teaser.hidden = !offer;
+  if (!offer) return;
+  teaser.innerHTML = `<span class="focaccia-teaser-photo">${itemImage(items.get('smoked-turkey'))}</span>
+    <span class="focaccia-teaser-copy"><small>${t('focacciaKicker')}</small><strong>${t('focacciaBanner')}</strong><span>${t('takeaway')} · ${price(orderItem(offer.addId).price)}</span></span>${icon('chevron')}`;
+}
+
+function renderFocacciaPromo() {
+  const entry = orderItem(focacciaOffer.addId);
+  const base = items.get('to-go-lunch-favourite');
+  const before = base.before + entry.price - base.price;
+  const delta = focacciaOffer.delta < 0 ? `−${price(-focacciaOffer.delta)}` : `+${price(focacciaOffer.delta)}`;
+  const action = focacciaOffer.kind === 'combine' ? 'focacciaCombine' : focacciaOffer.kind === 'upgrade' ? 'focacciaUpgrade' : 'focacciaAction';
+  $('#focaccia-content').innerHTML = `<div class="focaccia-hero">
+      <div class="focaccia-food">${itemImage(items.get('smoked-turkey'), false)}</div>
+      <div class="focaccia-drink">${itemImage(items.get('iced-americano'), false)}<span>${icon('cup')}${t('takeaway')}</span></div>
+      <small class="focaccia-illustration">${t('illustration')}</small>
+    </div>
+    <div class="focaccia-copy">
+      <h2 id="focaccia-title">${t('focacciaTitle')}</h2><p class="focaccia-intro">${t('focacciaBody')}</p>
+      <div class="focaccia-ingredients"><span>${name(items.get('smoked-turkey'))}</span><b>+</b><span>${name(items.get('iced-americano'))}</span></div>
+      ${optionLabels(entry, language) ? `<p class="line-options">${optionLabels(entry, language)}</p>` : ''}
+      <div class="focaccia-price"><div><small>${t('focacciaBoth')}</small><strong>${price(entry.price)}</strong><del>${price(before)}</del></div><span>${t('quickSavings')} ${price(before - entry.price)}</span></div>
+      ${focacciaOffer.remove.length ? `<p class="focaccia-replacement">${t('focacciaReplace')}: ${focacciaOffer.remove.map(([id]) => name(orderItem(id))).join(' + ')}.<br>${t('focacciaDelta')}: <strong>${delta}</strong></p>` : ''}
+      <p class="focaccia-note">${t('focacciaTakeNote')}</p>
+    </div>`;
+  $('#accept-focaccia').innerHTML = `<span>${t(action)}</span><strong>${focacciaOffer.remove.length ? delta : price(entry.price)}</strong>${icon('arrow')}`;
+  $('#focaccia-later').textContent = t('focacciaLater');
+}
+
+function openFocacciaPromo(opener, automatic = false) {
+  if (document.querySelector('dialog[open]') || (automatic && (focacciaSeen || document.hidden))) return false;
+  if (automatic) {
+    if (document.activeElement?.matches('input, textarea, select, [contenteditable="true"]')) return false;
+    const menuBounds = $('#menu').getBoundingClientRect();
+    if (menuBounds.bottom <= 0 || menuBounds.top >= innerHeight) return false;
+  }
+  const offer = focacciaTakeawayOffer(selection, items, orderItem);
+  if (!offer || (automatic && selection.size && !offer.remove.length)) return false;
+  focacciaOffer = offer;
+  focacciaOpener = opener;
+  focacciaSeen = true;
+  clearTimeout(focacciaAutoTimer);
+  focacciaAutoTimer = null;
+  try { sessionStorage.setItem('pocitel-focaccia-offer-v1', 'seen'); } catch { /* Still once in this page visit. */ }
+  renderFocacciaPromo();
+  focacciaPromo.showModal();
+  $('#focaccia-content').scrollTop = 0;
+  return true;
+}
+
+function scheduleFocacciaPromo(delay = 8000) {
+  if (focacciaSeen || linkedItem) return;
+  if (focacciaAutoTimer) {
+    if (delay >= 8000) return;
+    clearTimeout(focacciaAutoTimer);
+  }
+  focacciaAutoTimer = setTimeout(() => {
+    focacciaAutoTimer = null;
+    openFocacciaPromo($('#focaccia-teaser'), true);
+  }, delay);
+}
+
+function acceptFocacciaPromo() {
+  const next = applyCheckoutOffer(selection, focacciaOffer, orderItem, maxQuantity);
+  if (!next) {
+    focacciaOffer = focacciaTakeawayOffer(selection, items, orderItem);
+    if (focacciaOffer) renderFocacciaPromo();
+    else focacciaPromo.close();
+    return;
+  }
+  focacciaTransaction = { before: [...selection], after: selectionSignature(next) };
+  selection.clear();
+  next.forEach((quantity, id) => selection.set(id, quantity));
+  suggestionsDismissed = true;
+  offerTransaction = null;
+  persistSelection();
+  focacciaPromo.close();
+  openCart($('.top [data-open-cart]'));
+  $('#announcement').textContent = `${t('focacciaAdded')} ${t('total')} ${price(selectionTotal())}`;
+}
+
+function undoFocacciaPromo() {
+  const previous = undoCheckoutOffer(selection, focacciaTransaction);
+  focacciaTransaction = null;
+  if (!previous) { renderCart(); return; }
+  selection.clear();
+  previous.forEach((quantity, id) => selection.set(id, quantity));
+  persistSelection();
+  $('#close-cart').focus({ preventScroll: true });
+  $('#announcement').textContent = t('offerUndone');
+}
+
 function addToSelection(id, opener) {
   if ((selection.get(id) ?? 0) >= maxQuantity) {
     $('#announcement').textContent = t('quantityLimit');
@@ -620,6 +782,7 @@ function renderCounts() {
   document.querySelectorAll('[data-open-cart]').forEach(node => node.setAttribute('aria-label', `${t('cart')} (${count})`));
   $('#selection-bar').hidden = count === 0;
   $('#bar-total').textContent = price(selectionTotal());
+  renderFocacciaTeaser();
 }
 
 function selectionTotal() {
@@ -672,6 +835,8 @@ function toggleCheckoutOffer() {
 }
 
 function renderCart() {
+  if (focacciaTransaction && focacciaTransaction.after !== selectionSignature(selection)) focacciaTransaction = null;
+  $('#focaccia-undo').hidden = !focacciaTransaction;
   const rows = [...selection].map(([id, quantity]) => {
     const entry = orderItem(id);
     return `<article class="cart-row">
@@ -745,6 +910,7 @@ function applyLanguage() {
   renderServiceMode();
   renderResults();
   renderCounts();
+  if (focacciaPromo.open) renderFocacciaPromo();
 }
 
 for (const entry of items.values()) {
@@ -782,7 +948,18 @@ document.addEventListener('click', event => {
   const button = event.target.closest('button');
   if (!button) return;
   const { lang, category, add, quantity, item, post, story, save, share, related, mode, edit } = button.dataset;
-  if (button.id === 'open-settings') {
+  if (button.id === 'focaccia-teaser') {
+    openFocacciaPromo(button);
+  } else if (button.id === 'close-focaccia' || button.id === 'focaccia-later') {
+    focacciaPromo.close();
+  } else if (button.id === 'accept-focaccia') {
+    acceptFocacciaPromo();
+  } else if (button.id === 'undo-focaccia') {
+    undoFocacciaPromo();
+  } else if (button.dataset.nutritionRetry) {
+    const entry = orderItem(button.dataset.nutritionRetry);
+    fillNutrition(button.parentElement, entry, { open: true, changed: (entry.milk && entry.milk !== 'standard') || (entry.syrup && entry.syrup !== 'none') });
+  } else if (button.id === 'open-settings') {
     settings.showModal();
   } else if (button.id === 'close-settings' || button.id === 'done-settings') {
     settings.close();
@@ -814,6 +991,7 @@ document.addEventListener('click', event => {
     renderServiceMode();
     filterResults();
     scrollToMenuStart();
+    if (takeawayMode) scheduleFocacciaPromo(600);
   } else if (button === savedFilter) {
     savedOnly = !savedOnly;
     if (savedOnly) {
@@ -889,6 +1067,9 @@ document.addEventListener('click', event => {
 });
 
 settings.addEventListener('close', () => $('#open-settings').focus({ preventScroll: true }));
+focacciaPromo.addEventListener('close', () => {
+  if (!cart.open && focacciaOpener?.isConnected && !focacciaOpener.hidden) focacciaOpener.focus({ preventScroll: true });
+});
 
 cart.addEventListener('change', event => {
   if (event.target.id === 'checkout-offer-toggle') toggleCheckoutOffer();
@@ -974,3 +1155,13 @@ applyLanguage();
 $('#service-picker').hidden = false;
 if (items.has(linkedItem)) openPost([linkedItem], results.querySelector(`[data-post="${linkedItem}"]`) ?? search);
 else if (location.hash === '#pairings') scrollToMenuStart();
+
+if (!linkedItem && !focacciaSeen && 'IntersectionObserver' in window) {
+  const offerObserver = new IntersectionObserver(entries => {
+    if (entries.some(entry => entry.isIntersecting)) {
+      scheduleFocacciaPromo();
+      offerObserver.disconnect();
+    }
+  }, { threshold: .5 });
+  offerObserver.observe($('#result-meta'));
+}
