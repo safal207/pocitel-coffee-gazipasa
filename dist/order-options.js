@@ -26,9 +26,26 @@ const comboDrinks = {
   'lunch-favourite': 'iced-americano',
 };
 
+export const comboFoodIds = ['smoked-turkey', 'beetroot', 'zucchini'];
+export const comboDrinkIds = ['iced-americano', 'cappuccino', 'latte', 'iced-latte', 'americano', 'flat-white', 'turkish-coffee', 'espresso', 'cortado', 'mocha', 'matcha', 'hot-chocolate', 'chai', 'salep', 'toffee', 'caramel', 'iced-mocha', 'frappe', 'iced-matcha', 'tea', 'relax', 'maroc', 'balance'];
+export const isTakeaway = entry => Boolean(entry?.sourceId) || entry?.serving === 'takeaway';
+
+export function builtComboId({ foodId, drinkId, milk = 'standard', syrup = 'none', serving = 'takeaway' } = {}) {
+  if (!comboFoodIds.includes(foodId) || !comboDrinkIds.includes(drinkId) || !['cafe', 'takeaway'].includes(serving) || !milkOptions.some(o => o.id === milk) || !syrupOptions.some(o => o.id === syrup)) return undefined;
+  if (foodId === 'smoked-turkey' && drinkId === 'iced-americano') return configurationId(serving === 'takeaway' ? 'to-go-lunch-favourite' : 'lunch-favourite', milk, syrup);
+  return `pair~${foodId}~${drinkId}~${milk}~${syrup}~${serving}`;
+}
+
+export function comboChoice(entry) {
+  if (!entry) return null;
+  if (entry.isBuiltCombo) return { ...entry.comboChoice };
+  if ((entry.sourceId ?? entry.baseId ?? entry.id) !== 'lunch-favourite') return null;
+  return { foodId: 'smoked-turkey', drinkId: 'iced-americano', milk: entry.milk ?? 'standard', syrup: entry.syrup ?? 'none', serving: isTakeaway(entry) ? 'takeaway' : 'cafe' };
+}
+
 export function customization(entry) {
   const baseId = entry.sourceId ?? entry.baseId ?? entry.id;
-  const drink = comboDrinks[baseId] ?? baseId;
+  const drink = entry.isBuiltCombo ? entry.comboChoice.drinkId : comboDrinks[baseId] ?? baseId;
   return { milk: milkDrinks.has(drink), syrup: syrupDrinks.has(drink) };
 }
 
@@ -42,6 +59,19 @@ export function resolveOrderItem(id, catalog) {
   if (typeof id !== 'string') return undefined;
   if (catalog.has(id)) return catalog.get(id);
   const parts = id.split('~');
+  if (parts[0] === 'pair') {
+    if (parts.length !== 6) return undefined;
+    const [, foodId, drinkId, milk, syrup, serving] = parts;
+    const choice = { foodId, drinkId, milk, syrup, serving };
+    if (builtComboId(choice) !== id) return undefined;
+    const food = catalog.get(foodId);
+    const drink = catalog.get(drinkId);
+    const chosenDrink = resolveOrderItem(configurationId(drinkId, milk, syrup), catalog);
+    if (!food || !drink || !chosenDrink) return undefined;
+    return { id, isBuiltCombo: true, comboChoice: choice, componentIds: [foodId, drinkId], milk, syrup, serving,
+      names: ['Kendi eşleşmem', 'My pairing', 'Моё комбо'],
+      descriptions: food.names.map((label, language) => `${label} + ${drink.names[language]}`), image: food.image, price: food.price + chosenDrink.price };
+  }
   if (parts.length !== 3) return undefined;
   const [baseId, milk, syrup] = parts;
   const base = catalog.get(baseId);

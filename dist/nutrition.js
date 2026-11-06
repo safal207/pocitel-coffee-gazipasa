@@ -41,7 +41,7 @@ export function recipeEnergy(recipe) {
 export function nutritionFor(entry, catalog) {
   if (!entry) return null;
   const id = entry.sourceId ?? entry.baseId ?? entry.id;
-  const parts = comboParts[id]?.map(part => nutritionFor(catalog.get(part), catalog));
+  const parts = (entry.componentIds ?? comboParts[id])?.map(part => nutritionFor(catalog.get(part), catalog));
   if (parts) {
     if (parts.some(part => !part)) throw new Error(`Missing pairing nutrition: ${id}`);
     return { id, entry, parts, energy: parts.reduce((sum, part) => [sum[0] + part.energy[0], sum[1] + part.energy[1]], [0, 0]),
@@ -79,7 +79,7 @@ export function nutritionMarkup(entry, language, catalog, { open = false, change
       <div><h3>${t('ingredients')}</h3>${ingredientBlocks}</div>
       <div><h3>${t('benefits')}</h3><p>${record.benefits.map(key => escape(benefitProfiles[key][language])).join(' ')}</p></div>
       <div><h3>${t('vitamins')}</h3><p>${vitamins}</p></div>
-      <p class="nutrition-note">${t('note')}${entry.sourceId ? ` ${t('take')}` : ''}</p>
+      <p class="nutrition-note">${t('note')}${entry.sourceId || entry.serving === 'takeaway' ? ` ${t('take')}` : ''}</p>
       <details class="nutrition-basis"><summary>${t('basis')}</summary><p>${basis}</p>
         <p class="nutrition-sources">${t('sources')}: <a href="https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/nutrient-data/nutrient-value-some-common-foods-2008.html" target="_blank" rel="noopener noreferrer">Health Canada</a> · <a href="https://www.nhs.uk/conditions/vitamins-and-minerals/" target="_blank" rel="noopener noreferrer">NHS</a> · <a href="https://www.nutella.com/tr/tr/products/spread/nutella" target="_blank" rel="noopener noreferrer">Nutella</a></p>
       </details>
