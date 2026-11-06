@@ -1,10 +1,10 @@
 import { categories } from './menu.js?v=20261104-drinks';
 import { items, categoryByItem, categoryById, combos, feedOrder, takeawaySuggestions, takeawayItems } from './catalog.js?v=20261105-focaccia';
 import { shareUrl } from './share-links.js?v=20261104-share';
-import { milkOptions, syrupOptions, customization, configurationId, resolveOrderItem, optionLabels, replaceOrderLine } from './order-options.js';
-import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOffer, undoCheckoutOffer } from './checkout-offers.js';
+import { milkOptions, syrupOptions, customization, configurationId, resolveOrderItem, optionLabels, replaceOrderLine, comboFoodIds, comboDrinkIds, builtComboId, comboChoice, isTakeaway } from './order-options.js?v=20261106-builder';
+import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOffer, undoCheckoutOffer } from './checkout-offers.js?v=20261106-builder';
 import { energyRanges } from './nutrition-summary.js?v=20261105-focaccia';
-import { focacciaTakeawayOffer } from './focaccia-offer.js?v=20261105-focaccia';
+import { focacciaTakeawayOffer, selectedComboOffer } from './focaccia-offer.js?v=20261106-builder';
 
 const copy = {
   skip: ['Menüye geç', 'Skip to menu', 'Перейти к меню'],
@@ -18,10 +18,20 @@ const copy = {
   settings: ['Dil ve görünüm', 'Language & appearance', 'Язык и оформление'],
   done: ['Tamam', 'Done', 'Готово'],
   added: ['Siparişe eklendi', 'Added to your order', 'Добавлено в заказ'],
+  comboFood: ['Focaccia seç', 'Choose your focaccia', 'Выберите фокаччу'],
+  comboDrinkSelect: ['İçecek seç', 'Choose your drink', 'Выберите напиток'],
+  comboOptions: ['Servis ve eklemeler', 'Serving & extras', 'Подача и дополнения'],
+  comboSave: ['Eşleşmeyi kaydet', 'Save pairing', 'Сохранить комбо'],
+  comboAdd: ['Eşleşmeyi ekle', 'Add pairing', 'Добавить комбо'],
+  comboJoin: ['Eşleşme oluştur', 'Combine items', 'Собрать комбо'],
+  comboMenuSum: ['Seçtiğin iki ürünün menü fiyatları', 'Menu prices of your two choices', 'Сумма выбранных позиций по меню'],
+  comboFrom: ['Başlangıç', 'From', 'От'],
+  comboOne: ['Bir eşleşme', 'Per pairing', 'За одно комбо'],
+  comboEditQuantity: ['Siparişteki adet', 'Quantity in your order', 'Количество в заказе'],
   focacciaKicker: ['Molanı yanında götür', 'Take your break with you', 'Возьмите паузу с собой'],
-  focacciaTitle: ['Focaccia + kahve, al götür?', 'Focaccia + coffee, to go?', 'Вкусную фокаччу с собой?'],
+  focacciaTitle: ['Kendi eşleşmeni oluştur', 'Build your perfect pairing', 'Соберите своё комбо'],
   focacciaBody: ['Hindi fümeli, sebzeli focaccia. Yanına buzlu Americano. Güzel bir mola, nereye gidersen.', 'Golden focaccia with smoked turkey and vegetables, paired with an iced Americano. A lovely break, wherever you go.', 'Румяная фокачча с индейкой и овощами. А к ней — айс-американо. Всё для вкусной паузы на прогулке.'],
-  focacciaBanner: ['Focaccia + buzlu Americano', 'Focaccia + iced Americano', 'Фокачча + айс-американо'],
+  focacciaBanner: ['Focaccia + sevdiğin içecek', 'Focaccia + your favourite drink', 'Фокачча + любимый напиток'],
   focacciaAction: ['Al götür istiyorum', 'I’ll take it to go', 'Хочу с собой'],
   focacciaUpgrade: ['Siparişimi tamamla', 'Complete my order', 'Дополнить заказ'],
   focacciaCombine: ['Al götür eşleşmesine çevir', 'Make it a to-go pairing', 'Собрать комбо с собой'],
@@ -30,7 +40,7 @@ const copy = {
   focacciaDelta: ['Sipariş tutarındaki değişim', 'Change to your order total', 'Изменение суммы заказа'],
   focacciaReplace: ['Seçtiğin birer porsiyon yerine', 'Replaces one of each selected item', 'Заменит по одной выбранной порции'],
   focacciaTakeNote: ['Paket servis uygunluğunu ekibimizle teyit edin. Sipariş ve ödeme kafede.', 'Confirm takeaway availability with our team. Order and pay at the café.', 'Возможность подачи с собой уточните у команды. Заказ и оплата в кафе.'],
-  focacciaAdded: ['Al götür eşleşmesi siparişinde.', 'Your to-go pairing is in the order.', 'Комбо с собой добавлено в заказ.'],
+  focacciaAdded: ['Eşleşmen siparişinde.', 'Your pairing is in the order.', 'Комбо добавлено в заказ.'],
   focacciaUndo: ['Geri al', 'Undo', 'Отменить'],
   updated: ['Seçim güncellendi', 'Selection updated', 'Выбор обновлён'],
   customize: ['Özelleştir', 'Customize', 'Настроить'],
@@ -204,6 +214,7 @@ const maxQuantity = 99;
 let draft;
 let nutritionSequence = 0;
 let focacciaOffer;
+let focacciaDraft;
 let focacciaTransaction;
 let focacciaOpener;
 let focacciaAutoTimer;
@@ -219,7 +230,7 @@ async function fillNutrition(container, entry, options = {}) {
   container.innerHTML = `<p class="nutrition-loading" role="status">${t('nutritionLoading')}</p>`;
   try {
     // Nutrition is only fetched when someone opens a product, keeping the feed light.
-    const { nutritionMarkup } = await import('./nutrition.js?v=20261105-visible');
+    const { nutritionMarkup } = await import('./nutrition.js?v=20261106-builder');
     if (!container.isConnected || container.dataset.nutritionSequence !== sequence || language !== languageAtStart) return;
     container.innerHTML = nutritionMarkup(entry, language, items, { ...options, open });
     if (options.scrollTo && open) requestAnimationFrame(() => {
@@ -319,7 +330,7 @@ function renderConfigurator() {
   if (!supported.syrup) draft.syrup = 'none';
   $('#configure-product').innerHTML = `<div class="configure-product">
     <div class="configure-photo">${itemImage(entry, false)}${illustrationLabel(entry)}</div>
-    <div><p class="eyebrow">${t(entry.sourceId ? 'takeaway' : 'dineIn')}</p><h2 id="configure-title">${name(entry)}</h2>
+    <div><p class="eyebrow">${t(isTakeaway(entry) ? 'takeaway' : 'dineIn')}</p><h2 id="configure-title">${name(entry)}</h2>
       ${description(entry) ? `<p>${description(entry)}</p>` : ''}${priceMarkup(entry)}</div>
   </div><div id="configure-nutrition"></div>`;
   const fields = [];
@@ -362,6 +373,8 @@ function updateConfigurationTotal() {
 
 function openConfigurator(id, opener, editId) {
   const entry = orderItem(id);
+  const pairing = comboChoice(entry);
+  if (pairing) return openFocacciaPromo(opener, false, editId, pairing);
   const baseId = entry.baseId ?? entry.id;
   draft = {
     singleId: entry.sourceId ?? baseId, itemId: baseId,
@@ -669,46 +682,69 @@ function showAdded(entry, opener, updated = false) {
 
 function renderFocacciaTeaser() {
   const teaser = $('#focaccia-teaser');
-  const offer = focacciaTakeawayOffer(selection, items, orderItem);
-  teaser.hidden = !offer;
-  if (!offer) return;
-  teaser.innerHTML = `<span class="focaccia-teaser-photo">${itemImage(items.get('smoked-turkey'))}</span>
-    <span class="focaccia-teaser-copy"><small>${t('focacciaKicker')}</small><strong>${t('focacciaBanner')}</strong><span>${t('takeaway')} · ${price(orderItem(offer.addId).price)}</span></span>${icon('chevron')}`;
+  teaser.hidden = false;
+  const minimum = Math.min(...comboFoodIds.map(id => items.get(id).price)) + Math.min(...comboDrinkIds.map(id => items.get(id).price));
+  teaser.innerHTML = `<span class="focaccia-teaser-photo">${itemImage(items.get('smoked-turkey'))}</span><span class="focaccia-teaser-copy"><small>${t('focacciaTitle')}</small><strong>${t('focacciaBanner')}</strong><span>${t('comboFrom')} ${price(minimum)}</span></span>${icon('chevron')}`;
+}
+
+function comboSelect(field, title, options, value) {
+  return `<label class="combo-select"><span id="combo-${field}-label">${title}</span><select id="combo-${field}" aria-labelledby="combo-${field}-label" data-combo-field="${field}">${options.map(option => `<option value="${option.id}"${option.id === value ? ' selected' : ''}>${option.label}</option>`).join('')}</select></label>`;
 }
 
 function renderFocacciaPromo() {
-  const entry = orderItem(focacciaOffer.addId);
-  const base = items.get('to-go-lunch-favourite');
-  const before = base.before + entry.price - base.price;
-  const delta = focacciaOffer.delta < 0 ? `−${price(-focacciaOffer.delta)}` : `+${price(focacciaOffer.delta)}`;
-  const action = focacciaOffer.kind === 'combine' ? 'focacciaCombine' : focacciaOffer.kind === 'upgrade' ? 'focacciaUpgrade' : 'focacciaAction';
-  $('#focaccia-content').innerHTML = `<div class="focaccia-hero">
-      <div class="focaccia-food">${itemImage(items.get('smoked-turkey'), false)}</div>
-      <div class="focaccia-drink">${itemImage(items.get('iced-americano'), false)}<span>${icon('cup')}${t('takeaway')}</span></div>
-      <small class="focaccia-illustration">${t('illustration')}</small>
-    </div>
-    <div class="focaccia-copy">
-      <h2 id="focaccia-title">${t('focacciaTitle')}</h2><p class="focaccia-intro">${t('focacciaBody')}</p>
-      <div class="focaccia-ingredients"><span>${name(items.get('smoked-turkey'))}</span><b>+</b><span>${name(items.get('iced-americano'))}</span></div>
-      ${optionLabels(entry, language) ? `<p class="line-options">${optionLabels(entry, language)}</p>` : ''}
-      <div class="focaccia-price"><div><small>${t('focacciaBoth')}</small><strong>${price(entry.price)}</strong><del>${price(before)}</del></div><span>${t('quickSavings')} ${price(before - entry.price)}</span></div>
-      ${focacciaOffer.remove.length ? `<p class="focaccia-replacement">${t('focacciaReplace')}: ${focacciaOffer.remove.map(([id]) => name(orderItem(id))).join(' + ')}.<br>${t('focacciaDelta')}: <strong>${delta}</strong></p>` : ''}
-      <p class="focaccia-note">${t('focacciaTakeNote')}</p>
+  const drink = items.get(focacciaDraft.drinkId);
+  const supported = customization(drink);
+  if (!supported.milk) focacciaDraft.milk = 'standard';
+  if (!supported.syrup) focacciaDraft.syrup = 'none';
+  const entry = orderItem(builtComboId(focacciaDraft));
+  const food = items.get(focacciaDraft.foodId);
+  focacciaOffer = selectedComboOffer(selection, items, orderItem, focacciaDraft, { editId: focacciaDraft.editId, limit: maxQuantity });
+  const quantity = focacciaDraft.editId ? selection.get(focacciaDraft.editId) ?? 1 : 1;
+  const base = items.get(entry.baseId ?? entry.id);
+  const before = base?.before ? base.before + entry.price - base.price : entry.price;
+  const saving = before - entry.price;
+  const delta = focacciaOffer ? `${focacciaOffer.delta < 0 ? '−' : '+'}${price(Math.abs(focacciaOffer.delta))}` : '';
+  const action = focacciaDraft.editId ? 'comboSave' : focacciaOffer?.kind === 'combine' ? 'comboJoin' : focacciaOffer?.kind === 'upgrade' ? 'focacciaUpgrade' : focacciaDraft.serving === 'takeaway' ? 'focacciaAction' : 'comboAdd';
+  const advancedOpen = Boolean($('#focaccia-content .combo-advanced[open]'));
+  const serving = t(focacciaDraft.serving === 'takeaway' ? 'takeaway' : 'dineIn');
+  const drinkPhoto = (focacciaDraft.serving === 'takeaway' && items.get(`to-go-${drink.id}`)) || drink;
+  $('#focaccia-service').textContent = serving;
+  $('#focaccia-content').innerHTML = `<div class="focaccia-hero"><div class="focaccia-food">${itemImage(food, false)}</div><div class="focaccia-drink">${itemImage(drinkPhoto, false)}<span>${icon('cup')}${serving}</span></div><small class="focaccia-illustration">${t('illustration')}</small></div>
+    <div class="focaccia-copy"><h2 id="focaccia-title">${t('focacciaTitle')}</h2>
+      <div class="combo-selectors">
+        ${comboSelect('foodId', t('comboFood'), comboFoodIds.map(id => ({ id, label: `${name(items.get(id))} · ${price(items.get(id).price)}` })), focacciaDraft.foodId)}
+        ${comboSelect('drinkId', t('comboDrinkSelect'), comboDrinkIds.map(id => ({ id, label: `${name(items.get(id))} · ${price(items.get(id).price)}` })), focacciaDraft.drinkId)}
+      </div><p class="combo-ingredients">${description(food)}</p>
+      <details class="combo-advanced"${advancedOpen ? ' open' : ''}><summary>${t('comboOptions')}</summary>
+        ${comboSelect('serving', t('serviceMode'), [{ id: 'takeaway', label: t('takeaway') }, { id: 'cafe', label: t('dineIn') }], focacciaDraft.serving)}
+        ${supported.milk ? comboSelect('milk', t('milk'), milkOptions.map(option => ({ id: option.id, label: `${option.labels[language]} · ${option.id === 'standard' ? t('included') : `+${price(items.get('plant-milk').price)}`}` })), focacciaDraft.milk) : ''}
+        ${supported.syrup ? comboSelect('syrup', t('syrup'), syrupOptions.map(option => ({ id: option.id, label: `${option.labels[language]} · ${option.id === 'none' ? t('included') : `+${price(items.get('syrup').price)}`}` })), focacciaDraft.syrup) : ''}
+      </details>
+      <div class="focaccia-price"><div><small>${t(quantity > 1 ? 'comboOne' : 'focacciaBoth')}</small><strong>${price(entry.price)}</strong>${saving ? `<del>${price(before)}</del>` : ''}</div>${saving ? `<span>${t('quickSavings')} ${price(saving)}</span>` : ''}</div>
+      ${!saving ? `<p class="combo-price-note">${t('comboMenuSum')}</p>` : ''}
+      ${quantity > 1 ? `<p class="combo-price-note">${t('comboEditQuantity')}: ${quantity} · ${t('total')}: ${price(entry.price * quantity)}</p>` : ''}
+      ${focacciaOffer?.remove.length && !focacciaDraft.editId ? `<p class="focaccia-replacement">${t('focacciaReplace')}: ${focacciaOffer.remove.map(([id]) => name(orderItem(id))).join(' + ')}.<br>${t('focacciaDelta')}: <strong>${delta}</strong></p>` : ''}
+      <div id="combo-nutrition"></div><p class="focaccia-note">${t('focacciaTakeNote')}</p>${!focacciaOffer ? `<p class="nutrition-changed" role="alert">${t('quantityLimit')}</p>` : ''}
     </div>`;
-  $('#accept-focaccia').innerHTML = `<span>${t(action)}</span><strong>${focacciaOffer.remove.length ? delta : price(entry.price)}</strong>${icon('arrow')}`;
+  fillNutrition($('#combo-nutrition'), entry, { changed: focacciaDraft.milk !== 'standard' || focacciaDraft.syrup !== 'none' });
+  $('#accept-focaccia').disabled = !focacciaOffer;
+  $('#accept-focaccia').innerHTML = `<span>${t(action)}</span><strong>${focacciaDraft.editId ? price(entry.price * quantity) : focacciaOffer?.remove.length ? delta : price(entry.price)}</strong>${icon('arrow')}`;
   $('#focaccia-later').textContent = t('focacciaLater');
+  $('#combo-price-status').textContent = `${name(food)} + ${name(drink)} · ${t('total')} ${price(entry.price * quantity)}`;
 }
 
-function openFocacciaPromo(opener, automatic = false) {
-  if (document.querySelector('dialog[open]') || (automatic && (focacciaSeen || document.hidden))) return false;
+function openFocacciaPromo(opener, automatic = false, editId = null, initialChoice = null) {
+  const openDialog = document.querySelector('dialog[open]');
+  if ((openDialog && (automatic || (openDialog !== cart && openDialog !== viewer))) || (automatic && (focacciaSeen || document.hidden))) return false;
   if (automatic) {
     if (document.activeElement?.matches('input, textarea, select, [contenteditable="true"]')) return false;
     const menuBounds = $('#menu').getBoundingClientRect();
     if (menuBounds.bottom <= 0 || menuBounds.top >= innerHeight) return false;
   }
   const offer = focacciaTakeawayOffer(selection, items, orderItem);
-  if (!offer || (automatic && selection.size && !offer.remove.length)) return false;
-  focacciaOffer = offer;
+  if (automatic && (!offer || (selection.size && !offer.remove.length))) return false;
+  const choice = initialChoice ?? comboChoice(orderItem(offer?.addId ?? 'to-go-lunch-favourite'));
+  focacciaDraft = { ...choice, editId };
   focacciaOpener = opener;
   focacciaSeen = true;
   clearTimeout(focacciaAutoTimer);
@@ -734,12 +770,8 @@ function scheduleFocacciaPromo(delay = 8000) {
 
 function acceptFocacciaPromo() {
   const next = applyCheckoutOffer(selection, focacciaOffer, orderItem, maxQuantity);
-  if (!next) {
-    focacciaOffer = focacciaTakeawayOffer(selection, items, orderItem);
-    if (focacciaOffer) renderFocacciaPromo();
-    else focacciaPromo.close();
-    return;
-  }
+  if (!next) { renderFocacciaPromo(); return; }
+  const changedId = focacciaOffer.addId;
   focacciaTransaction = { before: [...selection], after: selectionSignature(next) };
   selection.clear();
   next.forEach((quantity, id) => selection.set(id, quantity));
@@ -747,7 +779,11 @@ function acceptFocacciaPromo() {
   offerTransaction = null;
   persistSelection();
   focacciaPromo.close();
-  openCart($('.top [data-open-cart]'));
+  if (viewer.open) viewer.close();
+  if (cart.open) {
+    renderCart();
+    cartItems.querySelector(`[data-edit="${changedId}"]`)?.focus({ preventScroll: true });
+  } else openCart($('.top [data-open-cart]'));
   $('#announcement').textContent = `${t('focacciaAdded')} ${t('total')} ${price(selectionTotal())}`;
 }
 
@@ -841,7 +877,7 @@ function renderCart() {
     const entry = orderItem(id);
     return `<article class="cart-row">
       <div class="cart-product-image">${itemImage(entry)}</div>
-      <div class="cart-product-copy"><h3>${name(entry)}</h3><small class="service-tag">${t(entry.sourceId ? 'takeaway' : 'dineIn')}</small>${entry.before ? `<p class="cart-description">${description(entry)}</p>` : ''}${optionLabels(entry, language) ? `<small class="line-options">${optionLabels(entry, language)}</small>` : ''}
+      <div class="cart-product-copy"><h3>${name(entry)}</h3><small class="service-tag">${t(isTakeaway(entry) ? 'takeaway' : 'dineIn')}</small>${entry.before || entry.isBuiltCombo ? `<p class="cart-description">${description(entry)}</p>` : ''}${optionLabels(entry, language) ? `<small class="line-options">${optionLabels(entry, language)}</small>` : ''}
         <button type="button" class="edit-line" data-edit="${id}" aria-label="${t('edit')} · ${name(entry)}">${t('edit')}</button>
       </div>
       <div class="quantity cart-quantity">
@@ -872,11 +908,11 @@ function renderWaiter() {
   $('#waiter-items').innerHTML = [...selection].map(([id, quantity]) => {
     const entry = orderItem(id);
     return `<li><div class="waiter-photo">${itemImage(entry, false)}<span class="waiter-quantity">${quantity}×</span></div>
-      <div class="waiter-item-copy"><strong>${entry.names[0]}</strong>${language ? `<small lang="${languages[language]}">${name(entry)}</small>` : ''}<p class="service-tag">${copy[entry.sourceId ? 'takeaway' : 'dineIn'][0]}</p>${optionLabels(entry, 0) ? `<p class="line-options">${optionLabels(entry, 0)}</p>` : ''}${entry.before ? `<p>${entry.descriptions[0]}</p>` : ''}
+      <div class="waiter-item-copy"><strong>${entry.names[0]}</strong>${language ? `<small lang="${languages[language]}">${name(entry)}</small>` : ''}<p class="service-tag">${copy[isTakeaway(entry) ? 'takeaway' : 'dineIn'][0]}</p>${optionLabels(entry, 0) ? `<p class="line-options">${optionLabels(entry, 0)}</p>` : ''}${entry.before || entry.isBuiltCombo ? `<p>${entry.descriptions[0]}</p>` : ''}
       <span class="waiter-price">${price(entry.price * quantity, locales[0])}</span></div></li>`;
   }).join('');
   $('#waiter-total').textContent = price(selectionTotal(), locales[0]);
-  $('#waiter-take-note').hidden = ![...selection.keys()].some(id => orderItem(id).sourceId);
+  $('#waiter-take-note').hidden = ![...selection.keys()].some(id => isTakeaway(orderItem(id)));
   const savings = checkoutSavings(selection, items, orderItem);
   $('#waiter-savings').hidden = !savings;
   $('#waiter-savings').textContent = `Eşleşme avantajınız: ${price(savings, locales[0])}`;
@@ -1165,3 +1201,12 @@ if (!linkedItem && !focacciaSeen && 'IntersectionObserver' in window) {
   }, { threshold: .5 });
   offerObserver.observe($('#result-meta'));
 }
+
+// Native selects retain their focus when dependent choices and prices rerender.
+focacciaPromo.addEventListener('change', event => {
+  const field = event.target.dataset.comboField;
+  if (!['foodId', 'drinkId', 'serving', 'milk', 'syrup'].includes(field)) return;
+  focacciaDraft[field] = event.target.value;
+  renderFocacciaPromo();
+  $(`#combo-${field}`)?.focus({ preventScroll: true });
+});

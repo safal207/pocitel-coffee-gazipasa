@@ -1,4 +1,4 @@
-import { configurationId } from './order-options.js';
+import { configurationId, isTakeaway } from './order-options.js?v=20261106-builder';
 
 const pairings = [
   { id: 'turkish-classic', food: 'cilbir', drink: 'tea' },
@@ -16,21 +16,24 @@ export function checkoutSavings(selection, catalog, resolve) {
   return [...selection].reduce((sum, [id, quantity]) => {
     const entry = resolve(id);
     const base = catalog.get(entry.baseId ?? entry.id);
-    return sum + Math.max(0, (base.before ?? base.price) - base.price) * quantity;
+    return sum + Math.max(0, base ? (base.before ?? base.price) - base.price : 0) * quantity;
   }, 0);
 }
 
 // A checked offer is a single reversible cart transaction, including replacements.
 export function applyCheckoutOffer(selection, offer, resolve, limit = 99) {
   if (!offer || selectionSignature(selection) !== offer.signature || !resolve(offer.addId)) return null;
+  const addQuantity = offer.addQuantity ?? 1;
+  if (!Number.isInteger(addQuantity) || addQuantity < 1 || addQuantity > limit) return null;
   const next = new Map(selection);
   for (const [id, quantity] of offer.remove) {
+    if (!Number.isInteger(quantity) || quantity < 1) return null;
     const previous = next.get(id) ?? 0;
     if (previous < quantity) return null;
     if (previous === quantity) next.delete(id);
     else next.set(id, previous - quantity);
   }
-  const quantity = (next.get(offer.addId) ?? 0) + 1;
+  const quantity = (next.get(offer.addId) ?? 0) + addQuantity;
   if (quantity > limit) return null;
   next.set(offer.addId, quantity);
   return next;
@@ -45,9 +48,9 @@ export function recommendCheckout(selection, catalog, resolve) {
   if (!selection.size) return null;
   const entries = [...selection.keys()].map(resolve);
   const findSingle = id => entries.find(entry => !entry.sourceId && baseId(entry) === id);
-  const hasFood = entries.some(entry => foods.has(baseId(entry)) || pairings.some(pair => pair.id === baseId(entry)));
-  const hasDrink = entries.some(entry => drinks.has(baseId(entry)) || pairings.some(pair => pair.id === baseId(entry)));
-  const hasCoffee = entries.some(entry => (drinks.has(baseId(entry)) && !['tea', 'relax', 'maroc', 'balance'].includes(baseId(entry))) || pairings.some(pair => pair.id === baseId(entry) && pair.drink !== 'tea'));
+  const hasFood = entries.some(entry => entry.isBuiltCombo || foods.has(baseId(entry)) || pairings.some(pair => pair.id === baseId(entry)));
+  const hasDrink = entries.some(entry => entry.isBuiltCombo || drinks.has(baseId(entry)) || pairings.some(pair => pair.id === baseId(entry)));
+  const hasCoffee = entries.some(entry => (entry.isBuiltCombo && !['tea', 'relax', 'maroc', 'balance'].includes(entry.comboChoice.drinkId)) || (drinks.has(baseId(entry)) && !['tea', 'relax', 'maroc', 'balance'].includes(baseId(entry))) || pairings.some(pair => pair.id === baseId(entry) && pair.drink !== 'tea'));
   const make = (kind, addId, remove = [], reason = kind) => {
     const added = resolve(addId);
     if (!added) return null;
@@ -73,7 +76,7 @@ export function recommendCheckout(selection, catalog, resolve) {
     }
   }
 
-  const hasTakeaway = entries.some(entry => entry.sourceId);
+  const hasTakeaway = entries.some(isTakeaway);
   let next;
   let reason;
   if (hasFood && !hasDrink && !hasTakeaway) {

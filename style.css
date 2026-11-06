@@ -669,3 +669,17 @@ body:has(dialog[open]) .added-notice { visibility: hidden; }
   .service-options button { padding-inline: .55rem; font-size: .74rem; }
   .menu-utilities { gap: 2px; }
 }
+
+.combo-selectors { display: grid; gap: .55rem; margin-top: .8rem; }
+.combo-select { display: grid; gap: .2rem; min-width: 0; color: var(--olive); font-size: .72rem; font-weight: 650; }
+.combo-select select { display: block; min-width: 0; width: 100%; min-height: 44px; padding: .55rem .6rem; border: 1px solid var(--strong-line); border-radius: 8px; background: var(--cream); color: var(--ink); font: 400 .8rem var(--sans); text-overflow: ellipsis; }
+.combo-select select:focus-visible { outline-offset: 2px; }
+.combo-ingredients { margin-top: .4rem; color: var(--muted); font-size: .72rem; line-height: 1.4; }
+.combo-advanced { margin-top: .65rem; font-size: .75rem; }
+.combo-advanced > summary { min-height: 44px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; color: var(--olive); }
+.combo-advanced > summary::after { content: '+'; }
+.combo-advanced[open] > summary::after { content: '−'; }
+.combo-advanced .combo-select + .combo-select { margin-top: .5rem; }
+.combo-price-note { color: var(--muted); font-size: .7rem; margin-top: .35rem; }
+#combo-nutrition .nutrition-panel { margin-top: .7rem; }
+#combo-nutrition .nutrition-panel > summary { flex-wrap: wrap; font-size: .72rem; gap: .35rem; }
