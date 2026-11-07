@@ -6,6 +6,7 @@ import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOf
 import { energyRanges } from './nutrition-summary.js?v=20261105-focaccia';
 import { focacciaTakeawayOffer, selectedComboOffer } from './focaccia-offer.js?v=20261106-builder';
 import { moments, restoreFavoriteCombos, nextComboChoice } from './discovery.js?v=20261107-moments';
+import { revealFor } from './ingredient-reveal.js?v=20261107-all-dishes';
 
 const copy = {
   skip: ['Menüye geç', 'Skip to menu', 'Перейти к меню'],
@@ -48,14 +49,10 @@ const copy = {
   lookInside: ['İçine bak', 'Look inside', 'Заглянуть внутрь'],
   cutawayHeading: ['İçindekileri keşfet', 'Discover what is inside', 'Посмотрите, что внутри'],
   cutawayHelp: ['İçini görmek için kaydırıcıyı sürükleyin', 'Drag the slider to reveal the ingredients', 'Передвиньте ползунок, чтобы увидеть состав'],
-  cutawayRange: ['Focaccia içeriğini göster', 'Reveal the focaccia ingredients', 'Показать состав фокаччи'],
+  cutawaySource: ['Menüde belirtilenler', 'As listed on the menu', 'Состав по меню'],
+  cutawayRange: ['Yemeğin içindekilerini göster', 'Reveal the dish ingredients', 'Показать состав блюда'],
   cutawayShown: ['Görünen iç kısım', 'Inside shown', 'Состав открыт на'],
-  cutawayCombo: ['Eşleşmedeki focaccia', 'Focaccia in the pairing', 'Фокачча в комбо'],
-  cutawayBread: ['Focaccia ekmeği', 'Focaccia bread', 'Хлеб фокачча'],
-  cutawayTurkey: ['Hindi füme', 'Smoked turkey', 'Копчёная индейка'],
-  cutawayTomato: ['Domates', 'Tomato', 'Томаты'],
-  cutawayArugula: ['Roka', 'Arugula', 'Руккола'],
-  cutawayAvocado: ['Avokado sosu', 'Avocado sauce', 'Соус из авокадо'],
+  cutawayCombo: ['Eşleşmedeki yemek', 'Dish in the pairing', 'Блюдо в комбо'],
   focacciaKicker: ['Molanı yanında götür', 'Take your break with you', 'Возьмите паузу с собой'],
   focacciaTitle: ['Kendi eşleşmeni oluştur', 'Build your perfect pairing', 'Соберите своё комбо'],
   focacciaBody: ['Hindi fümeli, sebzeli focaccia. Yanına buzlu Americano. Güzel bir mola, nereye gidersen.', 'Golden focaccia with smoked turkey and vegetables, paired with an iced Americano. A lovely break, wherever you go.', 'Румяная фокачча с индейкой и овощами. А к ней — айс-американо. Всё для вкусной паузы на прогулке.'],
@@ -551,23 +548,32 @@ function scrollToMenuStart(smooth = false) {
   });
 }
 
-const cutawayParts = ['cutawayBread', 'cutawayTurkey', 'cutawayTomato', 'cutawayArugula', 'cutawayAvocado'];
-const hasCutaway = entry => entry.id === 'smoked-turkey' || (entry.sourceId ?? entry.id) === 'lunch-favourite';
+const hasCutaway = entry => Boolean(revealFor(entry, language));
+const focacciaViews = {
+  'smoked-turkey': ['assets/cutaway/focaccia-outside.webp', 'assets/cutaway/focaccia-inside.webp'],
+  beetroot: ['assets/cutaway/beetroot-outside.webp', 'assets/illustrations/branded/beetroot.webp'],
+  zucchini: ['assets/cutaway/zucchini-outside.webp', 'assets/illustrations/branded/zucchini.webp'],
+};
 
 function cutawayMarkup(entry) {
-  const isPairing = entry.id !== 'smoked-turkey';
+  const reveal = revealFor(entry, language);
+  const food = items.get(reveal.dishId);
+  const shown = reveal.pairing ? food : entry;
+  const views = focacciaViews[reveal.dishId] ?? [`assets/${shown.image}.webp`, `assets/${shown.image}.webp`];
+  const illustrated = Boolean(focacciaViews[reveal.dishId]) || shown.sourceId || shown.image.startsWith('illustrations/');
+  const caption = reveal.pairing ? `${t('cutawayCombo')} · ${name(food)}` : t('cutawayHeading');
   return `<div class="cutaway" style="--cutaway-split: 50%">
-    <img class="cutaway-outside" src="assets/cutaway/focaccia-outside.webp" width="1024" height="683" alt="" decoding="async">
-    <div class="cutaway-inside" aria-hidden="true">
-      <img src="assets/cutaway/focaccia-inside.webp" width="1024" height="683" alt="" decoding="async">
-      ${cutawayParts.map((part, index) => `<span class="cutaway-tag cutaway-tag-${index}">${t(part)}</span>`).join('')}
+    <img class="cutaway-outside" src="${views[0]}" alt="" decoding="async">
+    <div class="cutaway-inside${focacciaViews[reveal.dishId] ? '' : ' cutaway-annotated'}" aria-hidden="true">
+      <img src="${views[1]}" alt="" decoding="async">
+      <div class="cutaway-label-stack">${reveal.parts.map(part => `<span class="cutaway-tag">${part}</span>`).join('')}</div>
     </div>
     <span class="cutaway-divider" aria-hidden="true"><span class="cutaway-handle">↔</span></span>
     <input type="range" min="0" max="100" step="1" value="50" class="cutaway-range" data-cutaway-range aria-label="${t('cutawayRange')}" aria-describedby="cutaway-help" aria-valuetext="${t('cutawayShown')} 50%">
-    <span class="cutaway-art-label">${t('illustration')}</span>
+    ${illustrated ? `<span class="cutaway-art-label">${t('illustration')}</span>` : ''}
   </div>
-  <div class="cutaway-guide" id="cutaway-help"><strong>${t(isPairing ? 'cutawayCombo' : 'cutawayHeading')}</strong><span>${t('cutawayHelp')}</span></div>
-  <div class="cutaway-legend" aria-label="${t('cutawayHeading')}">${cutawayParts.map(part => `<span>${t(part)}</span>`).join('')}</div>`;
+  <div class="cutaway-guide" id="cutaway-help"><strong>${caption}</strong><span>${t('cutawayHelp')} · ${t('cutawaySource')}</span></div>
+  <div class="cutaway-legend" aria-label="${t('cutawayHeading')}">${reveal.parts.map(part => `<span>${part}</span>`).join('')}</div>`;
 }
 
 function renderViewer() {
