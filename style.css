@@ -722,3 +722,37 @@ body:has(dialog[open]) .added-notice { visibility: hidden; }
   .moment-photo { flex-basis: 50px; }
   .combo-personal-actions button { font-size: .67rem; }
 }
+
+/* An accessible comparison for the focaccia in the menu and pairing. */
+.cutaway-preview { position: absolute; z-index: 1; right: .55rem; bottom: .55rem; display: inline-flex; align-items: center; gap: .35rem; padding: .35rem .55rem; border: 1px solid rgba(255,255,255,.55); border-radius: 50px; background: rgba(54,30,25,.82); color: #fff; font: 650 .68rem/1.1 var(--sans); }
+.viewer-photo.has-cutaway { touch-action: pan-y; }
+.cutaway { position: relative; isolation: isolate; width: 100%; aspect-ratio: 3 / 2; max-height: 46svh; overflow: hidden; background: var(--image-ground); user-select: none; }
+.viewer-photo .cutaway img { position: absolute; inset: 0; width: 100%; height: 100%; max-height: none; aspect-ratio: auto; object-fit: cover; }
+.cutaway-inside { position: absolute; inset: 0; clip-path: inset(0 0 0 var(--cutaway-split)); }
+.cutaway-tag { position: absolute; right: .5rem; z-index: 1; max-width: 43%; padding: .22rem .37rem; border: 1px solid rgba(255,255,255,.55); border-radius: 5px; background: rgba(50,27,20,.86); color: #fff; font: 650 .64rem/1.15 var(--sans); text-align: right; text-shadow: 0 1px 2px #24120c; }
+.cutaway-tag::before { content: ''; position: absolute; right: 100%; top: 50%; width: 15px; border-top: 1px dashed #fff; }
+.cutaway-tag-0 { top: 17%; }
+.cutaway-tag-1 { top: 33%; }
+.cutaway-tag-2 { top: 45%; }
+.cutaway-tag-3 { top: 57%; }
+.cutaway-tag-4 { top: 69%; }
+.cutaway-divider { position: absolute; z-index: 2; top: 0; bottom: 0; left: var(--cutaway-split); width: 2px; transform: translateX(-50%); background: #fff; box-shadow: 0 0 4px rgba(0,0,0,.6); pointer-events: none; }
+.cutaway-handle { position: absolute; top: 50%; left: 50%; display: grid; place-items: center; width: 42px; height: 42px; transform: translate(-50%,-50%); border: 1px solid var(--wine); border-radius: 50%; background: #fff9f2; color: #54232c; box-shadow: 0 2px 10px rgba(0,0,0,.25); font: 700 1.2rem/1 var(--sans); }
+.cutaway:focus-within .cutaway-handle { outline: 3px solid #fff; outline-offset: 3px; }
+.cutaway-range { position: absolute; z-index: 3; inset: 0; width: 100%; height: 100%; margin: 0; opacity: .001; appearance: none; background: transparent; cursor: ew-resize; touch-action: pan-y; }
+.cutaway-range::-webkit-slider-runnable-track { width: 100%; height: 100%; background: transparent; }
+.cutaway-range::-webkit-slider-thumb { width: 1px; height: 100%; appearance: none; background: transparent; border: 0; }
+.cutaway-range::-moz-range-track { height: 100%; background: transparent; border: 0; }
+.cutaway-range::-moz-range-thumb { width: 1px; height: 100%; background: transparent; border: 0; }
+.cutaway-art-label { position: absolute; z-index: 4; left: .55rem; bottom: .5rem; padding: .18rem .36rem; border-radius: 4px; background: rgba(255,249,242,.92); color: #56372d; font: .6rem/1.1 var(--sans); pointer-events: none; }
+.cutaway-guide { display: flex; align-items: baseline; flex-wrap: wrap; gap: .25rem .6rem; padding: .55rem 1rem .35rem; background: var(--paper); color: var(--ink); }
+.cutaway-guide strong { color: var(--wine); font: 1.1rem/1.2 var(--serif); }
+.cutaway-guide span { color: var(--muted); font-size: .7rem; }
+.cutaway-legend { display: flex; flex-wrap: wrap; gap: .28rem; padding: 0 1rem .6rem; background: var(--paper); }
+.cutaway-legend span { padding: .24rem .42rem; border: 1px solid var(--line); border-radius: 999px; color: var(--olive); font-size: .67rem; line-height: 1.2; }
+@media (max-width: 350px) {
+  .cutaway-tag { right: .3rem; padding: .18rem .28rem; font-size: .56rem; }
+  .cutaway-tag::before { width: 9px; }
+  .cutaway-guide { padding-inline: .75rem; }
+  .cutaway-legend { padding-inline: .75rem; }
+}
