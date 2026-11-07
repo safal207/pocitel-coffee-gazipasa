@@ -5,6 +5,7 @@ import { milkOptions, syrupOptions, customization, configurationId, resolveOrder
 import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOffer, undoCheckoutOffer } from './checkout-offers.js?v=20261106-builder';
 import { energyRanges } from './nutrition-summary.js?v=20261105-focaccia';
 import { focacciaTakeawayOffer, selectedComboOffer } from './focaccia-offer.js?v=20261106-builder';
+import { moments, restoreFavoriteCombos, nextComboChoice } from './discovery.js?v=20261107-moments';
 
 const copy = {
   skip: ['Menüye geç', 'Skip to menu', 'Перейти к меню'],
@@ -28,6 +29,22 @@ const copy = {
   comboFrom: ['Başlangıç', 'From', 'От'],
   comboOne: ['Bir eşleşme', 'Per pairing', 'За одно комбо'],
   comboEditQuantity: ['Siparişteki adet', 'Quantity in your order', 'Количество в заказе'],
+  momentsTitle: ['Nasıl bir mola istersin?', 'What kind of break?', 'Чего хочется сейчас?'],
+  momentsHint: ['Sana uygun bir seçki seç', 'Choose a collection for the moment', 'Выберите подборку по настроению'],
+  savedCombosTitle: ['Favori eşleşmelerin', 'Your favourite pairings', 'Любимые комбо'],
+  savedCombosHint: ['Bu tarayıcıda saklanır', 'Saved in this browser', 'Сохранены в этом браузере'],
+  saveComboFavorite: ['Favorilere kaydet', 'Save pairing', 'В избранное'],
+  savedComboFavorite: ['Favorilerde', 'Saved', 'Сохранено'],
+  removeComboFavorite: ['Favorilerden çıkar', 'Remove favourite', 'Убрать из избранного'],
+  openComboFavorite: ['Eşleşmeyi aç', 'Open pairing', 'Открыть комбо'],
+  comboSavedNotice: ['Eşleşme favorilerine kaydedildi.', 'Pairing saved to your favourites.', 'Комбо сохранено в избранном.'],
+  comboRemovedNotice: ['Eşleşme favorilerden çıkarıldı.', 'Pairing removed from your favourites.', 'Комбо убрано из избранного.'],
+  comboSessionNotice: ['Yalnızca bu oturum için kaydedildi.', 'Saved for this session only.', 'Сохранено только на время этой сессии.'],
+  anotherCombo: ['Başka bir eşleşme', 'Another pairing', 'Другое сочетание'],
+  comboBudget: ['Öneri bütçesi', 'Budget for suggestions', 'Бюджет для подбора'],
+  comboAnyBudget: ['Sınır yok', 'No limit', 'Без ограничения'],
+  comboUpTo: ['En fazla', 'Up to', 'До'],
+  comboNoAlternative: ['Bu bütçe ve seçeneklerle başka eşleşme yok. Bütçeyi veya seçenekleri değiştirin.', 'No other pairing fits these options and budget. Change the budget or options.', 'Других сочетаний с такими настройками и бюджетом нет. Измените бюджет или дополнения.'],
   focacciaKicker: ['Molanı yanında götür', 'Take your break with you', 'Возьмите паузу с собой'],
   focacciaTitle: ['Kendi eşleşmeni oluştur', 'Build your perfect pairing', 'Соберите своё комбо'],
   focacciaBody: ['Hindi fümeli, sebzeli focaccia. Yanına buzlu Americano. Güzel bir mola, nereye gidersen.', 'Golden focaccia with smoked turkey and vegetables, paired with an iced Americano. A lovely break, wherever you go.', 'Румяная фокачча с индейкой и овощами. А к ней — айс-американо. Всё для вкусной паузы на прогулке.'],
@@ -209,6 +226,7 @@ const focacciaPromo = $('#focaccia-promo');
 const selectionKey = 'pocitel-selection-v1';
 const languageKey = 'pocitel-language';
 const savedKey = 'pocitel-saved-v1';
+const favoriteCombosKey = 'pocitel-favorite-combos-v1';
 const pageSize = 8;
 const maxQuantity = 99;
 let draft;
@@ -279,6 +297,7 @@ const linkedItem = document.documentElement.dataset.shareItem || params.get('ite
 let language = languages.indexOf(document.documentElement.dataset.shareLang || params.get('lang'));
 if (language < 0) language = Math.max(0, languages.indexOf(readSetting(languageKey)));
 let activeCategory = location.hash === '#pairings' ? 'combos' : 'all';
+let activeMoment = null;
 let takeawayMode = Boolean(items.get(linkedItem)?.sourceId);
 if (takeawayMode) activeCategory = 'all';
 let savedOnly = false;
@@ -293,6 +312,7 @@ let sharePhotoUrl;
 let touchOrigin;
 const selection = restoreSelection();
 const saved = new Set();
+let favoriteCombos = restoreFavoriteCombos(readSetting(favoriteCombosKey), orderItem);
 try {
   const stored = JSON.parse(readSetting(savedKey));
   if (Array.isArray(stored)) stored.filter(id => items.has(id)).forEach(id => saved.add(id));
@@ -476,8 +496,10 @@ function renderServiceMode() {
 
 function renderResults(append = false) {
   const terms = normalize(search.value).split(/\s+/u).filter(Boolean);
+  const moment = moments.find(option => option.id === activeMoment);
   const matching = (takeawayMode ? takeawayItems : feedOrder).filter(entry =>
     (activeCategory === 'all' || categoryByItem.get(entry.id).id === activeCategory) &&
+    (!moment || moment.ids.includes(entry.id)) &&
     (!savedOnly || saved.has(entry.id)) &&
     terms.every(term => entry.searchText.includes(term))
   );
@@ -500,6 +522,7 @@ function renderResults(append = false) {
 
 function filterResults() {
   visibleLimit = pageSize;
+  renderMoments();
   document.querySelectorAll('[data-category]').forEach(button => button.setAttribute('aria-pressed', button.dataset.category === activeCategory));
   savedFilter.setAttribute('aria-pressed', savedOnly);
   renderResults();
@@ -680,6 +703,55 @@ function showAdded(entry, opener, updated = false) {
   }, 6000);
 }
 
+function renderMoments() {
+  $('#moments').innerHTML = `<div class="discovery-heading"><div><p class="eyebrow">${t('momentsHint')}</p><h3 id="moments-title">${t('momentsTitle')}</h3></div></div>
+    <div class="moment-list" role="group" aria-label="${t('momentsTitle')}">${moments.map(moment => `
+      <button type="button" class="moment-card" data-moment="${moment.id}" aria-pressed="${activeMoment === moment.id}" aria-controls="results">
+        <span class="moment-photo">${itemImage(items.get(moment.image))}</span>
+        <span class="moment-copy"><strong>${moment.labels[language]}</strong><small>${moment.captions[language]}</small></span>
+      </button>`).join('')}</div>`;
+}
+
+let favoritesPersisted = true;
+function persistFavoriteCombos() {
+  try { localStorage.setItem(favoriteCombosKey, JSON.stringify(favoriteCombos)); return true; }
+  catch { return false; }
+}
+
+function renderFavoriteCombos() {
+  const area = $('#favorite-combos');
+  area.hidden = !favoriteCombos.length;
+  if (!favoriteCombos.length) { area.innerHTML = ''; return; }
+  area.innerHTML = `<div class="discovery-heading"><div><p class="eyebrow">${t(favoritesPersisted ? 'savedCombosHint' : 'comboSessionNotice')}</p><h3 id="favorite-combos-title">${t('savedCombosTitle')}</h3></div></div>
+    <div class="favorite-list">${favoriteCombos.map(id => {
+      const entry = orderItem(id);
+      const choice = comboChoice(entry);
+      const drink = items.get(choice.drinkId);
+      const details = [t(isTakeaway(entry) ? 'takeaway' : 'dineIn'), optionLabels(entry, language)].filter(Boolean).join(' · ');
+      return `<article class="favorite-card">
+        <button type="button" class="favorite-open" data-favorite-combo="${id}" aria-label="${t('openComboFavorite')} · ${description(entry)}">
+          <span class="favorite-photos">${itemImage(items.get(choice.foodId))}${itemImage(drink)}</span>
+          <span class="favorite-copy"><strong>${description(entry)}</strong><small>${details}</small><b>${price(entry.price)}</b></span>
+        </button>
+        <button type="button" class="favorite-remove" data-remove-favorite="${id}" aria-label="${t('removeComboFavorite')} · ${description(entry)}">${icon('close')}</button>
+      </article>`;
+    }).join('')}</div>`;
+}
+
+function toggleFavoriteCombo() {
+  const id = builtComboId(focacciaDraft);
+  if (!comboChoice(orderItem(id))) return;
+  const removing = favoriteCombos.includes(id);
+  favoriteCombos = removing ? favoriteCombos.filter(savedId => savedId !== id) : [...favoriteCombos, id];
+  favoritesPersisted = persistFavoriteCombos();
+  renderFavoriteCombos();
+  renderFocacciaPromo();
+  const status = $('#combo-pick-status');
+  status.textContent = t(favoritesPersisted ? (removing ? 'comboRemovedNotice' : 'comboSavedNotice') : 'comboSessionNotice');
+  status.hidden = false;
+  $('#favorite-current-combo').focus({ preventScroll: true });
+}
+
 function renderFocacciaTeaser() {
   const teaser = $('#focaccia-teaser');
   teaser.hidden = false;
@@ -706,6 +778,8 @@ function renderFocacciaPromo() {
   const delta = focacciaOffer ? `${focacciaOffer.delta < 0 ? '−' : '+'}${price(Math.abs(focacciaOffer.delta))}` : '';
   const action = focacciaDraft.editId ? 'comboSave' : focacciaOffer?.kind === 'combine' ? 'comboJoin' : focacciaOffer?.kind === 'upgrade' ? 'focacciaUpgrade' : focacciaDraft.serving === 'takeaway' ? 'focacciaAction' : 'comboAdd';
   const advancedOpen = Boolean($('#focaccia-content .combo-advanced[open]'));
+  const budgetOpen = Boolean($('#focaccia-content .combo-budget[open]'));
+  const favorite = favoriteCombos.includes(builtComboId(focacciaDraft));
   const serving = t(focacciaDraft.serving === 'takeaway' ? 'takeaway' : 'dineIn');
   const drinkPhoto = (focacciaDraft.serving === 'takeaway' && items.get(`to-go-${drink.id}`)) || drink;
   $('#focaccia-service').textContent = serving;
@@ -715,6 +789,14 @@ function renderFocacciaPromo() {
         ${comboSelect('foodId', t('comboFood'), comboFoodIds.map(id => ({ id, label: `${name(items.get(id))} · ${price(items.get(id).price)}` })), focacciaDraft.foodId)}
         ${comboSelect('drinkId', t('comboDrinkSelect'), comboDrinkIds.map(id => ({ id, label: `${name(items.get(id))} · ${price(items.get(id).price)}` })), focacciaDraft.drinkId)}
       </div><p class="combo-ingredients">${description(food)}</p>
+      <div class="combo-personal-actions">
+        <button type="button" class="combo-alternative" id="another-combo"><span aria-hidden="true">↻</span> ${t('anotherCombo')}</button>
+        <button type="button" class="combo-favorite" id="favorite-current-combo" aria-pressed="${favorite}">${icon('bookmark')} ${t(favorite ? 'savedComboFavorite' : 'saveComboFavorite')}</button>
+      </div>
+      <details class="combo-budget"${budgetOpen ? ' open' : ''}><summary>${t('comboBudget')}</summary>
+        ${comboSelect('budget', t('comboBudget'), [{ id: '0', label: t('comboAnyBudget') }, ...[350, 450, 550, 700].map(value => ({ id: String(value), label: `${t('comboUpTo')} ${price(value)}` }))], focacciaDraft.budget)}
+      </details>
+      <p id="combo-pick-status" class="combo-pick-status" role="status" hidden></p>
       <details class="combo-advanced"${advancedOpen ? ' open' : ''}><summary>${t('comboOptions')}</summary>
         ${comboSelect('serving', t('serviceMode'), [{ id: 'takeaway', label: t('takeaway') }, { id: 'cafe', label: t('dineIn') }], focacciaDraft.serving)}
         ${supported.milk ? comboSelect('milk', t('milk'), milkOptions.map(option => ({ id: option.id, label: `${option.labels[language]} · ${option.id === 'standard' ? t('included') : `+${price(items.get('plant-milk').price)}`}` })), focacciaDraft.milk) : ''}
@@ -744,7 +826,7 @@ function openFocacciaPromo(opener, automatic = false, editId = null, initialChoi
   const offer = focacciaTakeawayOffer(selection, items, orderItem);
   if (automatic && (!offer || (selection.size && !offer.remove.length))) return false;
   const choice = initialChoice ?? comboChoice(orderItem(offer?.addId ?? 'to-go-lunch-favourite'));
-  focacciaDraft = { ...choice, editId };
+  focacciaDraft = { ...choice, editId, budget: '0' };
   focacciaOpener = opener;
   focacciaSeen = true;
   clearTimeout(focacciaAutoTimer);
@@ -946,6 +1028,8 @@ function applyLanguage() {
   renderServiceMode();
   renderResults();
   renderCounts();
+  renderMoments();
+  renderFavoriteCombos();
   if (focacciaPromo.open) renderFocacciaPromo();
 }
 
@@ -967,6 +1051,7 @@ document.addEventListener('click', event => {
   const jump = event.target.closest('[data-jump]');
   if (jump) {
     event.preventDefault();
+    activeMoment = null;
     takeawayMode = false;
     activeCategory = jump.dataset.jump;
     savedOnly = false;
@@ -983,8 +1068,40 @@ document.addEventListener('click', event => {
   }
   const button = event.target.closest('button');
   if (!button) return;
-  const { lang, category, add, quantity, item, post, story, save, share, related, mode, edit } = button.dataset;
-  if (button.id === 'focaccia-teaser') {
+  const { lang, category, add, quantity, item, post, story, save, share, related, mode, edit, moment, favoriteCombo, removeFavorite } = button.dataset;
+  if (moment) {
+    activeMoment = activeMoment === moment ? null : moment;
+    const selected = moments.find(option => option.id === activeMoment);
+    takeawayMode = selected?.mode === 'takeaway';
+    activeCategory = 'all';
+    savedOnly = false;
+    search.value = '';
+    renderServiceMode();
+    filterResults();
+    document.querySelector(`[data-moment="${moment}"]`)?.focus({ preventScroll: true });
+    scrollToMenuStart();
+  } else if (favoriteCombo) {
+    const choice = comboChoice(orderItem(favoriteCombo));
+    if (choice) openFocacciaPromo(button, false, null, choice);
+  } else if (removeFavorite) {
+    favoriteCombos = favoriteCombos.filter(id => id !== removeFavorite);
+    favoritesPersisted = persistFavoriteCombos();
+    renderFavoriteCombos();
+    ($('#favorite-combos .favorite-open') ?? $('#focaccia-teaser')).focus({ preventScroll: true });
+    $('#announcement').textContent = t(favoritesPersisted ? 'comboRemovedNotice' : 'comboSessionNotice');
+  } else if (button.id === 'another-combo') {
+    const next = nextComboChoice(focacciaDraft, orderItem, focacciaDraft.budget);
+    if (!next) {
+      $('#combo-pick-status').textContent = t('comboNoAlternative');
+      $('#combo-pick-status').hidden = false;
+    } else {
+      focacciaDraft = next;
+      renderFocacciaPromo();
+      $('#another-combo').focus({ preventScroll: true });
+    }
+  } else if (button.id === 'favorite-current-combo') {
+    toggleFavoriteCombo();
+  } else if (button.id === 'focaccia-teaser') {
     openFocacciaPromo(button);
   } else if (button.id === 'close-focaccia' || button.id === 'focaccia-later') {
     focacciaPromo.close();
@@ -1016,10 +1133,12 @@ document.addEventListener('click', event => {
     writeSetting(languageKey, lang);
     applyLanguage();
   } else if (category) {
+    activeMoment = null;
     activeCategory = category;
     filterResults();
     scrollToMenuStart();
   } else if (mode && (mode === 'takeaway') !== takeawayMode) {
+    activeMoment = null;
     takeawayMode = mode === 'takeaway';
     activeCategory = 'all';
     savedOnly = false;
@@ -1029,6 +1148,7 @@ document.addEventListener('click', event => {
     scrollToMenuStart();
     if (takeawayMode) scheduleFocacciaPromo(600);
   } else if (button === savedFilter) {
+    activeMoment = null;
     savedOnly = !savedOnly;
     if (savedOnly) {
       activeCategory = 'all';
@@ -1205,7 +1325,7 @@ if (!linkedItem && !focacciaSeen && 'IntersectionObserver' in window) {
 // Native selects retain their focus when dependent choices and prices rerender.
 focacciaPromo.addEventListener('change', event => {
   const field = event.target.dataset.comboField;
-  if (!['foodId', 'drinkId', 'serving', 'milk', 'syrup'].includes(field)) return;
+  if (!['foodId', 'drinkId', 'serving', 'milk', 'syrup', 'budget'].includes(field)) return;
   focacciaDraft[field] = event.target.value;
   renderFocacciaPromo();
   $(`#combo-${field}`)?.focus({ preventScroll: true });
