@@ -45,6 +45,17 @@ const copy = {
   comboAnyBudget: ['Sınır yok', 'No limit', 'Без ограничения'],
   comboUpTo: ['En fazla', 'Up to', 'До'],
   comboNoAlternative: ['Bu bütçe ve seçeneklerle başka eşleşme yok. Bütçeyi veya seçenekleri değiştirin.', 'No other pairing fits these options and budget. Change the budget or options.', 'Других сочетаний с такими настройками и бюджетом нет. Измените бюджет или дополнения.'],
+  lookInside: ['İçine bak', 'Look inside', 'Заглянуть внутрь'],
+  cutawayHeading: ['İçindekileri keşfet', 'Discover what is inside', 'Посмотрите, что внутри'],
+  cutawayHelp: ['İçini görmek için kaydırıcıyı sürükleyin', 'Drag the slider to reveal the ingredients', 'Передвиньте ползунок, чтобы увидеть состав'],
+  cutawayRange: ['Focaccia içeriğini göster', 'Reveal the focaccia ingredients', 'Показать состав фокаччи'],
+  cutawayShown: ['Görünen iç kısım', 'Inside shown', 'Состав открыт на'],
+  cutawayCombo: ['Eşleşmedeki focaccia', 'Focaccia in the pairing', 'Фокачча в комбо'],
+  cutawayBread: ['Focaccia ekmeği', 'Focaccia bread', 'Хлеб фокачча'],
+  cutawayTurkey: ['Hindi füme', 'Smoked turkey', 'Копчёная индейка'],
+  cutawayTomato: ['Domates', 'Tomato', 'Томаты'],
+  cutawayArugula: ['Roka', 'Arugula', 'Руккола'],
+  cutawayAvocado: ['Avokado sosu', 'Avocado sauce', 'Соус из авокадо'],
   focacciaKicker: ['Molanı yanında götür', 'Take your break with you', 'Возьмите паузу с собой'],
   focacciaTitle: ['Kendi eşleşmeni oluştur', 'Build your perfect pairing', 'Соберите своё комбо'],
   focacciaBody: ['Hindi fümeli, sebzeli focaccia. Yanına buzlu Americano. Güzel bir mola, nereye gidersen.', 'Golden focaccia with smoked turkey and vegetables, paired with an iced Americano. A lovely break, wherever you go.', 'Румяная фокачча с индейкой и овощами. А к ней — айс-американо. Всё для вкусной паузы на прогулке.'],
@@ -458,15 +469,17 @@ function nutritionLink(entry) {
 
 function menuPost(entry, index = 8) {
   const category = categoryByItem.get(entry.id);
+  const peek = hasCutaway(entry);
   return `<article class="feed-post${entry.sourceId ? ' take-post' : ''}" id="post-${entry.id}">
     <div class="post-top">
       <span class="post-mark"><svg aria-hidden="true"><use href="#i-sprig"/></svg></span>
       <span>${category.labels[language]}</span>
       ${entry.sourceId ? `<span class="pinned">${t('takeaway')}</span>` : entry.before ? `<span class="pinned">${t('pinned')}</span>` : ''}
     </div>
-    <button type="button" class="post-media" data-post="${entry.id}" aria-label="${t('details')} · ${name(entry)}">
+    <button type="button" class="post-media" data-post="${entry.id}" aria-label="${t('details')} · ${name(entry)}${peek ? ` · ${t('lookInside')}` : ''}">
       ${itemImage(entry, index > 1)}
       ${illustrationLabel(entry)}
+      ${peek ? `<span class="cutaway-preview"><span aria-hidden="true">↔</span> ${t('lookInside')}</span>` : ''}
     </button>
     <div class="post-body">
       <div class="post-heading"><h3>${name(entry)}</h3>${priceMarkup(entry)}</div>
@@ -538,6 +551,25 @@ function scrollToMenuStart(smooth = false) {
   });
 }
 
+const cutawayParts = ['cutawayBread', 'cutawayTurkey', 'cutawayTomato', 'cutawayArugula', 'cutawayAvocado'];
+const hasCutaway = entry => entry.id === 'smoked-turkey' || (entry.sourceId ?? entry.id) === 'lunch-favourite';
+
+function cutawayMarkup(entry) {
+  const isPairing = entry.id !== 'smoked-turkey';
+  return `<div class="cutaway" style="--cutaway-split: 50%">
+    <img class="cutaway-outside" src="assets/cutaway/focaccia-outside.webp" width="1024" height="683" alt="" decoding="async">
+    <div class="cutaway-inside" aria-hidden="true">
+      <img src="assets/cutaway/focaccia-inside.webp" width="1024" height="683" alt="" decoding="async">
+      ${cutawayParts.map((part, index) => `<span class="cutaway-tag cutaway-tag-${index}">${t(part)}</span>`).join('')}
+    </div>
+    <span class="cutaway-divider" aria-hidden="true"><span class="cutaway-handle">↔</span></span>
+    <input type="range" min="0" max="100" step="1" value="50" class="cutaway-range" data-cutaway-range aria-label="${t('cutawayRange')}" aria-describedby="cutaway-help" aria-valuetext="${t('cutawayShown')} 50%">
+    <span class="cutaway-art-label">${t('illustration')}</span>
+  </div>
+  <div class="cutaway-guide" id="cutaway-help"><strong>${t(isPairing ? 'cutawayCombo' : 'cutawayHeading')}</strong><span>${t('cutawayHelp')}</span></div>
+  <div class="cutaway-legend" aria-label="${t('cutawayHeading')}">${cutawayParts.map(part => `<span>${t(part)}</span>`).join('')}</div>`;
+}
+
 function renderViewer() {
   const { ids, index, story } = openedPost;
   const entry = items.get(ids[index]);
@@ -548,9 +580,8 @@ function renderViewer() {
     <div class="story-progress" aria-hidden="true">${ids.map((_, step) => `<span class="${step <= index ? 'read' : ''}"></span>`).join('')}</div>` :
     (openedPost.nutritionOpen ? `<p class="viewer-item-name">${name(entry)}</p>` : `<p class="eyebrow">${entry.sourceId ? `${t('takeaway')} · ` : ''}${categoryByItem.get(entry.id).labels[language]}</p>`);
   viewerContent.innerHTML = `
-    <div class="viewer-photo${entry.sourceId ? ' take-photo' : ''}">
-      ${itemImage(entry, false)}
-      ${illustrationLabel(entry)}
+    <div class="viewer-photo${entry.sourceId ? ' take-photo' : ''}${hasCutaway(entry) ? ' has-cutaway' : ''}">
+      ${hasCutaway(entry) ? cutawayMarkup(entry) : `${itemImage(entry, false)}${illustrationLabel(entry)}`}
     </div>
     <div class="viewer-body">
       <div class="post-heading"><h2 id="post-title">${name(entry)}</h2>${priceMarkup(entry)}</div>
@@ -1288,12 +1319,14 @@ shareDialog.addEventListener('close', () => {
   if (shareOpener?.isConnected) shareOpener.focus({ preventScroll: true });
 });
 viewer.addEventListener('keydown', event => {
+  if (event.target.matches('[data-cutaway-range]')) return;
   if (openedPost.story && ['ArrowLeft', 'ArrowRight'].includes(event.key)) {
     event.preventDefault();
     stepStory(event.key === 'ArrowLeft' ? -1 : 1);
   }
 });
 viewerContent.addEventListener('touchstart', event => {
+  if (event.target.closest('.cutaway')) { touchOrigin = null; return; }
   touchOrigin = event.target.closest('.viewer-photo') && event.touches.length === 1
     ? event.touches[0]
     : null;
@@ -1306,6 +1339,15 @@ viewerContent.addEventListener('touchend', event => {
   touchOrigin = null;
   if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) stepStory(dx < 0 ? 1 : -1);
 }, { passive: true });
+
+viewerContent.addEventListener('input', event => {
+  if (!event.target.matches('[data-cutaway-range]')) return;
+  const amount = Number(event.target.value);
+  const cutaway = event.target.closest('.cutaway');
+  if (!cutaway || !Number.isFinite(amount)) return;
+  cutaway.style.setProperty('--cutaway-split', `${amount}%`);
+  event.target.setAttribute('aria-valuetext', `${t('cutawayShown')} ${100 - amount}%`);
+});
 
 applyLanguage();
 $('#service-picker').hidden = false;
