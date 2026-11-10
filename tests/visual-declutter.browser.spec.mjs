@@ -70,3 +70,14 @@ test('Shorts interactions remain independent from photo and order actions', asyn
   await share.click();
   await expect(page.locator('#share-dialog')).toBeVisible();
 });
+
+test('Add-to-order remains the primary functional CTA', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`${base}/?lang=ru&item=sweet-morning`, { waitUntil: 'domcontentloaded' });
+  const add = page.locator('#post-viewer .viewer-body .post-actions [data-add="sweet-morning"]');
+  await expect(add).toBeVisible();
+  await add.click();
+  await expect(page.locator('#post-viewer')).not.toBeVisible();
+  await expect(page.locator('#selection-bar')).toBeVisible();
+  await expect(page.locator('#selection-bar [data-count]')).toHaveText('1');
+});
