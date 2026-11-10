@@ -24,8 +24,8 @@ test('translations have concise text for short hints, full ingredients and slide
   assert.ok(app.includes("cutawayAllIngredients: ['Tüm malzemeler', 'All ingredients', 'Весь состав']"));
   assert.ok(app.includes("cutawayShow: ['Tam aç', 'Reveal fully', 'Раскрыть целиком']"));
   assert.ok(app.includes("cutawayHide: ['Fotoğrafı göster', 'Show photo', 'Вернуть фото']"));
-  assert.ok(html.includes('app.js?v=20261110-declutter'));
-  assert.ok(html.includes('style.css?v=20261110-declutter'));
+  assert.ok(html.includes('app.js?v=20261110-fast-share'));
+  assert.ok(html.includes('style.css?v=20261110-fast-share'));
 });
 
 test('all menu-derived ingredients remain available in the collapsed disclosure', () => {
