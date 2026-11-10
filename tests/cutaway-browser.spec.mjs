@@ -23,7 +23,7 @@ test.describe('Mobile ingredient reveal / Shorts release gate', () => {
       const photo = dialog.locator('.cutaway');
       const preview = photo.locator('[data-qa="inside-overlay"]');
       await expect(preview).toBeVisible();
-      await expect(preview).toContainText('ВНУТРИ');
+      await expect(preview).toContainText('Внутри');
       await expect(preview).toContainText(revealFor(items.get(entry.id), 2).parts[0]);
       const rail = photo.locator('.post-social-rail');
       const handle = photo.locator('.cutaway-handle');
@@ -54,7 +54,7 @@ test.describe('Mobile ingredient reveal / Shorts release gate', () => {
 
 test.describe('Narrow screens and languages', () => {
   for (const width of [320, 360, 768]) {
-    for (const [lang, title] of [['tr', 'İÇİNDE'], ['en', 'INSIDE'], ['ru', 'ВНУТРИ']]) {
+    for (const [lang, title] of [['tr', 'İçinde'], ['en', 'Inside'], ['ru', 'Внутри']]) {
       test(`pancake: ${width}px and ${lang}`, async ({ page }) => {
         await page.setViewportSize({ width, height: 740 });
         await page.goto(`${base}/?lang=${lang}&item=sweet-morning`, { waitUntil: 'domcontentloaded' });
