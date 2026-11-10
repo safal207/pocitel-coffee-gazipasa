@@ -28,7 +28,7 @@ test('fallback is compact and does not contain the original photo preview or sec
   assert.match(html, /id="share-extras"/);
   assert.match(html, /id="share-photo-button"/);
   assert.match(html, /id="save-photo"/);
-  assert.match(html, /20261110-fast-share/);
+  assert.match(html, /20261110-warm-mirror/);
 });
 
 test('four direct channel URLs encode a public per-dish URL and localized invitation', () => {

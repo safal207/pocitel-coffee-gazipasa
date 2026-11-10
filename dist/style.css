@@ -1284,3 +1284,114 @@ button.social-rail-item:hover { background: rgba(33,41,37,.91); }
   .share-quick-grid a { padding-inline: 7px; gap: 5px; font-size: .75rem; }
   .share-channel-symbol { width: 25px; height: 25px; flex-basis: 25px; }
 }
+
+/* Warm mirror lighting: a quiet ambient border light, not a heavy neon shadow.
+   It keeps photos and copy legible in all four appearance themes. */
+.feed-post {
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(246, 209, 149, .31),
+    0 3px 18px rgba(178, 117, 52, .105),
+    inset 0 0 0 1px rgba(255, 245, 216, .27);
+  transition: box-shadow .22s ease, transform .2s ease;
+}
+.feed-post::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 238, 190, .28),
+              inset 0 0 24px rgba(242, 188, 107, .085);
+  pointer-events: none;
+}
+.feed-post:hover,
+.feed-post:focus-within,
+.feed-post.is-joy-tapped {
+  box-shadow:
+    0 0 0 1px rgba(240, 187, 110, .59),
+    0 0 24px rgba(240, 169, 70, .19),
+    0 6px 19px rgba(165, 107, 44, .12),
+    inset 0 0 0 1px rgba(255, 243, 202, .42);
+}
+@media (hover: hover) and (pointer: fine) {
+  .feed-post:hover { transform: translateY(-2px); }
+}
+.feed-post.is-joy-tapped { animation: pocitel-soft-pop .48s ease-out; }
+#post-viewer.is-joy-tapped {
+  box-shadow: 0 0 0 2px rgba(243, 183, 93, .44),
+              0 0 28px rgba(242, 187, 111, .18),
+              0 18px 55px rgba(31, 18, 16, .23);
+}
+#post-viewer .viewer-photo { box-shadow: inset 0 0 23px rgba(246, 197, 112, .10); }
+.is-joy-tapped.social-rail-like[aria-pressed="true"] .icon { animation: pocitel-heart-pop .45s cubic-bezier(.2,.85,.2,1); }
+.is-joy-tapped.save-post .icon { animation: pocitel-heart-pop .45s ease-out; }
+.is-joy-tapped.post-add { animation: pocitel-soft-pop .40s ease-out; }
+.selection-bar.is-joy-tapped { animation: pocitel-order-pulse .52s ease-out; }
+.added-notice.is-joy-tapped { animation: pocitel-notice-pop .52s ease-out; }
+.added-notice::before {
+  content: '✓';
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: var(--surface-checked);
+  color: var(--olive);
+  font: 800 .85rem/1 var(--sans);
+}
+.micro-feedback {
+  position: fixed;
+  z-index: 8;
+  left: 50%;
+  bottom: calc(max(18px, env(safe-area-inset-bottom)) + 73px);
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(310px, calc(100% - 36px));
+  padding: 9px 17px;
+  border: 1px solid rgba(241, 205, 153, .7);
+  border-radius: 100px;
+  background: var(--cream);
+  color: var(--wine);
+  box-shadow: 0 0 18px rgba(227, 163, 83, .18), 0 5px 20px var(--shadow);
+  font: 650 .83rem/1.35 var(--sans);
+  text-align: center;
+  pointer-events: none;
+}
+.micro-feedback.is-visible { animation: pocitel-toast-in .23s ease-out; }
+@keyframes pocitel-soft-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(.989); }
+  75% { transform: scale(1.008); }
+  100% { transform: scale(1); }
+}
+@keyframes pocitel-heart-pop {
+  0% { transform: scale(1); }
+  43% { transform: scale(1.26); }
+  72% { transform: scale(.94); }
+  100% { transform: scale(1); }
+}
+@keyframes pocitel-order-pulse {
+  0%, 100% { box-shadow: 0 5px 18px var(--shadow); }
+  45% { box-shadow: 0 0 0 4px rgba(238, 190, 113, .25), 0 0 22px rgba(233, 171, 83, .3); }
+}
+@keyframes pocitel-notice-pop {
+  0% { transform: translateY(6px); opacity: .5; }
+  80% { transform: translateY(-2px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes pocitel-toast-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feed-post, .feed-post:hover { transition: none; transform: none; }
+  .feed-post.is-joy-tapped,
+  #post-viewer.is-joy-tapped,
+  .is-joy-tapped.social-rail-like .icon,
+  .is-joy-tapped.save-post .icon,
+  .is-joy-tapped.post-add,
+  .selection-bar.is-joy-tapped,
+  .added-notice.is-joy-tapped,
+  .micro-feedback.is-visible { animation: none !important; }
+}
