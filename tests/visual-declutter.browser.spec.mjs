@@ -56,7 +56,14 @@ test.describe('Poçitel visually quiet dish detail on mobile', () => {
   }
 });
 
-test('Shorts interactions remain independent from photo and order actions', async ({ page }) => {
+test('Shorts interactions and native one-tap share remain independent from ordering', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', { configurable: true, value: data => {
+      window.__sharedFromTap = data;
+      window.__activationAtShare = navigator.userActivation?.isActive;
+      return Promise.resolve();
+    }});
+  });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${base}/?lang=ru&item=sweet-morning`, { waitUntil: 'domcontentloaded' });
   const viewer = page.locator('#post-viewer');
@@ -66,9 +73,13 @@ test('Shorts interactions remain independent from photo and order actions', asyn
   await expect(like).toHaveAttribute('aria-pressed', 'true');
   await like.click();
   await expect(like).toHaveAttribute('aria-pressed', 'false');
-  const share = viewer.locator('.post-social-rail [data-share="sweet-morning"]');
-  await share.click();
-  await expect(page.locator('#share-dialog')).toBeVisible();
+  await viewer.locator('.post-social-rail [data-share="sweet-morning"]').click();
+  const result = await page.evaluate(() => ({ data: window.__sharedFromTap, active: window.__activationAtShare }));
+  expect(result.data.url).toContain('share-ru-sweet-morning.html');
+  expect(result.data.title).toContain('Poçitel');
+  expect(result.active).toBe(true);
+  await expect(page.locator('#quick-share')).toHaveCount(0);
+  await expect(viewer).toBeVisible();
 });
 
 test('Add-to-order remains the primary functional CTA', async ({ page }) => {
