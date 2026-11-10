@@ -19,6 +19,10 @@ const copy = {
   navVisit: ['Ziyaret', 'Visit', 'Как добраться'],
   language: ['Dil', 'Language', 'Язык'],
   like: ['Beğen', 'Like', 'Нравится'],
+  likedFeedback: ['Beğendin', 'Liked', 'Понравилось'],
+  unlikedFeedback: ['Beğeni kaldırıldı', 'Like removed', 'Лайк убран'],
+  savedFeedback: ['Kaydedildi', 'Saved', 'Сохранено'],
+  unsavedFeedback: ['Kaydedilenlerden kaldırıldı', 'Removed from saved', 'Убрано из сохранённого'],
   views: ['Görüntülenme', 'Views', 'Просмотры'],
   socialActions: ['Ürün etkileşimleri', 'Dish interactions', 'Действия с блюдом'],
   engagementLocal: ['Beğeniler ve görüntülenmeler yalnızca bu cihazda saklanır.', 'Likes and views are saved on this device only.', 'Лайки и просмотры сохраняются только на этом устройстве.'],
@@ -239,6 +243,8 @@ const settings = $('#settings');
 let lastAddedId;
 let lastAddedOpener;
 let noticeTimer;
+let microFeedbackTimer;
+const pulseTimers = new WeakMap();
 const viewer = $('#post-viewer');
 const viewerContent = $('#viewer-content');
 const shareDialog = $('#share-dialog');
@@ -504,11 +510,39 @@ function persistEngagement() {
   writeSetting(engagementKey, serializeEngagement(engagement));
 }
 
-function handleLike(id) {
+function pulseTap(element) {
+  if (!element) return;
+  const card = element.closest('.feed-post, #post-viewer');
+  for (const node of [element, card].filter(Boolean)) {
+    clearTimeout(pulseTimers.get(node));
+    node.classList.remove('is-joy-tapped');
+    // Double RAF is unnecessary: the class is also a short-lived glowing state.
+    node.classList.add('is-joy-tapped');
+    pulseTimers.set(node, setTimeout(() => node.classList.remove('is-joy-tapped'), 500));
+  }
+}
+
+function showMicroFeedback(message) {
+  const toast = $('#micro-feedback');
+  if (!toast) return;
+  clearTimeout(microFeedbackTimer);
+  toast.textContent = message;
+  toast.hidden = false;
+  toast.classList.add('is-visible');
+  $('#announcement').textContent = message;
+  microFeedbackTimer = setTimeout(() => {
+    toast.classList.remove('is-visible');
+    toast.hidden = true;
+  }, 1450);
+}
+
+function handleLike(id, opener) {
   if (!items.has(id)) return;
   toggleLike(engagement, id);
   persistEngagement();
   refreshEngagement(id);
+  pulseTap(opener);
+  showMicroFeedback(t(engagement.likes.has(id) ? 'likedFeedback' : 'unlikedFeedback'));
 }
 
 function handleView(id) {
@@ -715,10 +749,12 @@ function stepStory(delta) {
   }
 }
 
-function toggleSaved(id) {
+function toggleSaved(id, opener) {
   if (!saved.delete(id)) saved.add(id);
   writeSetting(savedKey, JSON.stringify([...saved]));
   document.querySelectorAll(`[data-save="${id}"]`).forEach(node => node.setAttribute('aria-pressed', saved.has(id)));
+  pulseTap(opener);
+  showMicroFeedback(t(saved.has(id) ? 'savedFeedback' : 'unsavedFeedback'));
   if (savedOnly && !saved.has(id)) {
     renderResults();
     if (!viewer.open) (results.querySelector('.save-post') ?? savedFilter).focus();
@@ -840,7 +876,10 @@ function showAdded(entry, opener, updated = false) {
   lastAddedId = entry.id;
   lastAddedOpener = opener;
   $('#added-message').textContent = `${t(updated ? 'updated' : 'added')} · ${name(entry)}`;
-  $('#added-notice').hidden = false;
+  const addedNotice = $('#added-notice');
+  addedNotice.hidden = false;
+  pulseTap(addedNotice);
+  pulseTap($('#selection-bar'));
   clearTimeout(noticeTimer);
   noticeTimer = setTimeout(() => {
     const notice = $('#added-notice');
@@ -1305,7 +1344,7 @@ document.addEventListener('click', event => {
     visibleLimit += pageSize;
     renderResults(true);
   } else if (like) {
-    handleLike(like);
+    handleLike(like, button);
   } else if (post) {
     openPost([post], button);
   } else if (related) {
@@ -1316,7 +1355,7 @@ document.addEventListener('click', event => {
     viewer.scrollTop = 0;
     $('#close-post').focus();
   } else if (save) {
-    toggleSaved(save);
+    toggleSaved(save, button);
   } else if (share) {
     sharePost(button, share);
   } else if (button.id === 'copy-link') {
