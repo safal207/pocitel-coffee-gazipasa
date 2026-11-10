@@ -28,6 +28,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Install image converter
+        run: python3 -m pip install --quiet Pillow
+      - name: Rebuild all 165 share pages from current canonical template
+        run: node scripts/build-share-pages.mjs
       - name: Run all Node tests
         run: node --test tests/*.test.mjs
 
@@ -67,3 +71,28 @@ jobs:
             test-results/
             playwright-report/
           if-no-files-found: ignore
+
+  publish:
+    name: "Publish tested menu and 165 canonical share pages"
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [data-and-unit, browser-geometry]
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install image converter
+        run: python3 -m pip install --quiet Pillow
+      - name: Build all static share pages from latest index
+        run: node scripts/build-share-pages.mjs
+      - name: Publish complete dist to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          enable_jekyll: false
