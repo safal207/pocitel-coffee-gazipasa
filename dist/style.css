@@ -1395,3 +1395,7 @@ button.social-rail-item:hover { background: rgba(33,41,37,.91); }
   .added-notice.is-joy-tapped,
   .micro-feedback.is-visible { animation: none !important; }
 }
+
+/* Quantity edits update the modal in place. The app restores scrollTop after
+   redraw, so disable competing browser scroll anchoring in this pane only. */
+#cart .cart-scroll { overflow-anchor: none; }

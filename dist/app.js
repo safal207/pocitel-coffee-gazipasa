@@ -1139,6 +1139,10 @@ function toggleCheckoutOffer() {
 }
 
 function renderCart() {
+  // Quantity changes recreate rows; keep the modal's exact scroll position.
+  // Otherwise mobile browsers may jump to the newly focused + / - button.
+  const scrollPane = cart.querySelector('.cart-scroll');
+  const previousScrollTop = cart.open ? scrollPane?.scrollTop : null;
   if (focacciaTransaction && focacciaTransaction.after !== selectionSignature(selection)) focacciaTransaction = null;
   $('#focaccia-undo').hidden = !focacciaTransaction;
   const rows = [...selection].map(([id, quantity]) => {
@@ -1170,6 +1174,7 @@ function renderCart() {
   $('#checkout-help').hidden = !selection.size;
   $('#checkout-items-label').hidden = !selection.size;
   $('#checkout-picture-note').hidden = ![...selection.keys()].some(id => { const entry = orderItem(id); return entry.sourceId || entry.image.startsWith('illustrations/'); });
+  if (previousScrollTop != null && scrollPane) scrollPane.scrollTop = previousScrollTop;
 }
 
 function renderWaiter() {
@@ -1390,8 +1395,10 @@ document.addEventListener('click', event => {
     $('#show-waiter').focus();
   } else if (quantity) {
     changeSelection(item, Number(quantity));
+    // Re-rendering replaces the clicked node. Restore keyboard focus without
+    // allowing the browser to auto-scroll the cart or the page.
     const replacement = cartItems.querySelector(`[data-item="${item}"][data-quantity="${quantity}"]:not(:disabled)`);
-    (replacement ?? cartItems.querySelector('button') ?? $('#close-cart')).focus();
+    (replacement ?? cartItems.querySelector('button') ?? $('#close-cart')).focus({ preventScroll: true });
   } else if (button.hasAttribute('data-open-cart')) {
     openCart(button);
   } else if (button.id === 'show-waiter' && selection.size) {
