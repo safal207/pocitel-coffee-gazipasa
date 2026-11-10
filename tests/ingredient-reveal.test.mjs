@@ -17,6 +17,19 @@ test('every breakfast, snack and focaccia has a localized ingredient reveal', ()
   }
 });
 
+test('food extras use only their named menu components in each language', () => {
+  const extras = ['tomato-cucumber', 'olives', 'cheese', 'egg', 'nutella', 'chocolate-sauce'];
+  for (const id of extras) {
+    for (const language of [0, 1, 2]) {
+      const result = revealFor(items.get(id), language);
+      assert.equal(result?.dishId, id, id);
+      assert.equal(result.pairing, false, id);
+      assert.ok(result.parts.every(part => typeof part === 'string' && part.trim()), id);
+      assert.equal(result.parts.length, id === 'tomato-cucumber' ? 2 : 1, id);
+    }
+  }
+});
+
 test('pairings reveal their actual food, including takeaway variants', () => {
   for (const [pairId, [foodId]] of Object.entries(comboParts)) {
     const result = revealFor(items.get(pairId), 2);
