@@ -45,6 +45,14 @@ const dishParts = {
     ['Ricotta peyniri', 'Ricotta cheese', 'Рикотта'], ['Izgara kabak', 'Grilled zucchini', 'Цукини на гриле'],
     ['Roka', 'Arugula', 'Руккола'],
   ],
+  'tomato-cucumber': [
+    ['Domates', 'Tomato', 'Помидоры'], ['Salatalık', 'Cucumber', 'Огурцы'],
+  ],
+  olives: [['Zeytin', 'Olives', 'Оливки']],
+  cheese: [['Dilim peynir', 'Sliced cheese', 'Ломтики сыра']],
+  egg: [['Yumurta', 'Egg', 'Яйцо']],
+  nutella: [['Nutella', 'Nutella', 'Nutella']],
+  'chocolate-sauce': [['Belçika çikolata sosu', 'Belgian chocolate sauce', 'Соус из бельгийского шоколада']],
 };
 
 export const pairingFood = {
