@@ -525,11 +525,13 @@ function pulseTap(element) {
 function showMicroFeedback(message) {
   const toast = $('#micro-feedback');
   if (!toast) return;
+  // A modal dialog is in the browser top layer; body-level toasts appear behind it.
+  const host = viewer.open ? viewer : document.body;
+  if (toast.parentElement !== host) host.appendChild(toast);
   clearTimeout(microFeedbackTimer);
   toast.textContent = message;
   toast.hidden = false;
   toast.classList.add('is-visible');
-  $('#announcement').textContent = message;
   microFeedbackTimer = setTimeout(() => {
     toast.classList.remove('is-visible');
     toast.hidden = true;
