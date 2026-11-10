@@ -22,7 +22,7 @@ test('feedback for likes and saved items is real state dependent in all 3 langua
   }
   assert.match(app, /showMicroFeedback\(t\(engagement\.likes\.has\(id\) \? 'likedFeedback' : 'unlikedFeedback'\)\)/);
   assert.match(app, /showMicroFeedback\(t\(saved\.has\(id\) \? 'savedFeedback' : 'unsavedFeedback'\)\)/);
-  assert.match(app, /role="status" aria-live="polite"/);
+  assert.match(html, /role="status" aria-live="polite"/);
 });
 
 test('toasts enter dialog top layer and never block taps', () => {
