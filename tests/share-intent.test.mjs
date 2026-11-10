@@ -15,7 +15,7 @@ test('every menu item can be shared with its real public preview page in TR/EN/R
       });
       assert.equal(data.url, shareUrl(entry.id, lang));
       assert.ok(data.title.includes(entry.names[idx]) && data.title.includes('Poçitel'));
-      assert.ok(data.text.includes(entry.descriptions[idx]));
+      assert.ok(data.text.includes(entry.descriptions[idx].trim()), `${entry.id} / ${lang}: complete description`);
       assert.ok(data.text.includes(['Menüden keşfet','Explore this dish','Посмотри это блюдо'][idx]));
       const targets = directShareTargets(data);
       assert.deepEqual(targets.map(t => t.id), ['whatsapp', 'telegram', 'facebook', 'x']);
