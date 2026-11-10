@@ -1,6 +1,7 @@
 import { categories } from './menu.js?v=20261104-drinks';
 import { items, categoryByItem, categoryById, combos, feedOrder, takeawaySuggestions, takeawayItems } from './catalog.js?v=20261105-focaccia';
 import { shareUrl } from './share-links.js?v=20261104-share';
+import { makeShareData, directShareTargets } from './share-direct.js?v=20261110-fast-share';
 import { milkOptions, syrupOptions, customization, configurationId, resolveOrderItem, optionLabels, replaceOrderLine, comboFoodIds, comboDrinkIds, builtComboId, comboChoice, isTakeaway } from './order-options.js?v=20261106-builder';
 import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOffer, undoCheckoutOffer } from './checkout-offers.js?v=20261106-builder';
 import { energyRanges } from './nutrition-summary.js?v=20261105-focaccia';
@@ -130,6 +131,8 @@ const copy = {
   more: ['Daha fazla göster', 'Show more', 'Показать ещё'],
   paired: ['Bu eşleşmeyi deneyin', 'Try it in this pairing', 'Попробуйте в комбо'],
   share: ['Paylaş', 'Share', 'Поделиться'],
+  shareInvite: ['Menüden keşfet', 'Explore this dish', 'Посмотри это блюдо'],
+  shareClose: ['Paylaşımı kapat', 'Close sharing', 'Закрыть варианты отправки'],
   shareLink: ['Bağlantıyı paylaş', 'Send link', 'Отправить ссылку'],
   photoSeparately: ['Fotoğrafı ayrıca gönder', 'Send photo separately', 'Фото отдельно'],
   linkPreviewHint: ['Bağlantıda ürünün fotoğrafı, adı ve fiyatı bulunur.', 'The link includes this item’s photo, name and price.', 'В превью ссылки — фото, название и цена этой позиции.'],
@@ -238,8 +241,6 @@ let lastAddedOpener;
 let noticeTimer;
 const viewer = $('#post-viewer');
 const viewerContent = $('#viewer-content');
-const shareDialog = $('#share-dialog');
-const shareLink = $('#share-link');
 const savedFilter = $('#saved-filter');
 const configure = $('#configure');
 const focacciaPromo = $('#focaccia-promo');
@@ -325,11 +326,8 @@ let savedOnly = false;
 let visibleLimit = pageSize;
 let openedPost;
 let postOpener;
-let shareOpener;
-let sharedPost;
-let sharedLink;
-let shareSequence = 0;
-let sharePhotoUrl;
+let quickShareOpener = null;
+let quickShareData = null;
 let touchOrigin;
 const selection = restoreSelection();
 const saved = new Set();
@@ -720,89 +718,108 @@ function toggleSaved(id) {
   }
 }
 
+function closeQuickShare(restoreFocus = false) {
+  document.getElementById('quick-share')?.remove();
+  const previous = quickShareOpener;
+  quickShareOpener = null;
+  quickShareData = null;
+  if (restoreFocus && previous?.isConnected) previous.focus({ preventScroll: true });
+}
+
+function showQuickShare(button, data) {
+  const same = quickShareOpener === button && Boolean(document.getElementById('quick-share'));
+  closeQuickShare();
+  if (same) return;
+  quickShareOpener = button;
+  quickShareData = data;
+
+  // Fallback is a small floating row of direct social links, not another dialog.
+  // Inside an open modal, the row must be a descendant of the top-layer dialog.
+  const tray = document.createElement('div');
+  tray.id = 'quick-share';
+  tray.className = 'quick-share';
+  tray.setAttribute('role', 'group');
+  tray.setAttribute('aria-label', t('share'));
+  const top = document.createElement('div');
+  top.className = 'quick-share-top';
+  const title = document.createElement('strong');
+  title.textContent = t('share');
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.id = 'close-quick-share';
+  close.textContent = '×';
+  close.setAttribute('aria-label', t('shareClose'));
+  top.append(title, close);
+  const targets = document.createElement('div');
+  targets.className = 'quick-share-targets';
+  for (const target of directShareTargets(data)) {
+    const link = document.createElement('a');
+    link.className = 'quick-share-target';
+    link.dataset.quickTarget = target.id;
+    link.href = target.url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = target.label;
+    link.setAttribute('aria-label', `${t('share')} · ${target.label}`);
+    targets.append(link);
+  }
+  const copy = document.createElement('button');
+  copy.type = 'button';
+  copy.className = 'quick-share-target quick-share-copy';
+  copy.dataset.quickCopy = 'true';
+  copy.textContent = t('copyLink');
+  targets.append(copy);
+  tray.append(top, targets);
+  (viewer.open ? viewer : document.body).append(tray);
+  targets.querySelector('a')?.focus({ preventScroll: true });
+}
+
 async function sharePost(button, id) {
   const entry = items.get(id);
   if (!entry) return;
-  const url = shareUrl(id, languages[language]);
-  const sequence = ++shareSequence;
-  if (sharePhotoUrl) URL.revokeObjectURL(sharePhotoUrl);
-  sharePhotoUrl = undefined;
-  sharedPost = null;
-  shareOpener = button;
-  shareLink.value = url;
-  sharedLink = { title: `${name(entry)} · ${price(entry.price)} · Poçitel`, url };
-  $('#share-link-button').hidden = !navigator.share;
-  $('#share-link-button').disabled = false;
-  $('#copy-link').classList.toggle('primary', !navigator.share);
-  $('#copy-link').classList.toggle('quiet', Boolean(navigator.share));
-  $('#share-extras').open = false;
-  $('#share-photo').src = `assets/${entry.image}.webp`;
-  $('#share-photo').alt = name(entry);
-  $('#share-caption').textContent = `${name(entry)}${entry.sourceId ? ` · ${t('takeaway')}` : ''} · ${price(entry.price)}`;
-  $('#share-photo-button').hidden = !navigator.share || !navigator.canShare;
-  $('#share-photo-button').disabled = true;
-  $('#save-photo').hidden = true;
-  $('#save-photo').removeAttribute('href');
-  $('#share-status').textContent = t('linkPreviewHint');
-  shareDialog.showModal();
-  shareDialog.scrollTop = 0;
-  try {
-    const { prepareSharePhoto } = await import('./share-photo.js');
-    if (sequence !== shareSequence || !shareDialog.open) return;
-    const file = await prepareSharePhoto(`assets/${entry.image}.webp`, id);
-    if (sequence !== shareSequence || !shareDialog.open) return;
-    sharedPost = { files: [file], title: name(entry), text: `${$('#share-caption').textContent} · Poçitel Coffee & Brunch`, url };
-    sharePhotoUrl = URL.createObjectURL(file);
-    $('#save-photo').href = sharePhotoUrl;
-    $('#save-photo').download = file.name;
-    $('#save-photo').hidden = false;
-    let supported = false;
-    try { supported = Boolean(navigator.share && navigator.canShare?.({ files: [file] })); } catch { /* Use download instead. */ }
-    $('#share-photo-button').hidden = !supported;
-    $('#share-photo-button').disabled = !supported;
-  } catch {
-    if (sequence !== shareSequence || !shareDialog.open) return;
-    $('#share-photo-button').hidden = true;
-    // A photo download failure must not disable the already-ready public link.
+  const data = makeShareData({
+    name: name(entry), description: description(entry), price: price(entry.price),
+    invitation: t('shareInvite'), url: shareUrl(id, languages[language]),
+  });
+  if (typeof navigator.share !== 'function') {
+    showQuickShare(button, data);
+    return;
   }
-}
-
-async function sharePreparedLink() {
-  if (!sharedLink || !navigator.share) return;
-  const sequence = shareSequence;
-  $('#share-link-button').disabled = true;
+  closeQuickShare();
   try {
-    await navigator.share(sharedLink);
-    if (sequence === shareSequence && shareDialog.open) shareDialog.close();
+    // Never await an image fetch or render a menu first: keep transient user activation.
+    await navigator.share(data);
   } catch (error) {
-    if (sequence === shareSequence && error.name !== 'AbortError') $('#share-status').textContent = t('photoFallback');
-  } finally {
-    if (sequence === shareSequence) $('#share-link-button').disabled = false;
+    // Cancelling the system chooser must not open a surprise second menu.
+    if (error?.name !== 'AbortError') showQuickShare(button, data);
   }
 }
 
-async function sharePreparedPhoto() {
-  if (!sharedPost) return;
-  const sequence = shareSequence;
-  $('#share-photo-button').disabled = true;
+async function copyQuickShareLink() {
+  const data = quickShareData;
+  if (!data) return;
   try {
-    // No fetch/decode awaits here: the tap must reach navigator.share directly.
-    await navigator.share(sharedPost);
-    if (sequence === shareSequence && shareDialog.open) shareDialog.close();
-  } catch (error) {
-    if (sequence === shareSequence && error.name !== 'AbortError') $('#share-status').textContent = t('photoFallback');
-  } finally {
-    if (sequence === shareSequence) $('#share-photo-button').disabled = false;
-  }
-}
-
-async function copyPostLink() {
-  try {
-    await navigator.clipboard.writeText(shareLink.value);
-    $('#share-status').textContent = t('copied');
+    if (!navigator.clipboard?.writeText) throw new Error('Clipboard API unavailable');
+    await navigator.clipboard.writeText(data.url);
+    closeQuickShare();
+    $('#announcement').textContent = t('copied');
   } catch {
-    shareLink.select();
-    $('#share-status').textContent = t('manualCopy');
+    // No insecure execCommand; offer a selected URL in-place for manual copying.
+    const tray = document.getElementById('quick-share');
+    if (!tray) return;
+    let field = tray.querySelector('.quick-share-manual');
+    if (!field) {
+      field = document.createElement('input');
+      field.className = 'quick-share-manual';
+      field.type = 'text';
+      field.readOnly = true;
+      field.setAttribute('aria-label', t('linkLabel'));
+      tray.append(field);
+    }
+    field.value = data.url;
+    field.focus();
+    field.select();
+    $('#announcement').textContent = t('manualCopy');
   }
 }
 
@@ -1162,6 +1179,12 @@ function openCart(opener) {
 }
 
 document.addEventListener('click', event => {
+  if (event.target.closest('[data-quick-target]')) {
+    closeQuickShare();
+    return; // The native anchor opens a platform directly from this user click.
+  }
+  if (document.getElementById('quick-share') &&
+      !event.target.closest('#quick-share, [data-share]')) closeQuickShare();
   if (event.target.closest('.settings-visit')) settings.close();
   const jump = event.target.closest('[data-jump]');
   if (jump) {
@@ -1289,14 +1312,10 @@ document.addEventListener('click', event => {
     toggleSaved(save);
   } else if (share) {
     sharePost(button, share);
-  } else if (button.id === 'copy-link') {
-    copyPostLink();
-  } else if (button.id === 'share-link-button') {
-    sharePreparedLink();
-  } else if (button.id === 'share-photo-button') {
-    sharePreparedPhoto();
-  } else if (button.id === 'close-share') {
-    shareDialog.close();
+  } else if (button.dataset.quickCopy) {
+    copyQuickShareLink();
+  } else if (button.id === 'close-quick-share') {
+    closeQuickShare(true);
   } else if (button.id === 'close-post') {
     viewer.close();
   } else if (button.id === 'previous-story' || button.id === 'next-story') {
@@ -1395,15 +1414,13 @@ cart.addEventListener('close', () => {
 });
 
 viewer.addEventListener('close', () => {
+  closeQuickShare();
   if (!cart.open) (postOpener?.isConnected ? postOpener : savedFilter).focus({ preventScroll: true });
 });
-shareDialog.addEventListener('close', () => {
-  shareSequence++;
-  sharedPost = null;
-  sharedLink = null;
-  if (sharePhotoUrl) URL.revokeObjectURL(sharePhotoUrl);
-  sharePhotoUrl = undefined;
-  if (shareOpener?.isConnected) shareOpener.focus({ preventScroll: true });
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && document.getElementById('quick-share')) {
+    closeQuickShare(true);
+  }
 });
 viewer.addEventListener('keydown', event => {
   if (event.target.matches('[data-cutaway-range]')) return;
