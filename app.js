@@ -19,7 +19,6 @@ const copy = {
   like: ['Beğen', 'Like', 'Нравится'],
   views: ['Görüntülenme', 'Views', 'Просмотры'],
   socialActions: ['Ürün etkileşimleri', 'Dish interactions', 'Действия с блюдом'],
-  shareShort: ['Paylaş', 'Share', 'Поделиться'],
   engagementLocal: ['Beğeniler ve görüntülenmeler yalnızca bu cihazda saklanır.', 'Likes and views are saved on this device only.', 'Лайки и просмотры сохраняются только на этом устройстве.'],
   appearance: ['Görünüm', 'Appearance', 'Оформление'],
   appearanceMood: ['Görünüm', 'Appearance', 'Оформление'],
@@ -462,7 +461,7 @@ function postSocialRail(entry) {
       ${icon('heart')}<span data-like-count="${entry.id}">${liked ? 1 : 0}</span>
     </button>
     <button type="button" class="social-rail-item social-rail-share" data-share="${entry.id}" aria-label="${t('share')} · ${name(entry)}" title="${t('share')}">
-      ${icon('share')}<span>${t('shareShort')}</span>
+      ${icon('share')}
     </button>
   </div>`;
 }
@@ -631,16 +630,20 @@ function cutawayMarkup(entry, socialRail = '') {
     <img class="cutaway-outside" src="${views[0]}" alt="" decoding="async">
     <div class="cutaway-inside${focacciaViews[reveal.dishId] ? '' : ' cutaway-annotated'}" aria-hidden="true">
       <img src="${views[1]}" alt="" decoding="async">
-      <div class="cutaway-label-stack">${reveal.parts.map(part => `<span class="cutaway-tag">${part}</span>`).join('')}</div>
     </div>
     <span class="cutaway-divider" aria-hidden="true"><span class="cutaway-handle">↔</span></span>
     <input type="range" min="0" max="100" step="1" value="50" class="cutaway-range" data-cutaway-range aria-label="${t('cutawayRange')}" aria-describedby="cutaway-help" aria-valuetext="${t('cutawayShown')} 50%">
     ${socialRail}
     ${illustrated ? `<span class="cutaway-art-label">${t('illustration')}</span>` : ''}
   </div>
-  <div class="cutaway-guide" id="cutaway-help"><strong>${caption}</strong><span>${t('cutawayHelp')} · ${t('cutawaySource')}</span></div>
-  <div class="cutaway-controls"><button type="button" data-cutaway-toggle aria-pressed="false">${t('cutawayShow')}</button></div>
-  <div class="cutaway-legend" aria-label="${t('cutawayHeading')}">${reveal.parts.map(part => `<span>${part}</span>`).join('')}</div>`;
+  <div class="cutaway-details">
+    <div class="cutaway-guide" id="cutaway-help">
+      <strong>${caption}</strong>
+      <span>${t('cutawayHelp')} · ${t('cutawaySource')}</span>
+    </div>
+    <div class="cutaway-controls"><button type="button" data-cutaway-toggle aria-pressed="false">${t('cutawayShow')}</button></div>
+    <div class="cutaway-legend" aria-label="${t('cutawayHeading')}">${reveal.parts.map(part => `<span>${part}</span>`).join('')}</div>
+  </div>`;
 }
 
 function renderViewer() {
