@@ -1231,3 +1231,56 @@ button.social-rail-item:hover { background: rgba(33,41,37,.91); }
   #post-viewer .viewer-body { padding-inline: .77rem; }
   .post-social-rail .social-rail-item { width: 44px; min-height: 44px; }
 }
+
+/* Native Web Share is the primary one-tap path. This compact sheet is fallback-only. */
+#share-dialog.share-quick {
+  width: min(390px, calc(100% - 28px));
+  max-height: min(520px, calc(100dvh - 30px));
+  padding: 16px;
+  height: fit-content;
+  overflow-y: auto;
+  border-radius: 18px;
+}
+#share-dialog.share-quick .cart-header { margin-bottom: 5px; }
+#share-dialog.share-quick #share-title { font-size: clamp(1.28rem, 4vw, 1.55rem); }
+.share-quick-item {
+  margin: 2px 0 6px;
+  color: var(--wine);
+  font: 650 .88rem/1.35 var(--sans);
+  overflow-wrap: anywhere;
+}
+.share-quick-hint { color: var(--muted); font: .75rem/1.4 var(--sans); margin-bottom: 10px; }
+.share-quick-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; }
+.share-quick-grid a {
+  display: flex; align-items: center; gap: 8px;
+  min-height: 52px; padding: 8px 10px; border: 1px solid var(--line);
+  border-radius: 12px; background: var(--cream); color: var(--wine);
+  font: 650 .82rem/1.2 var(--sans); text-decoration: none;
+}
+.share-quick-grid a:hover { background: var(--surface-muted); border-color: var(--strong-line); }
+.share-quick-grid a:focus-visible { outline: 3px solid var(--wine); outline-offset: 2px; }
+.share-channel-symbol {
+  display: grid; place-items: center; flex: 0 0 29px;
+  width: 29px; height: 29px; border: 1px solid var(--line);
+  border-radius: 50%; color: var(--olive);
+  font: 750 .84rem/1 var(--sans);
+}
+#share-dialog.share-quick .share-quick-copy {
+  display: block; width: 100%; min-height: 45px;
+  margin: 10px 0 0; border-radius: 10px;
+}
+#share-dialog.share-quick #share-extras {
+  margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line);
+}
+#share-dialog.share-quick #share-extras summary { min-height: 36px; padding: 8px 0; }
+#share-dialog.share-quick #share-status:empty { display: none; }
+#share-dialog.share-quick #share-status { margin: 5px 0; font-size: .76rem; line-height: 1.4; }
+#share-dialog.share-quick #share-link:not([hidden]) {
+  width: 100%; margin: 6px 0 0; border-radius: 8px;
+  font-size: .77rem;
+}
+@media (max-width: 350px) {
+  #share-dialog.share-quick { padding: 11px; }
+  .share-quick-grid a { padding-inline: 7px; gap: 5px; font-size: .75rem; }
+  .share-channel-symbol { width: 25px; height: 25px; flex-basis: 25px; }
+}
