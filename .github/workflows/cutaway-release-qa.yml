@@ -32,7 +32,7 @@ jobs:
         run: node --test tests/*.test.mjs
 
   browser-geometry:
-    name: All 24 cutaways: responsive overlay and Shorts geometry
+    name: "All 24 cutaways — responsive overlay and Shorts geometry"
     needs: data-and-unit
     runs-on: ubuntu-latest
     timeout-minutes: 15
