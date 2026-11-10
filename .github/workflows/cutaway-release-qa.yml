@@ -1,0 +1,98 @@
+name: Poçitel cutaway release QA
+
+on:
+  pull_request:
+    paths:
+      - "dist/**"
+      - "tests/**"
+      - "docs/qa-cutaway-dependency-graph-2026-11-10.md"
+      - ".github/workflows/cutaway-release-qa.yml"
+  push:
+    branches: [main]
+    paths:
+      - "dist/**"
+      - "tests/**"
+      - ".github/workflows/cutaway-release-qa.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  data-and-unit:
+    name: Inventory, ingredients, images and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install image converter
+        run: python3 -m pip install --quiet Pillow
+      - name: Rebuild all 165 share pages from current canonical template
+        run: node scripts/build-share-pages.mjs
+      - name: Run all Node tests
+        run: node --test tests/*.test.mjs
+
+  browser-geometry:
+    name: "All 24 cutaways — responsive overlay and Shorts geometry"
+    needs: data-and-unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright and Chromium
+        run: |
+          npm init -y >/dev/null
+          npm pkg set type=module
+          npm install --no-save --no-audit --no-fund @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Start local menu site
+        run: |
+          python3 -m http.server 8088 --bind 127.0.0.1 --directory dist > /tmp/pocitel-http.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8088/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/pocitel-http.log
+          exit 1
+      - name: Run cutaway visual geometry and interaction gate
+        run: npx playwright test tests/cutaway-browser.spec.mjs --workers=2 --reporter=line
+      - name: Upload browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pocitel-cutaway-browser-evidence
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+
+  publish:
+    name: "Publish tested menu and 165 canonical share pages"
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [data-and-unit, browser-geometry]
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install image converter
+        run: python3 -m pip install --quiet Pillow
+      - name: Build all static share pages from latest index
+        run: node scripts/build-share-pages.mjs
+      - name: Publish complete dist to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          enable_jekyll: false
