@@ -32,12 +32,12 @@
   <!-- social-meta:end -->
   <meta name="robots" content="noindex">
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20261110-declutter">
+  <link rel="stylesheet" href="style.css?v=20261110-fast-share">
   <link rel="stylesheet" href="appearance.css?v=20261104-simple">
   <link rel="modulepreload" href="menu.js?v=20261104-drinks">
   <link rel="modulepreload" href="order-options.js?v=20261106-builder">
   <link rel="modulepreload" href="checkout-offers.js?v=20261106-builder">
-  <script src="app.js?v=20261110-declutter" type="module"></script>
+  <script src="app.js?v=20261110-fast-share" type="module"></script>
 </head>
 <body>
   <div class="startup-screen" aria-hidden="true" hidden>
@@ -221,31 +221,6 @@
       <button type="button" id="previous-story" class="button quiet"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span data-copy="previous">Önceki</span></button>
       <button type="button" id="next-story" class="button quiet"><span data-copy="next">Sonraki</span><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></button>
     </div>
-  </dialog>
-  <dialog id="share-dialog" aria-labelledby="share-title">
-    <div class="cart-header">
-      <h2 id="share-title" data-copy="share">Paylaş</h2>
-      <button type="button" class="icon-button" id="close-share" aria-label="Kapat" data-aria="close" autofocus><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
-    </div>
-    <figure class="share-preview">
-      <img id="share-photo" alt="">
-      <small class="share-brand">POÇİTEL COFFEE &amp; BRUNCH · GAZİPAŞA</small>
-      <figcaption id="share-caption"></figcaption>
-    </figure>
-    <p id="share-status" role="status"></p>
-    <div class="share-actions">
-      <button class="button primary" id="share-link-button" type="button" data-copy="shareLink" hidden>Bağlantıyı paylaş</button>
-      <button class="button primary" id="copy-link" type="button" data-copy="copyLink">Bağlantıyı kopyala</button>
-    </div>
-    <details id="share-extras">
-    <summary data-copy="photoSeparately">Fotoğrafı ayrıca gönder</summary>
-    <div class="share-actions">
-      <button class="button quiet" id="share-photo-button" type="button" data-copy="sharePhoto" disabled>Fotoğrafla paylaş</button>
-      <a class="button quiet" id="save-photo" data-copy="savePhoto" hidden>Fotoğrafı kaydet</a>
-    </div>
-    </details>
-    <label for="share-link" data-copy="linkLabel">Ürün bağlantısı</label>
-    <input id="share-link" type="url" readonly>
   </dialog>
   <dialog id="configure" aria-labelledby="configure-title">
     <div class="configure-header">
