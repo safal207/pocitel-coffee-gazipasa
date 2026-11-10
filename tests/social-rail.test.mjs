@@ -31,10 +31,10 @@ test('actions use the pre-existing like and share handlers', () => {
 test('right-aligned, accessible controls ship with cache-busted assets', () => {
   assert.match(css, /\.post-social-rail\s*\{[\s\S]*?position: absolute;[\s\S]*?right: 8px/);
   assert.match(css, /social-rail-item:focus-visible/);
-  assert.match(html, /app\.js\?v=20261110-mobile-polish/);
-  assert.match(html, /style\.css\?v=20261110-mobile-polish/);
+  assert.match(html, /app\.js\?v=20261110-inside-overlay/);
+  assert.match(html, /style\.css\?v=20261110-inside-overlay/);
 });
-test('compact cutaway controls show ingredients under image, not on the social rail', () => {
+test('compact cutaway controls show all ingredients under image and an overlay on the photo', () => {
   assert.match(app, /<div class="cutaway-details">/);
   assert.doesNotMatch(app, /cutaway-label-stack/);
   assert.doesNotMatch(app, /shareShort/);
@@ -46,5 +46,15 @@ test('share button is icon-only visually while keeping localized accessible name
   assert.match(app, /class="social-rail-item social-rail-share"[^>]*aria-label="/);
   assert.match(css, /\.social-rail-share span\s*\{[^}]*white-space: nowrap/);
   assert.match(css, /\.post-social-rail\s*\{[^}]*env\(safe-area-inset-right\)/);
-  assert.match(html, /style\.css\?v=20261110-mobile-polish-railfix/);
+  assert.match(html, /style\.css\?v=20261110-inside-overlay/);
+});
+
+test('inside labels are visible on the photo beside—not beneath—the social rail', () => {
+  assert.match(app, /class="cutaway-ingredient-card" aria-hidden="true"/);
+  assert.match(app, /reveal\.parts\.slice\(0, 4\)/);
+  assert.match(app, /cutaway\.dataset\.insideVisible = String\(amount <= 62\)/);
+  assert.match(app, /insideLabel: \['İçinde', 'Inside', 'Внутри'\]/);
+  assert.match(css, /\.cutaway-ingredient-card\s*\{[\s\S]*?left: calc\(var\(--cutaway-split\) \+ 24px\);[\s\S]*?right: 70px;/);
+  assert.match(css, /\.cutaway-ingredient-card\s*\{[\s\S]*?pointer-events: none/);
+  assert.match(css, /\.cutaway\[data-inside-visible="false"\] \.cutaway-ingredient-card \{ display: none; \}/);
 });
