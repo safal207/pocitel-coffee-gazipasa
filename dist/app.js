@@ -6,7 +6,7 @@ import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOf
 import { energyRanges } from './nutrition-summary.js?v=20261105-focaccia';
 import { focacciaTakeawayOffer, selectedComboOffer } from './focaccia-offer.js?v=20261106-builder';
 import { moments, restoreFavoriteCombos, nextComboChoice } from './discovery.js?v=20261107-moments';
-import { revealFor } from './ingredient-reveal.js?v=20261107-all-dishes';
+import { revealFor } from './ingredient-reveal.js?v=20261110-complete-food';
 
 const copy = {
   skip: ['Menüye geç', 'Skip to menu', 'Перейти к меню'],
@@ -53,6 +53,8 @@ const copy = {
   cutawayRange: ['Yemeğin içindekilerini göster', 'Reveal the dish ingredients', 'Показать состав блюда'],
   cutawayShown: ['Görünen iç kısım', 'Inside shown', 'Состав открыт на'],
   cutawayCombo: ['Eşleşmedeki yemek', 'Dish in the pairing', 'Блюдо в комбо'],
+  cutawayShow: ['Tüm içindekileri göster', 'Show all ingredients', 'Показать весь состав'],
+  cutawayHide: ['Yemeğe dön', 'Show the dish', 'Показать блюдо'],
   focacciaKicker: ['Molanı yanında götür', 'Take your break with you', 'Возьмите паузу с собой'],
   focacciaTitle: ['Kendi eşleşmeni oluştur', 'Build your perfect pairing', 'Соберите своё комбо'],
   focacciaBody: ['Hindi fümeli, sebzeli focaccia. Yanına buzlu Americano. Güzel bir mola, nereye gidersen.', 'Golden focaccia with smoked turkey and vegetables, paired with an iced Americano. A lovely break, wherever you go.', 'Румяная фокачча с индейкой и овощами. А к ней — айс-американо. Всё для вкусной паузы на прогулке.'],
@@ -481,6 +483,7 @@ function menuPost(entry, index = 8) {
     <div class="post-body">
       <div class="post-heading"><h3>${name(entry)}</h3>${priceMarkup(entry)}</div>
       ${description(entry) ? `<p class="post-description">${description(entry)}</p>` : ''}
+      ${peek ? `<button type="button" class="look-inside-button" data-post="${entry.id}" aria-label="${t('lookInside')} · ${name(entry)}"><span aria-hidden="true">↔</span> ${t('lookInside')}</button>` : ''}
       ${nutritionLink(entry)}
       ${postActions(entry)}
     </div>
@@ -573,6 +576,7 @@ function cutawayMarkup(entry) {
     ${illustrated ? `<span class="cutaway-art-label">${t('illustration')}</span>` : ''}
   </div>
   <div class="cutaway-guide" id="cutaway-help"><strong>${caption}</strong><span>${t('cutawayHelp')} · ${t('cutawaySource')}</span></div>
+  <div class="cutaway-controls"><button type="button" data-cutaway-toggle aria-pressed="false">${t('cutawayShow')}</button></div>
   <div class="cutaway-legend" aria-label="${t('cutawayHeading')}">${reveal.parts.map(part => `<span>${part}</span>`).join('')}</div>`;
 }
 
@@ -1346,13 +1350,26 @@ viewerContent.addEventListener('touchend', event => {
   if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) stepStory(dx < 0 ? 1 : -1);
 }, { passive: true });
 
+function updateCutaway(range, amount) {
+  const cutaway = range.closest('.cutaway');
+  if (!cutaway || !Number.isFinite(amount)) return;
+  range.value = amount;
+  cutaway.style.setProperty('--cutaway-split', `${amount}%`);
+  range.setAttribute('aria-valuetext', `${t('cutawayShown')} ${100 - amount}%`);
+  const toggle = viewerContent.querySelector('[data-cutaway-toggle]');
+  toggle.setAttribute('aria-pressed', amount === 0);
+  toggle.textContent = t(amount === 0 ? 'cutawayHide' : 'cutawayShow');
+}
+
 viewerContent.addEventListener('input', event => {
   if (!event.target.matches('[data-cutaway-range]')) return;
-  const amount = Number(event.target.value);
-  const cutaway = event.target.closest('.cutaway');
-  if (!cutaway || !Number.isFinite(amount)) return;
-  cutaway.style.setProperty('--cutaway-split', `${amount}%`);
-  event.target.setAttribute('aria-valuetext', `${t('cutawayShown')} ${100 - amount}%`);
+  updateCutaway(event.target, Number(event.target.value));
+});
+
+viewerContent.addEventListener('click', event => {
+  if (!event.target.closest('[data-cutaway-toggle]')) return;
+  const range = viewerContent.querySelector('[data-cutaway-range]');
+  updateCutaway(range, Number(range.value) === 0 ? 100 : 0);
 });
 
 applyLanguage();
