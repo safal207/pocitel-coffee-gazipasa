@@ -1,6 +1,7 @@
 import { categories } from './menu.js?v=20261104-drinks';
 import { items, categoryByItem, categoryById, combos, feedOrder, takeawaySuggestions, takeawayItems } from './catalog.js?v=20261105-focaccia';
 import { shareUrl } from './share-links.js?v=20261104-share';
+import { socialShareTargets } from './social-share.js?v=20261110-fast-share';
 import { milkOptions, syrupOptions, customization, configurationId, resolveOrderItem, optionLabels, replaceOrderLine, comboFoodIds, comboDrinkIds, builtComboId, comboChoice, isTakeaway } from './order-options.js?v=20261106-builder';
 import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOffer, undoCheckoutOffer } from './checkout-offers.js?v=20261106-builder';
 import { energyRanges } from './nutrition-summary.js?v=20261105-focaccia';
@@ -130,6 +131,8 @@ const copy = {
   more: ['Daha fazla göster', 'Show more', 'Показать ещё'],
   paired: ['Bu eşleşmeyi deneyin', 'Try it in this pairing', 'Попробуйте в комбо'],
   share: ['Paylaş', 'Share', 'Поделиться'],
+  shareInvite: ['Şuna bak:', 'Check this out:', 'Посмотри:'],
+  quickShare: ['Uygulama seçin', 'Choose an app', 'Выберите приложение'],
   shareLink: ['Bağlantıyı paylaş', 'Send link', 'Отправить ссылку'],
   photoSeparately: ['Fotoğrafı ayrıca gönder', 'Send photo separately', 'Фото отдельно'],
   linkPreviewHint: ['Bağlantıda ürünün fotoğrafı, adı ve fiyatı bulunur.', 'The link includes this item’s photo, name and price.', 'В превью ссылки — фото, название и цена этой позиции.'],
@@ -328,8 +331,10 @@ let postOpener;
 let shareOpener;
 let sharedPost;
 let sharedLink;
+let sharedItemId;
 let shareSequence = 0;
 let sharePhotoUrl;
+let sharePhotoLoading = false;
 let touchOrigin;
 const selection = restoreSelection();
 const saved = new Set();
@@ -720,64 +725,84 @@ function toggleSaved(id) {
   }
 }
 
-async function sharePost(button, id) {
+// Native OS share sheet opens IN the original click: no modal, image loading or await
+// may happen first, otherwise browsers lose the required transient user activation.
+function sharePost(button, id) {
   const entry = items.get(id);
   if (!entry) return;
-  const url = shareUrl(id, languages[language]);
-  const sequence = ++shareSequence;
+  const payload = {
+    title: `${name(entry)} · ${price(entry.price)} · Poçitel`,
+    text: `${t('shareInvite')} ${name(entry)} · ${price(entry.price)} · Poçitel Coffee & Brunch`,
+    url: shareUrl(id, languages[language]),
+  };
+  if (typeof navigator.share === 'function') {
+    try {
+      Promise.resolve(navigator.share(payload)).catch(error => {
+        // Cancelling a native sheet must not open an unwanted second dialog.
+        if (error?.name !== 'AbortError') openQuickShareFallback(button, id, payload);
+      });
+      return;
+    } catch (error) {
+      if (error?.name === 'AbortError') return;
+    }
+  }
+  openQuickShareFallback(button, id, payload);
+}
+
+function openQuickShareFallback(button, id, payload) {
+  const entry = items.get(id);
+  if (!entry) return;
+  shareSequence++;
   if (sharePhotoUrl) URL.revokeObjectURL(sharePhotoUrl);
   sharePhotoUrl = undefined;
+  sharePhotoLoading = false;
   sharedPost = null;
+  sharedLink = payload;
+  sharedItemId = id;
   shareOpener = button;
-  shareLink.value = url;
-  sharedLink = { title: `${name(entry)} · ${price(entry.price)} · Poçitel`, url };
-  $('#share-link-button').hidden = !navigator.share;
-  $('#share-link-button').disabled = false;
-  $('#copy-link').classList.toggle('primary', !navigator.share);
-  $('#copy-link').classList.toggle('quiet', Boolean(navigator.share));
+  shareLink.value = payload.url;
+  shareLink.hidden = true;
+  $('#share-status').textContent = '';
+  $('#share-caption').textContent = `${name(entry)} · ${price(entry.price)}`;
+  const targets = socialShareTargets(payload);
+  for (const [channel, url] of Object.entries(targets)) {
+    $('#share-' + channel).href = url;
+  }
   $('#share-extras').open = false;
-  $('#share-photo').src = `assets/${entry.image}.webp`;
-  $('#share-photo').alt = name(entry);
-  $('#share-caption').textContent = `${name(entry)}${entry.sourceId ? ` · ${t('takeaway')}` : ''} · ${price(entry.price)}`;
-  $('#share-photo-button').hidden = !navigator.share || !navigator.canShare;
+  $('#share-photo-button').hidden = true;
   $('#share-photo-button').disabled = true;
   $('#save-photo').hidden = true;
   $('#save-photo').removeAttribute('href');
-  $('#share-status').textContent = t('linkPreviewHint');
   shareDialog.showModal();
-  shareDialog.scrollTop = 0;
+}
+
+async function prepareFallbackPhoto() {
+  if (!shareDialog.open || !sharedLink || !sharedItemId || sharedPost || sharePhotoLoading) return;
+  const sequence = shareSequence;
+  const entry = items.get(sharedItemId);
+  if (!entry) return;
+  sharePhotoLoading = true;
+  $('#share-status').textContent = t('preparingPhoto');
   try {
     const { prepareSharePhoto } = await import('./share-photo.js');
+    const file = await prepareSharePhoto(`assets/${entry.image}.webp`, entry.id);
     if (sequence !== shareSequence || !shareDialog.open) return;
-    const file = await prepareSharePhoto(`assets/${entry.image}.webp`, id);
-    if (sequence !== shareSequence || !shareDialog.open) return;
-    sharedPost = { files: [file], title: name(entry), text: `${$('#share-caption').textContent} · Poçitel Coffee & Brunch`, url };
+    sharedPost = {
+      files: [file], title: name(entry), text: sharedLink.text, url: sharedLink.url,
+    };
     sharePhotoUrl = URL.createObjectURL(file);
     $('#save-photo').href = sharePhotoUrl;
     $('#save-photo').download = file.name;
     $('#save-photo').hidden = false;
-    let supported = false;
-    try { supported = Boolean(navigator.share && navigator.canShare?.({ files: [file] })); } catch { /* Use download instead. */ }
-    $('#share-photo-button').hidden = !supported;
-    $('#share-photo-button').disabled = !supported;
+    let canShareFiles = false;
+    try { canShareFiles = Boolean(navigator.share && navigator.canShare?.({ files: [file] })); } catch { /* Keep download. */ }
+    $('#share-photo-button').hidden = !canShareFiles;
+    $('#share-photo-button').disabled = !canShareFiles;
+    $('#share-status').textContent = t('photoReady');
   } catch {
-    if (sequence !== shareSequence || !shareDialog.open) return;
-    $('#share-photo-button').hidden = true;
-    // A photo download failure must not disable the already-ready public link.
-  }
-}
-
-async function sharePreparedLink() {
-  if (!sharedLink || !navigator.share) return;
-  const sequence = shareSequence;
-  $('#share-link-button').disabled = true;
-  try {
-    await navigator.share(sharedLink);
-    if (sequence === shareSequence && shareDialog.open) shareDialog.close();
-  } catch (error) {
-    if (sequence === shareSequence && error.name !== 'AbortError') $('#share-status').textContent = t('photoFallback');
+    if (sequence === shareSequence && shareDialog.open) $('#share-status').textContent = t('photoFailed');
   } finally {
-    if (sequence === shareSequence) $('#share-link-button').disabled = false;
+    if (sequence === shareSequence) sharePhotoLoading = false;
   }
 }
 
@@ -797,10 +822,15 @@ async function sharePreparedPhoto() {
 }
 
 async function copyPostLink() {
+  if (!sharedLink) return;
   try {
-    await navigator.clipboard.writeText(shareLink.value);
-    $('#share-status').textContent = t('copied');
+    if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+    await navigator.clipboard.writeText(sharedLink.url);
+    $('#announcement').textContent = t('copied');
+    if (shareDialog.open) shareDialog.close();
   } catch {
+    shareLink.hidden = false;
+    shareLink.focus();
     shareLink.select();
     $('#share-status').textContent = t('manualCopy');
   }
@@ -1291,8 +1321,6 @@ document.addEventListener('click', event => {
     sharePost(button, share);
   } else if (button.id === 'copy-link') {
     copyPostLink();
-  } else if (button.id === 'share-link-button') {
-    sharePreparedLink();
   } else if (button.id === 'share-photo-button') {
     sharePreparedPhoto();
   } else if (button.id === 'close-share') {
@@ -1397,10 +1425,15 @@ cart.addEventListener('close', () => {
 viewer.addEventListener('close', () => {
   if (!cart.open) (postOpener?.isConnected ? postOpener : savedFilter).focus({ preventScroll: true });
 });
+$('#share-extras').addEventListener('toggle', () => {
+  if ($('#share-extras').open) prepareFallbackPhoto();
+});
 shareDialog.addEventListener('close', () => {
   shareSequence++;
   sharedPost = null;
   sharedLink = null;
+  sharedItemId = null;
+  sharePhotoLoading = false;
   if (sharePhotoUrl) URL.revokeObjectURL(sharePhotoUrl);
   sharePhotoUrl = undefined;
   if (shareOpener?.isConnected) shareOpener.focus({ preventScroll: true });
