@@ -53,6 +53,8 @@ const copy = {
   comboNoAlternative: ['Bu bütçe ve seçeneklerle başka eşleşme yok. Bütçeyi veya seçenekleri değiştirin.', 'No other pairing fits these options and budget. Change the budget or options.', 'Других сочетаний с такими настройками и бюджетом нет. Измените бюджет или дополнения.'],
   lookInside: ['İçine bak', 'Look inside', 'Заглянуть внутрь'],
   cutawayHeading: ['İçindekileri keşfet', 'Discover what is inside', 'Посмотрите, что внутри'],
+  insideLabel: ['İçinde', 'Inside', 'Внутри'],
+  moreIngredients: ['daha', 'more', 'ещё'],
   cutawayHelp: ['İçini görmek için kaydırıcıyı sürükleyin', 'Drag the slider to reveal the ingredients', 'Передвиньте ползунок, чтобы увидеть состав'],
   cutawaySource: ['Menüde belirtilenler', 'As listed on the menu', 'Состав по меню'],
   cutawayRange: ['Yemeğin içindekilerini göster', 'Reveal the dish ingredients', 'Показать состав блюда'],
@@ -626,13 +628,18 @@ function cutawayMarkup(entry, socialRail = '') {
   const views = focacciaViews[reveal.dishId] ?? [`assets/${shown.image}.webp`, `assets/${shown.image}.webp`];
   const illustrated = Boolean(focacciaViews[reveal.dishId]) || shown.sourceId || shown.image.startsWith('illustrations/');
   const caption = reveal.pairing ? `${t('cutawayCombo')} · ${name(food)}` : t('cutawayHeading');
-  return `<div class="cutaway" style="--cutaway-split: 50%">
+  return `<div class="cutaway" data-inside-visible="true" style="--cutaway-split: 50%">
     <img class="cutaway-outside" src="${views[0]}" alt="" decoding="async">
     <div class="cutaway-inside${focacciaViews[reveal.dishId] ? '' : ' cutaway-annotated'}" aria-hidden="true">
       <img src="${views[1]}" alt="" decoding="async">
     </div>
     <span class="cutaway-divider" aria-hidden="true"><span class="cutaway-handle">↔</span></span>
     <input type="range" min="0" max="100" step="1" value="50" class="cutaway-range" data-cutaway-range aria-label="${t('cutawayRange')}" aria-describedby="cutaway-help" aria-valuetext="${t('cutawayShown')} 50%">
+    <div class="cutaway-ingredient-card" aria-hidden="true">
+      <span class="cutaway-inside-kicker">${t('insideLabel')}</span>
+      ${reveal.parts.slice(0, 4).map(part => `<span class="cutaway-mini-tag">${part}</span>`).join('')}
+      ${reveal.parts.length > 4 ? `<span class="cutaway-inside-more">+${reveal.parts.length - 4} ${t('moreIngredients')}</span>` : ''}
+    </div>
     ${socialRail}
     ${illustrated ? `<span class="cutaway-art-label">${t('illustration')}</span>` : ''}
   </div>
@@ -1426,6 +1433,8 @@ function updateCutaway(range, amount) {
   if (!cutaway || !Number.isFinite(amount)) return;
   range.value = amount;
   cutaway.style.setProperty('--cutaway-split', `${amount}%`);
+  // Keep the explanation on the revealed side; hide it when the inside is mostly concealed.
+  cutaway.dataset.insideVisible = String(amount <= 62);
   range.setAttribute('aria-valuetext', `${t('cutawayShown')} ${100 - amount}%`);
   const toggle = viewerContent.querySelector('[data-cutaway-toggle]');
   toggle.setAttribute('aria-pressed', amount === 0);
