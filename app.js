@@ -57,12 +57,14 @@ const copy = {
   insideLabel: ['İçinde', 'Inside', 'Внутри'],
   moreIngredients: ['daha', 'more', 'ещё'],
   cutawayHelp: ['İçini görmek için kaydırıcıyı sürükleyin', 'Drag the slider to reveal the ingredients', 'Передвиньте ползунок, чтобы увидеть состав'],
+  cutawayHelpShort: ['Kaydır, içini gör', 'Swipe to reveal', 'Проведи, чтобы раскрыть'],
+  cutawayAllIngredients: ['Tüm malzemeler', 'All ingredients', 'Весь состав'],
   cutawaySource: ['Menüde belirtilenler', 'As listed on the menu', 'Состав по меню'],
   cutawayRange: ['Yemeğin içindekilerini göster', 'Reveal the dish ingredients', 'Показать состав блюда'],
   cutawayShown: ['Görünen iç kısım', 'Inside shown', 'Состав открыт на'],
   cutawayCombo: ['Eşleşmedeki yemek', 'Dish in the pairing', 'Блюдо в комбо'],
-  cutawayShow: ['Tüm içindekileri göster', 'Show all ingredients', 'Показать весь состав'],
-  cutawayHide: ['Yemeğe dön', 'Show the dish', 'Показать блюдо'],
+  cutawayShow: ['Tam aç', 'Reveal fully', 'Раскрыть целиком'],
+  cutawayHide: ['Fotoğrafı göster', 'Show photo', 'Вернуть фото'],
   focacciaKicker: ['Molanı yanında götür', 'Take your break with you', 'Возьмите паузу с собой'],
   focacciaTitle: ['Kendi eşleşmeni oluştur', 'Build your perfect pairing', 'Соберите своё комбо'],
   focacciaBody: ['Hindi fümeli, sebzeli focaccia. Yanına buzlu Americano. Güzel bir mola, nereye gidersen.', 'Golden focaccia with smoked turkey and vegetables, paired with an iced Americano. A lovely break, wherever you go.', 'Румяная фокачча с индейкой и овощами. А к ней — айс-американо. Всё для вкусной паузы на прогулке.'],
@@ -628,7 +630,6 @@ function cutawayMarkup(entry, socialRail = '') {
   const shown = reveal.pairing ? food : entry;
   const views = focacciaViews[reveal.dishId] ?? [`assets/${shown.image}.webp`, `assets/${shown.image}.webp`];
   const illustrated = Boolean(focacciaViews[reveal.dishId]) || shown.sourceId || shown.image.startsWith('illustrations/');
-  const caption = reveal.pairing ? `${t('cutawayCombo')} · ${name(food)}` : t('cutawayHeading');
   return `<div class="cutaway" style="--cutaway-split: 50%">
     <img class="cutaway-outside" src="${views[0]}" alt="" decoding="async">
     <div class="cutaway-inside${focacciaViews[reveal.dishId] ? '' : ' cutaway-annotated'}" aria-hidden="true">
@@ -641,12 +642,13 @@ function cutawayMarkup(entry, socialRail = '') {
     ${illustrated ? `<span class="cutaway-art-label">${t('illustration')}</span>` : ''}
   </div>
   <div class="cutaway-details">
-    <div class="cutaway-guide" id="cutaway-help">
-      <strong>${caption}</strong>
-      <span>${t('cutawayHelp')} · ${t('cutawaySource')}</span>
-    </div>
-    <div class="cutaway-controls"><button type="button" data-cutaway-toggle aria-pressed="false">${t('cutawayShow')}</button></div>
-    <div class="cutaway-legend" aria-label="${t('cutawayHeading')}">${reveal.parts.map(part => `<span>${part}</span>`).join('')}</div>
+    <div class="cutaway-guide" id="cutaway-help">${t('cutawayHelpShort')}</div>
+    <div class="cutaway-controls"><button type="button" data-cutaway-toggle aria-pressed="false" aria-label="${t('cutawayShow')}">${t('cutawayShow')}</button></div>
+    <details class="cutaway-ingredients" data-qa="ingredient-disclosure">
+      <summary>${t('cutawayAllIngredients')}</summary>
+      <div class="cutaway-legend" aria-label="${t('cutawayAllIngredients')}">${reveal.parts.map(part => `<span>${part}</span>`).join('')}</div>
+      <small class="cutaway-ingredient-source">${t('cutawaySource')}</small>
+    </details>
   </div>`;
 }
 
@@ -1432,8 +1434,9 @@ function updateCutaway(range, amount) {
   cutaway.style.setProperty('--cutaway-split', `${amount}%`);
   range.setAttribute('aria-valuetext', `${t('cutawayShown')} ${100 - amount}%`);
   const toggle = viewerContent.querySelector('[data-cutaway-toggle]');
-  toggle.setAttribute('aria-pressed', amount === 0);
+  toggle.setAttribute('aria-pressed', String(amount === 0));
   toggle.textContent = t(amount === 0 ? 'cutawayHide' : 'cutawayShow');
+  toggle.setAttribute('aria-label', toggle.textContent);
 }
 
 viewerContent.addEventListener('input', event => {
