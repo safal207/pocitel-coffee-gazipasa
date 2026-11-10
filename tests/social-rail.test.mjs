@@ -1,0 +1,36 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+
+const app = readFileSync(new URL('../dist/app.js', import.meta.url), 'utf8');
+const css = readFileSync(new URL('../dist/style.css', import.meta.url), 'utf8');
+const html = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
+
+test('social controls sit as siblings of the photo button, not nested in it', () => {
+  assert.match(app, /<div class="post-media-wrap">[\s\S]*?<button type="button" class="post-media"[\s\S]*?<\/button>\s*\$\{postSocialRail\(entry\)\}/);
+  assert.match(app, /function postSocialRail\(entry\)/);
+  assert.doesNotMatch(app, /class="engagement-bar"/);
+});
+
+test('all dish image viewers expose the same vertical social rail', () => {
+  assert.match(app, /cutawayMarkup\(entry, postSocialRail\(entry\)\)/);
+  assert.match(app, /illustrationLabel\(entry\)\}\$\{postSocialRail\(entry\)/);
+  assert.match(app, /\$\{socialRail\}/);
+});
+
+test('actions use the pre-existing like and share handlers', () => {
+  assert.match(app, /data-like="\$\{entry\.id\}"/);
+  assert.match(app, /data-share="\$\{entry\.id\}"/);
+  assert.match(app, /handleLike\(like\)/);
+  assert.match(app, /sharePost\(button, share\)/);
+  const segment = app.slice(app.indexOf('function postSocialRail'), app.indexOf('function postActions'));
+  assert.ok(segment.indexOf('social-rail-views') < segment.indexOf('social-rail-like'));
+  assert.ok(segment.indexOf('social-rail-like') < segment.indexOf('social-rail-share'));
+});
+
+test('right-aligned, accessible controls ship with cache-busted assets', () => {
+  assert.match(css, /\.post-social-rail\s*\{[\s\S]*?position: absolute;[\s\S]*?right: 8px/);
+  assert.match(css, /social-rail-item:focus-visible/);
+  assert.match(html, /app\.js\?v=20261110-shorts-rail/);
+  assert.match(html, /style\.css\?v=20261110-shorts-rail/);
+});
