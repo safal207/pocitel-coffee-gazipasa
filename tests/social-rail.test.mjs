@@ -31,6 +31,13 @@ test('actions use the pre-existing like and share handlers', () => {
 test('right-aligned, accessible controls ship with cache-busted assets', () => {
   assert.match(css, /\.post-social-rail\s*\{[\s\S]*?position: absolute;[\s\S]*?right: 8px/);
   assert.match(css, /social-rail-item:focus-visible/);
-  assert.match(html, /app\.js\?v=20261110-shorts-rail/);
-  assert.match(html, /style\.css\?v=20261110-shorts-rail/);
+  assert.match(html, /app\.js\?v=20261110-mobile-polish/);
+  assert.match(html, /style\.css\?v=20261110-mobile-polish/);
+});
+test('compact cutaway controls show ingredients under image, not on the social rail', () => {
+  assert.match(app, /<div class="cutaway-details">/);
+  assert.doesNotMatch(app, /cutaway-label-stack/);
+  assert.doesNotMatch(app, /shareShort/);
+  assert.match(css, /\.cutaway-details\s*\{/);
+  assert.match(css, /\.social-rail-share\s*\{/);
 });
