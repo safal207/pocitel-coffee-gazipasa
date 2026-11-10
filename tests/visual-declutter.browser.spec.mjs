@@ -50,7 +50,7 @@ test.describe('Poçitel visually quiet dish detail on mobile', () => {
       await toggle.click();
       await expect(slider).toHaveValue('100');
       const panel = viewer.locator('#viewer-nutrition .nutrition-panel');
-      await panel.locator('summary').click();
+      await panel.locator(':scope > summary').click();
       await expect(panel).toHaveAttribute('open', '');
     });
   }
