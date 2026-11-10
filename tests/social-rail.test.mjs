@@ -21,7 +21,7 @@ test('all dish image viewers expose the same vertical social rail', () => {
 test('actions use the pre-existing like and share handlers', () => {
   assert.match(app, /data-like="\$\{entry\.id\}"/);
   assert.match(app, /data-share="\$\{entry\.id\}"/);
-  assert.match(app, /handleLike\(like\)/);
+  assert.match(app, /handleLike\(like, button\)/);
   assert.match(app, /sharePost\(button, share\)/);
   const segment = app.slice(app.indexOf('function postSocialRail'), app.indexOf('function postActions'));
   assert.ok(segment.indexOf('social-rail-views') < segment.indexOf('social-rail-like'));
