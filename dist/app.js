@@ -7,6 +7,7 @@ import { energyRanges } from './nutrition-summary.js?v=20261105-focaccia';
 import { focacciaTakeawayOffer, selectedComboOffer } from './focaccia-offer.js?v=20261106-builder';
 import { moments, restoreFavoriteCombos, nextComboChoice } from './discovery.js?v=20261107-moments';
 import { revealFor } from './ingredient-reveal.js?v=20261110-complete-food';
+import { restoreEngagement, toggleLike, recordView, serializeEngagement } from './engagement.js?v=20261110-social';
 
 const copy = {
   skip: ['Menüye geç', 'Skip to menu', 'Перейти к меню'],
@@ -15,6 +16,9 @@ const copy = {
   navMenu: ['Menü', 'Menu', 'Меню'],
   navVisit: ['Ziyaret', 'Visit', 'Как добраться'],
   language: ['Dil', 'Language', 'Язык'],
+  like: ['Beğen', 'Like', 'Нравится'],
+  views: ['Görüntülenme', 'Views', 'Просмотры'],
+  engagementLocal: ['Beğeniler ve görüntülenmeler yalnızca bu cihazda saklanır.', 'Likes and views are saved on this device only.', 'Лайки и просмотры сохраняются только на этом устройстве.'],
   appearance: ['Görünüm', 'Appearance', 'Оформление'],
   appearanceMood: ['Görünüm', 'Appearance', 'Оформление'],
   settings: ['Dil ve görünüm', 'Language & appearance', 'Язык и оформление'],
@@ -236,6 +240,7 @@ const focacciaPromo = $('#focaccia-promo');
 const selectionKey = 'pocitel-selection-v1';
 const languageKey = 'pocitel-language';
 const savedKey = 'pocitel-saved-v1';
+const engagementKey = 'pocitel-engagement-v1';
 const favoriteCombosKey = 'pocitel-favorite-combos-v1';
 const pageSize = 8;
 const maxQuantity = 99;
@@ -322,6 +327,7 @@ let sharePhotoUrl;
 let touchOrigin;
 const selection = restoreSelection();
 const saved = new Set();
+let engagement = restoreEngagement(readSetting(engagementKey), items.keys());
 let favoriteCombos = restoreFavoriteCombos(readSetting(favoriteCombosKey), orderItem);
 try {
   const stored = JSON.parse(readSetting(savedKey));
@@ -443,11 +449,52 @@ function addButton(entry) {
 }
 
 function postActions(entry) {
-  return `<div class="post-actions">
+  const liked = engagement.likes.has(entry.id);
+  const views = engagement.views.get(entry.id) ?? 0;
+  return `<div class="engagement-bar" title="${t('engagementLocal')}">
+    <button type="button" class="engagement-like" data-like="${entry.id}" aria-label="${t('like')} · ${name(entry)}" aria-pressed="${liked}">${icon('heart')}<span data-like-count="${entry.id}">${liked ? 1 : 0}</span></button>
+    <span class="engagement-views" aria-label="${t('views')}: ${views} · ${name(entry)}">${icon('eye')}<span data-view-count="${entry.id}">${views}</span></span>
+  </div>
+  <div class="post-actions">
     <button type="button" class="icon-button save-post" data-save="${entry.id}" aria-label="${t('save')} · ${name(entry)}" aria-pressed="${saved.has(entry.id)}">${icon('bookmark')}</button>
     <button type="button" class="icon-button" data-share="${entry.id}" aria-label="${t('share')} · ${name(entry)}">${icon('share')}</button>
     ${addButton(entry)}
   </div>`;
+}
+
+function refreshEngagement(id) {
+  const liked = engagement.likes.has(id);
+  const views = engagement.views.get(id) ?? 0;
+  const entry = items.get(id);
+  document.querySelectorAll('[data-like]').forEach(button => {
+    if (button.dataset.like !== id) return;
+    button.setAttribute('aria-pressed', String(liked));
+    const count = button.querySelector('[data-like-count]');
+    if (count) count.textContent = liked ? '1' : '0';
+  });
+  document.querySelectorAll('[data-view-count]').forEach(count => {
+    if (count.dataset.viewCount !== id) return;
+    count.textContent = String(views);
+    count.parentElement.setAttribute('aria-label', `${t('views')}: ${views} · ${name(entry)}`);
+  });
+}
+
+function persistEngagement() {
+  writeSetting(engagementKey, serializeEngagement(engagement));
+}
+
+function handleLike(id) {
+  if (!items.has(id)) return;
+  toggleLike(engagement, id);
+  persistEngagement();
+  refreshEngagement(id);
+}
+
+function handleView(id) {
+  if (!items.has(id)) return;
+  recordView(engagement, id);
+  persistEngagement();
+  refreshEngagement(id);
 }
 
 function itemImage(entry, lazy = true) {
@@ -613,6 +660,7 @@ function openPost(ids, opener, story) {
   postOpener = opener;
   touchOrigin = null;
   renderViewer();
+  handleView(ids[0]);
   const controls = $('#story-controls');
   controls.hidden = !story;
   updateStoryControls();
@@ -630,6 +678,7 @@ function stepStory(delta) {
   if (!openedPost.story || next < 0 || next >= openedPost.ids.length) return;
   openedPost.index = next;
   renderViewer();
+  handleView(openedPost.ids[next]);
   updateStoryControls();
   if (document.activeElement?.disabled) {
     (delta > 0 ? $('#previous-story') : $('#next-story')).focus();
@@ -1109,7 +1158,7 @@ document.addEventListener('click', event => {
   }
   const button = event.target.closest('button');
   if (!button) return;
-  const { lang, category, add, quantity, item, post, story, save, share, related, mode, edit, moment, favoriteCombo, removeFavorite } = button.dataset;
+  const { lang, category, add, quantity, item, post, story, save, like, share, related, mode, edit, moment, favoriteCombo, removeFavorite } = button.dataset;
   if (moment) {
     activeMoment = activeMoment === moment ? null : moment;
     const selected = moments.find(option => option.id === activeMoment);
@@ -1200,12 +1249,15 @@ document.addEventListener('click', event => {
   } else if (button.id === 'more-posts') {
     visibleLimit += pageSize;
     renderResults(true);
+  } else if (like) {
+    handleLike(like);
   } else if (post) {
     openPost([post], button);
   } else if (related) {
     openedPost = { ids: [related], index: 0 };
     $('#story-controls').hidden = true;
     renderViewer();
+    handleView(related);
     viewer.scrollTop = 0;
     $('#close-post').focus();
   } else if (save) {
@@ -1370,6 +1422,12 @@ viewerContent.addEventListener('click', event => {
   if (!event.target.closest('[data-cutaway-toggle]')) return;
   const range = viewerContent.querySelector('[data-cutaway-range]');
   updateCutaway(range, Number(range.value) === 0 ? 100 : 0);
+});
+
+window.addEventListener('storage', event => {
+  if (event.key !== engagementKey) return;
+  engagement = restoreEngagement(event.newValue, items.keys());
+  for (const id of items.keys()) refreshEngagement(id);
 });
 
 applyLanguage();
