@@ -41,3 +41,10 @@ test('compact cutaway controls show ingredients under image, not on the social r
   assert.match(css, /\.cutaway-details\s*\{/);
   assert.match(css, /\.social-rail-share\s*\{/);
 });
+
+test('share button is icon-only visually while keeping localized accessible name', () => {
+  assert.match(app, /class="social-rail-item social-rail-share"[^>]*aria-label="/);
+  assert.match(css, /\.social-rail-share span\s*\{[^}]*white-space: nowrap/);
+  assert.match(css, /\.post-social-rail\s*\{[^}]*env\(safe-area-inset-right\)/);
+  assert.match(html, /style\.css\?v=20261110-mobile-polish-railfix/);
+});
