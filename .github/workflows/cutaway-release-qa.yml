@@ -61,7 +61,7 @@ jobs:
           cat /tmp/pocitel-http.log
           exit 1
       - name: Run cutaway visual geometry and interaction gate
-        run: npx playwright test tests/cutaway-browser.spec.mjs tests/visual-declutter.browser.spec.mjs --workers=2 --reporter=line
+        run: npx playwright test tests/cutaway-browser.spec.mjs tests/visual-declutter.browser.spec.mjs tests/quick-share.browser.spec.mjs --workers=2 --reporter=line
       - name: Upload browser failure evidence
         if: failure()
         uses: actions/upload-artifact@v4
