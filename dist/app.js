@@ -18,6 +18,8 @@ const copy = {
   language: ['Dil', 'Language', 'Язык'],
   like: ['Beğen', 'Like', 'Нравится'],
   views: ['Görüntülenme', 'Views', 'Просмотры'],
+  socialActions: ['Ürün etkileşimleri', 'Dish interactions', 'Действия с блюдом'],
+  shareShort: ['Paylaş', 'Share', 'Поделиться'],
   engagementLocal: ['Beğeniler ve görüntülenmeler yalnızca bu cihazda saklanır.', 'Likes and views are saved on this device only.', 'Лайки и просмотры сохраняются только на этом устройстве.'],
   appearance: ['Görünüm', 'Appearance', 'Оформление'],
   appearanceMood: ['Görünüm', 'Appearance', 'Оформление'],
@@ -448,16 +450,26 @@ function addButton(entry) {
   return `<button type="button" class="button primary post-add" data-add="${entry.id}" aria-label="${t('add')} · ${name(entry)}">${icon('plus')}${t('add')}</button>`;
 }
 
-function postActions(entry) {
+// Keep media and social buttons as siblings: buttons must never nest in buttons.
+function postSocialRail(entry) {
   const liked = engagement.likes.has(entry.id);
   const views = engagement.views.get(entry.id) ?? 0;
-  return `<div class="engagement-bar" title="${t('engagementLocal')}">
-    <button type="button" class="engagement-like" data-like="${entry.id}" aria-label="${t('like')} · ${name(entry)}" aria-pressed="${liked}">${icon('heart')}<span data-like-count="${entry.id}">${liked ? 1 : 0}</span></button>
-    <span class="engagement-views" aria-label="${t('views')}: ${views} · ${name(entry)}">${icon('eye')}<span data-view-count="${entry.id}">${views}</span></span>
-  </div>
-  <div class="post-actions">
+  return `<div class="post-social-rail" role="group" aria-label="${t('socialActions')} · ${name(entry)}">
+    <span class="social-rail-item social-rail-views" aria-label="${t('views')}: ${views} · ${name(entry)}" title="${t('views')}">
+      ${icon('eye')}<span data-view-count="${entry.id}">${views}</span>
+    </span>
+    <button type="button" class="social-rail-item social-rail-like" data-like="${entry.id}" aria-label="${t('like')} · ${name(entry)}" aria-pressed="${liked}" title="${t('like')}">
+      ${icon('heart')}<span data-like-count="${entry.id}">${liked ? 1 : 0}</span>
+    </button>
+    <button type="button" class="social-rail-item social-rail-share" data-share="${entry.id}" aria-label="${t('share')} · ${name(entry)}" title="${t('share')}">
+      ${icon('share')}<span>${t('shareShort')}</span>
+    </button>
+  </div>`;
+}
+
+function postActions(entry) {
+  return `<div class="post-actions">
     <button type="button" class="icon-button save-post" data-save="${entry.id}" aria-label="${t('save')} · ${name(entry)}" aria-pressed="${saved.has(entry.id)}">${icon('bookmark')}</button>
-    <button type="button" class="icon-button" data-share="${entry.id}" aria-label="${t('share')} · ${name(entry)}">${icon('share')}</button>
     ${addButton(entry)}
   </div>`;
 }
@@ -522,11 +534,14 @@ function menuPost(entry, index = 8) {
       <span>${category.labels[language]}</span>
       ${entry.sourceId ? `<span class="pinned">${t('takeaway')}</span>` : entry.before ? `<span class="pinned">${t('pinned')}</span>` : ''}
     </div>
-    <button type="button" class="post-media" data-post="${entry.id}" aria-label="${t('details')} · ${name(entry)}${peek ? ` · ${t('lookInside')}` : ''}">
-      ${itemImage(entry, index > 1)}
-      ${illustrationLabel(entry)}
-      ${peek ? `<span class="cutaway-preview"><span aria-hidden="true">↔</span> ${t('lookInside')}</span>` : ''}
-    </button>
+    <div class="post-media-wrap">
+      <button type="button" class="post-media" data-post="${entry.id}" aria-label="${t('details')} · ${name(entry)}${peek ? ` · ${t('lookInside')}` : ''}">
+        ${itemImage(entry, index > 1)}
+        ${illustrationLabel(entry)}
+        ${peek ? `<span class="cutaway-preview"><span aria-hidden="true">↔</span> ${t('lookInside')}</span>` : ''}
+      </button>
+      ${postSocialRail(entry)}
+    </div>
     <div class="post-body">
       <div class="post-heading"><h3>${name(entry)}</h3>${priceMarkup(entry)}</div>
       ${description(entry) ? `<p class="post-description">${description(entry)}</p>` : ''}
@@ -605,7 +620,7 @@ const focacciaViews = {
   zucchini: ['assets/cutaway/zucchini-outside.webp', 'assets/illustrations/branded/zucchini.webp'],
 };
 
-function cutawayMarkup(entry) {
+function cutawayMarkup(entry, socialRail = '') {
   const reveal = revealFor(entry, language);
   const food = items.get(reveal.dishId);
   const shown = reveal.pairing ? food : entry;
@@ -620,6 +635,7 @@ function cutawayMarkup(entry) {
     </div>
     <span class="cutaway-divider" aria-hidden="true"><span class="cutaway-handle">↔</span></span>
     <input type="range" min="0" max="100" step="1" value="50" class="cutaway-range" data-cutaway-range aria-label="${t('cutawayRange')}" aria-describedby="cutaway-help" aria-valuetext="${t('cutawayShown')} 50%">
+    ${socialRail}
     ${illustrated ? `<span class="cutaway-art-label">${t('illustration')}</span>` : ''}
   </div>
   <div class="cutaway-guide" id="cutaway-help"><strong>${caption}</strong><span>${t('cutawayHelp')} · ${t('cutawaySource')}</span></div>
@@ -638,7 +654,7 @@ function renderViewer() {
     (openedPost.nutritionOpen ? `<p class="viewer-item-name">${name(entry)}</p>` : `<p class="eyebrow">${entry.sourceId ? `${t('takeaway')} · ` : ''}${categoryByItem.get(entry.id).labels[language]}</p>`);
   viewerContent.innerHTML = `
     <div class="viewer-photo${entry.sourceId ? ' take-photo' : ''}${hasCutaway(entry) ? ' has-cutaway' : ''}">
-      ${hasCutaway(entry) ? cutawayMarkup(entry) : `${itemImage(entry, false)}${illustrationLabel(entry)}`}
+      ${hasCutaway(entry) ? cutawayMarkup(entry, postSocialRail(entry)) : `${itemImage(entry, false)}${illustrationLabel(entry)}${postSocialRail(entry)}`}
     </div>
     <div class="viewer-body">
       <div class="post-heading"><h2 id="post-title">${name(entry)}</h2>${priceMarkup(entry)}</div>
