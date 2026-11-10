@@ -50,7 +50,7 @@ jobs:
           npm init -y >/dev/null
           npm pkg set type=module
           npm install --no-save --no-audit --no-fund @playwright/test
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps chromium webkit
       - name: Start local menu site
         run: |
           python3 -m http.server 8088 --bind 127.0.0.1 --directory dist > /tmp/pocitel-http.log 2>&1 &
@@ -61,7 +61,8 @@ jobs:
           cat /tmp/pocitel-http.log
           exit 1
       - name: Run cutaway visual geometry and interaction gate
-        run: npx playwright test tests/cutaway-browser.spec.mjs tests/visual-declutter.browser.spec.mjs --workers=2 --reporter=line
+        run: npx playwright test tests/cutaway-browser.spec.mjs tests/visual-declutter.browser.spec.mjs tests/instant-share.browser.spec.mjs --workers=2 --reporter=line
+          npx playwright test tests/instant-share.browser.spec.mjs --browser=webkit --workers=2 --reporter=line
       - name: Upload browser failure evidence
         if: failure()
         uses: actions/upload-artifact@v4
