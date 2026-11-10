@@ -1005,3 +1005,66 @@ button.social-rail-item:hover { background: rgba(33,41,37,.91); }
   .social-rail-item { width: 45px; min-height: 46px; }
   .social-rail-share { min-height: 44px; }
 }
+
+/* Ingredient reveal on the actual food photo, without covering the Shorts controls. */
+.cutaway-ingredient-card {
+  position: absolute;
+  z-index: 4;
+  top: 10px;
+  left: calc(var(--cutaway-split) + 24px);
+  right: 70px;
+  max-width: 176px;
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 8px 9px;
+  border: 1px solid rgba(255, 255, 255, .42);
+  border-radius: 13px;
+  background: rgba(25, 34, 31, .68);
+  color: #fff9f1;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, .19);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: none; /* The comparison slider remains fully draggable. */
+  font-family: var(--sans);
+  text-shadow: 0 1px 2px rgba(0,0,0,.28);
+}
+.cutaway-inside-kicker {
+  font-size: .62rem;
+  line-height: 1.25;
+  font-weight: 800;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  color: #f2e8d3;
+}
+.cutaway-mini-tag {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: .69rem;
+  line-height: 1.25;
+  font-weight: 600;
+}
+.cutaway-mini-tag + .cutaway-mini-tag {
+  padding-top: 4px;
+  border-top: 1px solid rgba(255,255,255,.19);
+}
+.cutaway-inside-more { font-size: .65rem; color: #f6dfc3; font-weight: 700; }
+.cutaway[data-inside-visible="false"] .cutaway-ingredient-card { display: none; }
+@media (max-width: 560px) {
+  .cutaway-ingredient-card {
+    top: 8px;
+    left: calc(var(--cutaway-split) + 22px);
+    right: 65px;
+    max-width: 160px;
+    gap: 3px;
+    padding: 7px;
+    border-radius: 11px;
+  }
+  .cutaway-mini-tag { font-size: .64rem; line-height: 1.22; }
+}
+@media (max-width: 360px) {
+  .cutaway-ingredient-card { left: calc(var(--cutaway-split) + 19px); right: 60px; padding: 6px; }
+  .cutaway-mini-tag { font-size: .60rem; }
+}
