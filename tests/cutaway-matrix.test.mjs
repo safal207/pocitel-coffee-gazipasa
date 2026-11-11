@@ -70,3 +70,10 @@ test('unexpected or empty ingredients cannot create a fake ingredient overlay', 
   assert.equal(cutawayOverlayMarkup({ parts: ['<test>&"'] }, 'Inside', 'more', 'All ingredients').includes('<test>'), false);
   assert.ok(cutawayOverlayMarkup({ parts: ['<test>&"'] }, 'Inside', 'more', 'All ingredients').includes('&lt;test&gt;'));
 });
+
+test('cached older app versions keep their noninteractive caption', () => {
+  const markup = cutawayOverlayMarkup({ parts: ['Bread', 'Cheese', 'Tomato', 'Rocket'] }, 'Inside', 'more');
+  assert.match(markup, /role="note"/);
+  assert.doesNotMatch(markup, /<button|undefined/);
+  assert.ok(markup.includes('+1 more'));
+});

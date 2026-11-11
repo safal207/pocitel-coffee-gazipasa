@@ -8,7 +8,7 @@ import { energyRanges } from './nutrition-summary.js?v=20261105-focaccia';
 import { focacciaTakeawayOffer, selectedComboOffer } from './focaccia-offer.js?v=20261106-builder';
 import { moments, restoreFavoriteCombos, nextComboChoice } from './discovery.js?v=20261107-moments';
 import { revealFor } from './ingredient-reveal.js?v=20261110-complete-food';
-import { cutawayOverlayMarkup } from './cutaway-overlay.js?v=20261111-inside-regression-v2';
+import { cutawayOverlayMarkup } from './cutaway-overlay.js?v=20261111-inside-regression-v3';
 import { restoreEngagement, toggleLike, recordView, serializeEngagement } from './engagement.js?v=20261110-social';
 
 const copy = {
