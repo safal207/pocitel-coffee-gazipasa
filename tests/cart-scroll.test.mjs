@@ -29,8 +29,8 @@ test('scroll anchoring is disabled only inside the cart, not for menu or viewer'
 });
 
 test('current asset revisions keep cart behavior consistent with share previews', () => {
-  assert.match(html, /style\.css\?v=20261110-cart-stability/);
-  assert.match(html, /app\.js\?v=20261110-cart-stability/);
+  assert.match(html, /style\.css\?v=20261111-inside-regression-v3/);
+  assert.match(html, /app\.js\?v=20261111-inside-regression-v3/);
   assert.match(app, /function renderCartSuggestion\(/);
   assert.match(app, /function addToSelection\(/);
   assert.match(app, /function sharePost\(/);

@@ -71,6 +71,36 @@ test('Shorts interactions remain independent from photo and order actions', asyn
   await expect(page.locator('#share-dialog')).toBeVisible();
 });
 
+for (const [lang, label, missing] of [
+  ['tr', 'Tüm malzemeler', 'daha'],
+  ['en', 'All ingredients', 'more'],
+  ['ru', 'Весь состав', 'ещё'],
+]) {
+  test(`the on-photo ingredients open and close without moving the slider / ${lang}`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto(`${base}/?lang=${lang}&item=zucchini`, { waitUntil: 'domcontentloaded' });
+    const viewer = page.locator('#post-viewer');
+    const caption = viewer.locator('[data-cutaway-ingredients-toggle]');
+    const disclosure = viewer.locator('#cutaway-ingredients');
+    const slider = viewer.locator('[data-cutaway-range]');
+    await expect(caption).toBeVisible();
+    await expect(caption).toContainText(missing);
+    await expect(caption).toHaveAccessibleName(new RegExp(label));
+    await expect(caption).toHaveAttribute('aria-expanded', 'false');
+    const originalValue = await slider.inputValue();
+    await caption.click();
+    await expect(disclosure).toHaveAttribute('open', '');
+    await expect(caption).toHaveAttribute('aria-expanded', 'true');
+    await expect(slider).toHaveValue(originalValue);
+    await disclosure.locator('summary').click();
+    await expect(disclosure).not.toHaveAttribute('open', '');
+    await expect(caption).toHaveAttribute('aria-expanded', 'false');
+    await caption.focus();
+    await page.keyboard.press('Enter');
+    await expect(disclosure).toHaveAttribute('open', '');
+  });
+}
+
 test('Add-to-order remains the primary functional CTA', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${base}/?lang=ru&item=sweet-morning`, { waitUntil: 'domcontentloaded' });

@@ -38,7 +38,7 @@ jobs:
   browser-geometry:
     name: "All cutaways + declutter: responsive UX and Shorts geometry"
     needs: data-and-unit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -50,7 +50,9 @@ jobs:
           npm init -y >/dev/null
           npm pkg set type=module
           npm install --no-save --no-audit --no-fund @playwright/test
-          npx playwright install --with-deps chromium
+          # The hosted runner already has Chromium's system libraries.
+          # Avoid installing extra fonts from a potentially unavailable apt mirror.
+          npx playwright install chromium
       - name: Start local menu site
         run: |
           python3 -m http.server 8088 --bind 127.0.0.1 --directory dist > /tmp/pocitel-http.log 2>&1 &

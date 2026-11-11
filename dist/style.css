@@ -1015,6 +1015,7 @@ button.social-rail-item:hover { background: rgba(33,41,37,.91); }
   left: 9px;
   width: max-content;
   max-width: min(220px, calc(100% - 89px));
+  min-height: 44px;
   max-height: 66px;
   overflow: hidden;
   display: flex;
@@ -1029,10 +1030,13 @@ button.social-rail-item:hover { background: rgba(33,41,37,.91); }
   box-shadow: 0 5px 18px rgba(0, 0, 0, .21);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  pointer-events: none;
+  pointer-events: auto;
   font-family: var(--sans);
+  text-align: left;
   text-shadow: 0 1px 2px rgba(0,0,0,.3);
 }
+.cutaway-ingredient-card:not(button) { pointer-events: none; }
+.cutaway-ingredient-card:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 .cutaway-inside-kicker {
   display: block;
   font-size: .6rem;
@@ -1058,6 +1062,8 @@ button.social-rail-item:hover { background: rgba(33,41,37,.91); }
   font-weight: 700;
   line-height: 1.1;
   color: #f9e1be;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 @media (max-width: 360px) {
   .cutaway-ingredient-card {

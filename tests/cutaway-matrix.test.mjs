@@ -52,10 +52,11 @@ test('24 cutaway cards render a localized visible on-photo summary in all langua
       const model = previewFor(reveal);
       assert.ok(model && model.preview.length >= 1 && model.preview.length <= 3);
       assert.equal(model.preview.length + model.remaining, reveal.parts.length);
-      const markup = cutawayOverlayMarkup(reveal, title, more);
+      const markup = cutawayOverlayMarkup(reveal, title, more, 'All ingredients');
       assert.match(markup, /data-qa="inside-overlay"/);
       assert.ok(markup.includes(title), `${entry.id}: title ${language}`);
-      assert.ok(markup.includes('role="note"'));
+      assert.match(markup, /<button type="button"/);
+      assert.match(markup, /aria-controls="cutaway-ingredients" aria-expanded="false"/);
       assert.ok(markup.includes(reveal.parts[0].replaceAll('&', '&amp;')), `${entry.id}: first ingredient`);
       assert.equal((markup.match(/class="cutaway-ingredient-card"/g) || []).length, 1);
     }
@@ -65,7 +66,14 @@ test('24 cutaway cards render a localized visible on-photo summary in all langua
 test('unexpected or empty ingredients cannot create a fake ingredient overlay', () => {
   assert.equal(previewFor(null), null);
   assert.equal(previewFor({ parts: [] }), null);
-  assert.equal(cutawayOverlayMarkup(null, 'Внутри', 'ещё'), '');
-  assert.equal(cutawayOverlayMarkup({ parts: ['<test>&"'] }, 'Inside', 'more').includes('<test>'), false);
-  assert.ok(cutawayOverlayMarkup({ parts: ['<test>&"'] }, 'Inside', 'more').includes('&lt;test&gt;'));
+  assert.equal(cutawayOverlayMarkup(null, 'Внутри', 'ещё', 'Весь состав'), '');
+  assert.equal(cutawayOverlayMarkup({ parts: ['<test>&"'] }, 'Inside', 'more', 'All ingredients').includes('<test>'), false);
+  assert.ok(cutawayOverlayMarkup({ parts: ['<test>&"'] }, 'Inside', 'more', 'All ingredients').includes('&lt;test&gt;'));
+});
+
+test('cached older app versions keep their noninteractive caption', () => {
+  const markup = cutawayOverlayMarkup({ parts: ['Bread', 'Cheese', 'Tomato', 'Rocket'] }, 'Inside', 'more');
+  assert.match(markup, /role="note"/);
+  assert.doesNotMatch(markup, /<button|undefined/);
+  assert.ok(markup.includes('+1 more'));
 });
