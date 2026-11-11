@@ -12,12 +12,12 @@ export function previewFor(reveal) {
   };
 }
 
-export function cutawayOverlayMarkup(reveal, title, moreLabel) {
+export function cutawayOverlayMarkup(reveal, title, moreLabel, allLabel) {
   const data = previewFor(reveal);
   if (!data) return '';
-  return `<div class="cutaway-ingredient-card" data-qa="inside-overlay" role="note" aria-label="${escapeLabel(title)}: ${escapeLabel(data.full.join(', '))}">
+  return `<button type="button" class="cutaway-ingredient-card" data-qa="inside-overlay" data-cutaway-ingredients-toggle aria-controls="cutaway-ingredients" aria-expanded="false" aria-label="${escapeLabel(allLabel)}: ${escapeLabel(data.full.join(', '))}">
     <span class="cutaway-inside-kicker">${escapeLabel(title)}</span>
     <span class="cutaway-inside-preview">${data.preview.map(escapeLabel).join(' · ')}</span>
     ${data.remaining ? `<span class="cutaway-inside-more">+${data.remaining} ${escapeLabel(moreLabel)}</span>` : ''}
-  </div>`;
+  </button>`;
 }

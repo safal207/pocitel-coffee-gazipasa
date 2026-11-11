@@ -8,7 +8,7 @@ import { energyRanges } from './nutrition-summary.js?v=20261105-focaccia';
 import { focacciaTakeawayOffer, selectedComboOffer } from './focaccia-offer.js?v=20261106-builder';
 import { moments, restoreFavoriteCombos, nextComboChoice } from './discovery.js?v=20261107-moments';
 import { revealFor } from './ingredient-reveal.js?v=20261110-complete-food';
-import { cutawayOverlayMarkup } from './cutaway-overlay.js?v=20261110-visibility-qa';
+import { cutawayOverlayMarkup } from './cutaway-overlay.js?v=20261111-inside-regression-v2';
 import { restoreEngagement, toggleLike, recordView, serializeEngagement } from './engagement.js?v=20261110-social';
 
 const copy = {
@@ -678,14 +678,14 @@ function cutawayMarkup(entry, socialRail = '') {
     </div>
     <span class="cutaway-divider" aria-hidden="true"><span class="cutaway-handle">↔</span></span>
     <input type="range" min="0" max="100" step="1" value="50" class="cutaway-range" data-cutaway-range aria-label="${t('cutawayRange')}" aria-describedby="cutaway-help" aria-valuetext="${t('cutawayShown')} 50%">
-    ${cutawayOverlayMarkup(reveal, t('insideLabel'), t('moreIngredients'))}
+    ${cutawayOverlayMarkup(reveal, t('insideLabel'), t('moreIngredients'), t('cutawayAllIngredients'))}
     ${socialRail}
     ${illustrated ? `<span class="cutaway-art-label">${t('illustration')}</span>` : ''}
   </div>
   <div class="cutaway-details">
     <div class="cutaway-guide" id="cutaway-help">${t('cutawayHelpShort')}</div>
     <div class="cutaway-controls"><button type="button" data-cutaway-toggle aria-pressed="false" aria-label="${t('cutawayShow')}">${t('cutawayShow')}</button></div>
-    <details class="cutaway-ingredients" data-qa="ingredient-disclosure">
+    <details class="cutaway-ingredients" data-qa="ingredient-disclosure" id="cutaway-ingredients">
       <summary>${t('cutawayAllIngredients')}</summary>
       <div class="cutaway-legend" aria-label="${t('cutawayAllIngredients')}">${reveal.parts.map(part => `<span>${part}</span>`).join('')}</div>
       <small class="cutaway-ingredient-source">${t('cutawaySource')}</small>
@@ -1526,10 +1526,28 @@ viewerContent.addEventListener('input', event => {
 });
 
 viewerContent.addEventListener('click', event => {
+  const ingredientsSummary = event.target.closest('#cutaway-ingredients > summary');
+  if (ingredientsSummary) {
+    const ingredients = ingredientsSummary.parentElement;
+    viewerContent.querySelector('[data-cutaway-ingredients-toggle]')?.setAttribute('aria-expanded', String(!ingredients.open));
+    return;
+  }
+  const ingredientsToggle = event.target.closest('[data-cutaway-ingredients-toggle]');
+  if (ingredientsToggle) {
+    const ingredients = viewerContent.querySelector('#cutaway-ingredients');
+    ingredients.open = !ingredients.open;
+    ingredientsToggle.setAttribute('aria-expanded', String(ingredients.open));
+    return;
+  }
   if (!event.target.closest('[data-cutaway-toggle]')) return;
   const range = viewerContent.querySelector('[data-cutaway-range]');
   updateCutaway(range, Number(range.value) === 0 ? 100 : 0);
 });
+
+viewerContent.addEventListener('toggle', event => {
+  if (!event.target.matches('#cutaway-ingredients')) return;
+  viewerContent.querySelector('[data-cutaway-ingredients-toggle]')?.setAttribute('aria-expanded', String(event.target.open));
+}, true);
 
 window.addEventListener('storage', event => {
   if (event.key !== engagementKey) return;
