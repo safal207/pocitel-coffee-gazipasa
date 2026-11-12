@@ -15,7 +15,7 @@ test('native share is invoked on the first tap before fallback modal or image de
   assert.match(share, /navigator\.share\(payload\)/);
   assert.ok(share.indexOf('navigator.share(payload)') < share.indexOf('openQuickShareFallback(button, id, payload)'));
   assert.doesNotMatch(share, /await|shareDialog\.showModal|prepareSharePhoto|import\(/);
-  assert.match(share, /error\?\.name !== 'AbortError'/);
+  assert.match(share, /error\?\.name === 'AbortError'/);
 });
 
 test('fallback is compact and does not contain the original photo preview or second native share button', () => {
