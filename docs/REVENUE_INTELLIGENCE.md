@@ -7,7 +7,7 @@
 1. Visitor arrives via a QR or UTM link, chooses real menu items, and may opt into 30-day on-device interaction logging. No events are sent to a server.
 2. Visitor opens Show Waiter and may copy a PCT1. order code. It contains an unsigned draft ID, item IDs, quantities, quote and safe attribution tags. The code is **not payment evidence**.
 3. Cafe staff opens /admin.html on their own device, pastes the code, checks the actual payment and marks it as staff_manual. Duplicate order IDs are not counted twice.
-4. Alternatively import paid receipts from the POS CSV. Each line belongs to order_id; duplicates are skipped. Provenance is pos_csv, not remotely verified by the website.
+4. Alternatively import paid receipts from the POS CSV. Each line belongs to order_id. Exact repeat imports are skipped. If a staff-entered receipt matches the imported SKU/quantity/gross amounts, upgrade that order to POS provenance **without double-counting**. Conflicting receipts abort the entire import and require manual reconciliation. Provenance is pos_csv, not remotely verified by the website.
 5. Manager enters cost per SKU or imports a cost CSV. Dashboard computes paid-only gross, ticket average, contribution and quality coverage. Unknown VAT and ingredients are explicitly missing, never zero by assumption.
 6. Export all orders, costs and local event log into separate JSON backups. This local data does not synchronize across staff devices.
 
@@ -18,7 +18,7 @@ Revenue excluding VAT = gross / (1 + applicable VAT percent / 100).
 Variable costs = quantity × (ingredients + packaging + variable labor + payment fee + waste).
 Contribution = revenue excluding VAT − variable costs. Only complete input allows the contribution calculation.
 
-Contribution is **not net profit**: rent, fixed salary, corporate taxes, depreciation and other shared overhead are outside this metric. Cart additions, visits, likes, shares and Show Waiter screens are NOT sales. An unsigned customer PCT1 code is not a payment confirmation. The two declared-paid evidence sources (staff_manual and pos_csv) are displayed separately.
+Contribution is **not net profit**: rent, fixed salary, corporate taxes, depreciation and other shared overhead are outside this metric. Product-level contribution is displayed only when **every unit sold** for that SKU has complete VAT and variable cost; show known-unit coverage separately instead of presenting partial margin as a total. Cost records are current estimates, not historical cost snapshots — update/reconcile against period-specific recipes and purchasing invoices before making longitudinal claims. Cart additions, visits, likes, shares and Show Waiter screens are NOT sales. An unsigned customer PCT1 code is not a payment confirmation. The two declared-paid evidence sources (staff_manual and pos_csv) are displayed separately.
 
 ## POS import format
 
