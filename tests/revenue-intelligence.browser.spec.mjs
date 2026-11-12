@@ -71,13 +71,16 @@ test.describe('Revenue Intelligence: no fictitious sales and local-only ordering
   test('POS import is idempotent, supports nonzero contribution with complete VAT and cost',async({page})=>{
     await page.goto(base+'/admin.html');
     await page.locator('#admin-lang').selectOption('en');
-    await page.locator('#cost-item').selectOption('cappuccino');
-    await page.locator('#cost-ingredients').fill('40');
-    await page.locator('#cost-packaging').fill('8');
-    await page.locator('#cost-variableLabor').fill('10');
-    await page.locator('#cost-paymentFee').fill('4');
-    await page.locator('#cost-waste').fill('1');
-    await page.locator('#cost-form button[type=submit]').click();
+    const recipe={name:'costs.csv',mimeType:'text/csv',buffer:Buffer.from(
+      'item_id,ingredients,packaging,variableLabor,paymentFee,waste\n'+
+      'cappuccino,40,8,10,4,1\n')};
+    await page.locator('#cost-file').setInputFiles(recipe);
+    await page.locator('#import-costs').click();
+    await expect(page.locator('#cost-status')).toContainText('Imported: 1');
+    const importedCost=await page.evaluate(()=>JSON.parse(localStorage.getItem('pocitel-admin-costs-v1')).cappuccino);
+    expect(importedCost.variableLabor).toBe(10);
+    expect(importedCost.paymentFee).toBe(4);
+    expect(importedCost.waste).toBe(1);
     const file={name:'pos.csv',mimeType:'text/csv',buffer:Buffer.from(
       'order_id,paid_at,item_id,quantity,unit_gross_try,vat_percent,discount_gross_try,utm_source\n'+
       'pos_receipt_001,2026-11-01T12:00:00Z,cappuccino,2,185,10,0,instagram\n')};
