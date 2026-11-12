@@ -1530,3 +1530,20 @@ button.social-rail-item:hover { background: rgba(33,41,37,.91); }
   font: 750 .68rem/1 var(--sans);
   font-variant-numeric: tabular-nums;
 }
+
+/* Optional local-only diagnostic controls, no advertising trackers. */
+.analytics-optin {
+  display:flex;align-items:flex-start;gap:.65rem;padding:.7rem .1rem;
+  margin:.4rem 0;border-top:1px solid var(--line);color:var(--ink);
+  font-size:.78rem;line-height:1.4;
+}
+.analytics-optin input{flex:0 0 auto;width:19px;height:19px;margin-top:3px;accent-color:var(--wine);}
+.analytics-optin span{display:grid;gap:3px;}
+.analytics-optin small{color:var(--muted);font-size:.7rem;}
+.order-slip-details{border-top:1px solid var(--line);padding:.7rem .3rem;margin-top:.65rem;}
+.order-slip-details > summary{color:var(--olive);font-weight:650;min-height:43px;cursor:pointer;font-size:.78rem;}
+.order-slip-details .waiter-note{font-size:.72rem;}
+.order-slip-details textarea{display:block;width:100%;min-height:58px;padding:.5rem;font-size:.67rem;
+  line-height:1.35;overflow-wrap:anywhere;border:1px solid var(--line);border-radius:8px;background:var(--cream);color:var(--ink);resize:vertical;}
+.order-slip-details button{min-height:44px;margin:.4rem 0;font-size:.75rem;}
+.order-slip-details p[role=status]{font-size:.75rem;color:var(--olive);}

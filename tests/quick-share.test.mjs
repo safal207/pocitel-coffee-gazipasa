@@ -15,7 +15,7 @@ test('native share is invoked on the first tap before fallback modal or image de
   assert.match(share, /navigator\.share\(payload\)/);
   assert.ok(share.indexOf('navigator.share(payload)') < share.indexOf('openQuickShareFallback(button, id, payload)'));
   assert.doesNotMatch(share, /await|shareDialog\.showModal|prepareSharePhoto|import\(/);
-  assert.match(share, /error\?\.name !== 'AbortError'/);
+  assert.match(share, /error\?\.name === 'AbortError'/);
 });
 
 test('fallback is compact and does not contain the original photo preview or second native share button', () => {
@@ -28,7 +28,7 @@ test('fallback is compact and does not contain the original photo preview or sec
   assert.match(html, /id="share-extras"/);
   assert.match(html, /id="share-photo-button"/);
   assert.match(html, /id="save-photo"/);
-  assert.match(html, /20261112-combo-journey/);
+  assert.match(html, /20261112-revenue/);
 });
 
 test('four direct channel URLs encode a public per-dish URL and localized invitation', () => {

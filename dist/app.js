@@ -11,6 +11,8 @@ import { moments, restoreFavoriteCombos, nextComboChoice } from './discovery.js?
 import { revealFor } from './ingredient-reveal.js?v=20261110-complete-food';
 import { cutawayOverlayMarkup, cutawayPhotoTagsMarkup } from './cutaway-overlay.js?v=20261112-photo-reveal-v2';
 import { restoreEngagement, toggleLike, recordView, serializeEngagement } from './engagement.js?v=20261110-social';
+import { createLocalTelemetry } from './telemetry.js?v=20261112-ri';
+import { makeOrderSlip } from './revenue-core.js?v=20261112-ri';
 
 const copy = {
   skip: ['Menüye geç', 'Skip to menu', 'Перейти к меню'],
@@ -218,6 +220,13 @@ const copy = {
   coffeeForWalkReason: ['Brunch burada, cappuccino yolda. Molayı yanınızda götürün.', 'Brunch here, cappuccino on your walk. Take the moment with you.', 'Бранч здесь, капучино на прогулку. Возьмите настроение с собой.'],
   breakfastToGoReason: ['Kahvenizin yanına meyve, yoğurt ve granola — bardakta.', 'Fruit, yogurt and granola to go with your coffee — in a cup.', 'Фрукты, йогурт и гранола к кофе — тоже в стакане.'],
   sweetWithCoffeeReason: ['Kahvenizin yanına meyveli, Nutellalı pancake.', 'Fruit and Nutella pancakes to enjoy with your coffee.', 'Панкейки с фруктами и Nutella к вашему кофе.'],
+  telemetryLabel: ['Yerel kullanım günlüğü', 'Local usage diagnostics', 'Локальная диагностика'],
+  telemetryScope: ['İsteğe bağlı, yalnızca bu cihazda 30 gün saklanır. Sunucuya gönderilmez.', 'Optional: kept on this device for 30 days. Nothing is sent to a server.', 'Необязательно. Хранится 30 дней только на этом устройстве, на сервер не отправляется.'],
+  orderSlipSummary: ['Sipariş kodu (isteğe bağlı)', 'Order code (optional)', 'Код заказа (необязательно)'],
+  orderSlipHelp: ['Bu kod ödeme kanıtı değildir. İşletme ödemeyi ayrıca teyit eder.', 'This is not a payment receipt. Staff must confirm payment separately.', 'Это не чек об оплате. Сотрудник подтверждает платёж отдельно.'],
+  copyOrderSlip: ['Sipariş kodunu kopyala', 'Copy order code', 'Скопировать код заказа'],
+  slipCopied: ['Kod kopyalandı', 'Code copied', 'Код скопирован'],
+  slipManualCopy: ['Kodu seçip elle kopyalayın', 'Select the code and copy manually', 'Выделите и скопируйте код вручную'],
   handoffTitle: ['Sipariş vermek istiyorum', 'Let’s order this.', 'Хочу заказать это.'],
   handoffHelp: ['Bu ekranı ekibimize gösterin. Sipariş ve ödeme kafede tamamlanır.', 'Show this screen to our team. Your order and payment are completed at the café.', 'Покажите экран официанту. Он оформит заказ и примет оплату в кафе.'],
   handoffTurkish: ['Sipariş detayları', 'Order details · in Turkish for our team', 'Детали заказа · на турецком для официанта'],
@@ -359,6 +368,33 @@ try {
   if (Array.isArray(stored)) stored.filter(id => items.has(id)).forEach(id => saved.add(id));
 } catch { /* Ignore invalid saved data. */ }
 
+const telemetry = createLocalTelemetry({
+  storage: {
+    getItem: key => readSetting(key),
+    setItem: (key, value) => writeSetting(key, value),
+    removeItem: key => { try { localStorage.removeItem(key); } catch { /* No storage. */ } },
+  },
+  search: params,
+});
+const trace = (event, details = {}) => telemetry.record(event, { ...details, language: languages[language] });
+let lastOfferTracked = '';
+let slipSignature = null;
+let slipId = null;
+function currentOrderSlip() {
+  if (!selection.size) return '';
+  const signature = selectionSignature(selection);
+  if (signature !== slipSignature) {
+    slipSignature = signature;
+    const random = typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID().slice(0, 12).replaceAll('-', '')
+      : Date.now().toString(36);
+    slipId = 'pct_' + Date.now().toString(36) + '_' + random;
+  }
+  return makeOrderSlip({
+    id: slipId, lines: [...selection], quoteTotal: selectionTotal(),
+    attribution: telemetry.attribution,
+  });
+}
 const t = key => copy[key][language];
 const name = entry => entry.names[language];
 const description = entry => entry.descriptions[language];
@@ -456,6 +492,7 @@ function confirmConfiguration() {
     return;
   }
   persistSelection();
+  trace(draft.editId ? 'quantity_change' : 'add_to_cart', { itemId: entry.id, quantity: draft.quantity, amount: entry.price * draft.quantity });
   configure.close('saved');
   if (cart.open) {
     renderCart();
@@ -560,6 +597,7 @@ function handleView(id) {
   recordView(engagement, id);
   persistEngagement();
   refreshEngagement(id);
+  trace('dish_view', { itemId:id });
 }
 
 function itemImage(entry, lazy = true) {
@@ -785,6 +823,7 @@ function toggleSaved(id, opener) {
 function sharePost(button, id) {
   const entry = items.get(id);
   if (!entry) return;
+  trace('share_tap', { itemId:id });
   const payload = {
     title: `${name(entry)} · ${price(entry.price)} · Poçitel`,
     text: `${t('shareInvite')} ${name(entry)} · ${price(entry.price)} · Poçitel Coffee & Brunch`,
@@ -794,7 +833,8 @@ function sharePost(button, id) {
     try {
       Promise.resolve(navigator.share(payload)).catch(error => {
         // Cancelling a native sheet must not open an unwanted second dialog.
-        if (error?.name !== 'AbortError') openQuickShareFallback(button, id, payload);
+        if (error?.name === 'AbortError') trace('share_cancel', { itemId:id });
+        else openQuickShareFallback(button, id, payload);
       });
       return;
     } catch (error) {
@@ -807,6 +847,7 @@ function sharePost(button, id) {
 function openQuickShareFallback(button, id, payload) {
   const entry = items.get(id);
   if (!entry) return;
+  trace('share_fallback', { itemId:id });
   shareSequence++;
   if (sharePhotoUrl) URL.revokeObjectURL(sharePhotoUrl);
   sharePhotoUrl = undefined;
@@ -1075,6 +1116,9 @@ function scheduleFocacciaPromo(delay = 8000) {
   }, delay);
 }
 
+function entryPriceForTelemetry(id) {
+  return orderItem(id)?.price ?? null;
+}
 function acceptFocacciaPromo() {
   const next = applyCheckoutOffer(selection, focacciaOffer, orderItem, maxQuantity);
   if (!next) { renderFocacciaPromo(); return; }
@@ -1086,6 +1130,7 @@ function acceptFocacciaPromo() {
   offerTransaction = null;
   persistSelection();
   focacciaPromo.close();
+  trace('combo_added', { itemId:changedId, quantity:focacciaOffer.addQuantity, amount:entryPriceForTelemetry(changedId) });
   if (viewer.open) viewer.close();
   if (cart.open) {
     renderCart();
@@ -1111,6 +1156,7 @@ function addToSelection(id, opener) {
     return;
   }
   changeSelection(id, 1);
+  trace('add_to_cart', { itemId:id, quantity:selection.get(id), amount:orderItem(id)?.price });
   if (viewer.open) {
     viewer.close();
     opener = postOpener;
@@ -1140,7 +1186,12 @@ function renderCartSuggestion() {
   }
   if (!offerTransaction) checkoutOffer = suggestionsDismissed ? null : recommendCheckout(selection, items, orderItem);
   offer.hidden = !checkoutOffer;
-  if (!checkoutOffer) { offer.innerHTML = ''; return; }
+  if (!checkoutOffer) { offer.innerHTML = ''; lastOfferTracked = ''; return; }
+  const offerSignature = selectionSignature(selection) + '|' + checkoutOffer.addId;
+  if (!offerTransaction && lastOfferTracked !== offerSignature) {
+    trace('offer_view', { itemId: checkoutOffer.addId, amount: checkoutOffer.delta });
+    lastOfferTracked = offerSignature;
+  }
   const next = orderItem(checkoutOffer.addId);
   const applied = Boolean(offerTransaction);
   const titleKey = checkoutOffer.kind === 'combine' ? 'combineTitle' : checkoutOffer.kind === 'upgrade' ? 'upgradeTitle' : 'oneMoreTouch';
@@ -1169,6 +1220,7 @@ function toggleCheckoutOffer() {
   const removing = Boolean(offerTransaction);
   const next = removing ? undoCheckoutOffer(selection, offerTransaction) : applyCheckoutOffer(selection, checkoutOffer, orderItem, maxQuantity);
   if (!next) { renderCart(); return; }
+  if (!removing) trace('offer_accept', { itemId:checkoutOffer.addId, amount:checkoutOffer.delta });
   offerTransaction = removing ? null : { before: [...selection], after: selectionSignature(next) };
   selection.clear();
   next.forEach((quantity, id) => selection.set(id, quantity));
@@ -1244,6 +1296,7 @@ function changeSelection(id, delta) {
   if (next) selection.set(id, next);
   else selection.delete(id);
   persistSelection();
+  trace('quantity_change', { itemId:id, quantity:next, amount:orderItem(id)?.price });
   $('#announcement').textContent = `${name(orderItem(id))} · ${next}`;
 }
 
@@ -1255,6 +1308,7 @@ function applyLanguage() {
     document.querySelectorAll(`[data-${key}]`).forEach(node => node.setAttribute(attribute, t(node.dataset[key])));
   }
   $('#current-language').textContent = languages[language].toUpperCase();
+  $('#telemetry-optin').checked = telemetry.enabled;
   renderServiceMode();
   renderResults();
   renderCounts();
@@ -1363,6 +1417,7 @@ document.addEventListener('click', event => {
     writeSetting(languageKey, lang);
     applyLanguage();
   } else if (category) {
+    trace('category_select', { category });
     activeMoment = null;
     activeCategory = category;
     filterResults();
@@ -1376,7 +1431,6 @@ document.addEventListener('click', event => {
     renderServiceMode();
     filterResults();
     scrollToMenuStart();
-    if (takeawayMode) scheduleFocacciaPromo(600);
   } else if (button === savedFilter) {
     activeMoment = null;
     savedOnly = !savedOnly;
@@ -1429,9 +1483,10 @@ document.addEventListener('click', event => {
     updateConfigurationTotal();
     if (button.disabled) (button.id === 'configure-minus' ? $('#configure-plus') : $('#configure-minus')).focus();
   } else if (button.id === 'skip-extras') {
+    if (checkoutOffer) trace('offer_decline', {itemId:checkoutOffer.addId});
     suggestionsDismissed = true;
     renderCartSuggestion();
-    $('#show-waiter').focus();
+    $('#show-waiter').focus({preventScroll:true});
   } else if (quantity) {
     changeSelection(item, Number(quantity));
     // Re-rendering replaces the clicked node. Restore keyboard focus without
@@ -1442,8 +1497,24 @@ document.addEventListener('click', event => {
     openCart(button);
   } else if (button.id === 'show-waiter' && selection.size) {
     renderWaiter();
+    $('#order-slip-value').value = currentOrderSlip();
+    $('#order-slip-status').textContent = '';
+    trace('waiter_screen_view', { quantity:[...selection.values()].reduce((a,b)=>a+b,0), amount:selectionTotal() });
     waiter.showModal();
     waiter.scrollTop = 0;
+  } else if (button.id === 'copy-order-slip') {
+    const input=$('#order-slip-value');
+    const code=input.value||currentOrderSlip();
+    input.value=code;
+    if (navigator.clipboard?.writeText) {
+      Promise.resolve(navigator.clipboard.writeText(code)).then(
+        ()=>{$('#order-slip-status').textContent=t('slipCopied')},
+        ()=>{input.focus({preventScroll:true});input.select();$('#order-slip-status').textContent=t('slipManualCopy')}
+      );
+    } else {
+      input.focus({preventScroll:true});input.select();
+      $('#order-slip-status').textContent=t('slipManualCopy');
+    }
   } else if (button.id === 'close-waiter') {
     waiter.close();
   } else if (button.id === 'close-cart') {
@@ -1589,6 +1660,10 @@ viewerContent.addEventListener('toggle', event => {
   viewerContent.querySelector('[data-cutaway-ingredients-toggle]')?.setAttribute('aria-expanded', String(event.target.open));
 }, true);
 
+$('#telemetry-optin').addEventListener('change', event => {
+  telemetry.setEnabled(Boolean(event.target.checked));
+  if (telemetry.enabled) trace('menu_view');
+});
 window.addEventListener('storage', event => {
   if (event.key !== engagementKey) return;
   engagement = restoreEngagement(event.newValue, items.keys());
@@ -1596,25 +1671,19 @@ window.addEventListener('storage', event => {
 });
 
 applyLanguage();
+trace('menu_view');
 $('#service-picker').hidden = false;
 if (items.has(linkedItem)) openPost([linkedItem], results.querySelector(`[data-post="${linkedItem}"]`) ?? search);
 else if (location.hash === '#pairings') scrollToMenuStart();
 
-if (!linkedItem && !focacciaSeen && 'IntersectionObserver' in window) {
-  const offerObserver = new IntersectionObserver(entries => {
-    if (entries.some(entry => entry.isIntersecting)) {
-      scheduleFocacciaPromo();
-      offerObserver.disconnect();
-    }
-  }, { threshold: .5 });
-  offerObserver.observe($('#result-meta'));
-}
+// Pairing discovery remains in the existing teaser. No unsolicited timed modal.
 
 // Native selects retain their focus when dependent choices and prices rerender.
 focacciaPromo.addEventListener('change', event => {
   const field = event.target.dataset.comboField;
   if (!['foodId', 'drinkId', 'serving', 'milk', 'syrup', 'budget'].includes(field)) return;
   focacciaDraft[field] = event.target.value;
+  if (field === 'foodId' || field === 'drinkId') trace('combo_change', {itemId:event.target.value});
   comboLastEditedField = field === 'foodId' || field === 'drinkId' ? field : null;
   renderFocacciaPromo();
   $(`#combo-${field}`)?.focus({ preventScroll: true });
