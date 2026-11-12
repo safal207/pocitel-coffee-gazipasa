@@ -1418,3 +1418,115 @@ button.social-rail-item:hover { background: rgba(33,41,37,.91); }
 /* Quantity edits update the modal in place. The app restores scrollTop after
    redraw, so disable competing browser scroll anchoring in this pane only. */
 #cart .cart-scroll { overflow-anchor: none; }
+
+/* Calm pairing progression, grounded in actual preselected menu components. */
+.combo-journey {
+  display: grid;
+  gap: 5px;
+  margin-top: .65rem;
+  padding: .55rem .65rem .48rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-selected);
+}
+.combo-journey-meta {
+  display: flex;
+  align-items: baseline;
+  gap: .5rem;
+  min-width: 0;
+  color: var(--olive);
+  font: 600 .68rem/1.35 var(--sans);
+}
+.combo-journey-meta strong {
+  color: var(--wine);
+  font-variant-numeric: tabular-nums;
+  font-size: .82rem;
+  flex: none;
+}
+.combo-journey-meta span { min-width: 0; }
+.combo-journey-bar {
+  width: 100%;
+  height: 5px;
+  display: block;
+  border: none;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--line);
+  color: var(--olive);
+  accent-color: var(--olive);
+}
+.combo-journey-bar::-webkit-progress-bar { background: var(--line); border-radius: 999px; }
+.combo-journey-bar::-webkit-progress-value {
+  background: linear-gradient(90deg, var(--olive), #bd9758);
+  border-radius: 999px;
+}
+.combo-journey-bar::-moz-progress-bar { background: var(--olive); border-radius: 999px; }
+.combo-journey-steps {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .25rem;
+  padding: 0;
+  margin: 0;
+}
+.combo-journey-steps li {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: .28rem;
+  color: var(--muted);
+  font: 600 .65rem/1.2 var(--sans);
+  overflow-wrap: anywhere;
+}
+.combo-journey-steps li.is-complete { color: var(--olive); }
+.combo-journey-steps li.is-next { color: var(--wine); font-weight: 750; }
+.combo-journey-symbol {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: .65rem;
+}
+.combo-journey-steps .is-complete .combo-journey-symbol {
+  background: var(--olive);
+  color: var(--on-accent);
+  border-color: var(--olive);
+}
+.combo-journey-steps .is-next .combo-journey-symbol {
+  background: var(--cream);
+  border-color: var(--wine);
+}
+.combo-journey-steps .is-just-chosen .combo-journey-symbol {
+  animation: combo-journey-pop .38s ease-out;
+}
+@keyframes combo-journey-pop {
+  0%, 100% { transform: scale(1); }
+  45% { transform: scale(1.19); box-shadow: 0 0 9px rgba(213, 167, 93, .32); }
+}
+@media (max-width: 350px) {
+  .combo-journey { padding: .48rem .48rem .44rem; }
+  .combo-journey-steps li { font-size: .6rem; gap: .17rem; }
+  .combo-journey-symbol { width: 16px; height: 16px; }
+  .combo-journey-meta { font-size: .64rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .combo-journey-steps .is-just-chosen .combo-journey-symbol { animation: none !important; }
+}
+
+/* The order is the only event that earns stage 3/3; reuse the existing undo. */
+.focaccia-undo > .combo-done-check {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  min-width: 35px;
+  height: 26px;
+  border-radius: 100px;
+  padding-inline: 4px;
+  background: var(--olive);
+  color: var(--on-accent);
+  font: 750 .68rem/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+}
