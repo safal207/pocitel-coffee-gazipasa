@@ -83,7 +83,7 @@ export async function createOwnerServer({password,dataDir,port=0}={}) {
           if(!rows.length) throw Error('No cost rows');
           const seen=new Set();
           for(const row of rows){
-            if(!items.has(row.item_id)||seen.has(row.item_id)) throw Error('Invalid or duplicate cost SKU');
+            if(!sku(row.item_id)||seen.has(row.item_id)) throw Error('Invalid or duplicate cost SKU');
             seen.add(row.item_id);
             const cost=normalizedCost(Object.fromEntries(COST_FIELDS.map(key=>[key,row[key.toLowerCase()]?.trim()?Number(row[key.toLowerCase()]):null])));
             if(!cost) throw Error('Invalid ingredient cost or variable expense');

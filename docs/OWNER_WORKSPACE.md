@@ -34,6 +34,9 @@ this server deliberately offers no remote listen mode.
 4. Import validated per-portion costs using `docs/cost-import-template.csv`.
    Every variable expense needs an explicit number, including `0` where verified.
    Blank fields mean **unknown**, so contribution remains unavailable.
+   Takeaway SKUs require serving-specific costs; cafe packaging is not reused.
+   The protected importer also accepts valid full configured/combo SKU IDs for
+   direct recipes when component or packaging costs cannot safely be inferred.
 5. Download the private JSON backup and store it securely. Restarting the server
    restores its saved ledger. Do not upload real business backups into this public repo.
 

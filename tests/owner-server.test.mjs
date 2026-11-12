@@ -21,6 +21,11 @@ test('slips reject omitted/nonfinite totals, malformed rows and duplicate quanti
  }
  assert.throws(()=>parseCsv('a,b\n1,2,3'),/width/);
 });
+test('takeaway packaging cannot inherit a cafe cost declaration',()=>{
+ const cost={ingredients:40,packaging:0,variableLabor:0,paymentFee:0,waste:0};
+ assert.equal(unitCostFor('to-go-cappuccino',{cappuccino:cost},resolve).complete,false);
+ assert.equal(unitCostFor('to-go-cappuccino',{'to-go-cappuccino':{...cost,packaging:8}},resolve).value,48);
+});
 test('restored diagnostics drop arbitrary fields and erase expired data on disk',()=>{
  const now=new Date().toISOString();
  assert.equal(cleanLog([{event:'menu_view',at:now,email:'private@example.com'}])[0].email,undefined);

@@ -40,7 +40,11 @@ export function unitCostFor(itemId, costs, resolve) {
     return cost ? {complete:true, missing:[], value:money(Object.values(cost).reduce((a,b)=>a+b,0))}
       : {complete:false, missing:[itemId], value:null};
   }
-  const base = entry.sourceId ?? entry.baseId ?? entry.id;
+  // Cafe packaging is not evidence of takeaway packaging. Require a direct
+  // serving-specific recipe for plain takeaway SKUs and custom takeaway pairs.
+  if ((entry.sourceId && !entry.baseId) || entry.serving === 'takeaway')
+    return {complete:false, missing:[itemId], value:null};
+  const base = entry.baseId ?? entry.sourceId ?? entry.id;
   if (base !== itemId && completeCost(costs[base]) && !entry.isBuiltCombo) {
     let total = Object.values(completeCost(costs[base])).reduce((a,b)=>a+b,0);
     const extras = [
