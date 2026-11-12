@@ -111,8 +111,8 @@ test.describe('Revenue Intelligence: no fictitious sales and local-only ordering
     await expect(page.locator('#kpi-source')).toHaveText('0 / 1');
     const importFile=(gross,vat=10)=>({
       name:'pos.csv',mimeType:'text/csv',buffer:Buffer.from(
-        'order_id,paid_at,item_id,quantity,unit_gross_try,vat_percent,discount_gross_try,utm_source\\n'+
-        'pct_reconcile_1,2026-11-01T12:00:00Z,cappuccino,1,'+gross+','+vat+',0,\\n'),
+        'order_id,paid_at,item_id,quantity,unit_gross_try,vat_percent,discount_gross_try,utm_source\n'+
+        'pct_reconcile_1,2026-11-01T12:00:00Z,cappuccino,1,'+gross+','+vat+',0,\n'),
     });
     await page.locator('#pos-file').setInputFiles(importFile(185));
     await page.locator('#import-pos').click();
