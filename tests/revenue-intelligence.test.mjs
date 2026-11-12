@@ -5,7 +5,7 @@ import { items } from '../dist/catalog.js';
 import { resolveOrderItem, builtComboId } from '../dist/order-options.js';
 import {
   COST_FIELDS, normalizedCost, normalizeCostBook, unitCostFor, paidOrderMetrics,
-  makePaidOrder, revenueReport, parseCsv, importPosCsv, makeOrderSlip, parseOrderSlip,
+  makePaidOrder, revenueReport, parseCsv, importPosCsv, reconcilePosOrders, makeOrderSlip, parseOrderSlip,
 } from '../dist/revenue-core.js';
 import { createLocalTelemetry, safeAttribution, experimentVariant } from '../dist/telemetry.js';
 
@@ -95,6 +95,56 @@ test('POS import is grouped by paid order and validates columns and totals',()=>
   assert.equal(report.bySource[1].knownOrders,0);
   assert.throws(()=>importPosCsv('order_id,paid_at,item_id\nx,y,tea',resolve),/Missing POS CSV columns/);
   assert.throws(()=>importPosCsv(csv.replace('cappuccino,2','unknown,2'),resolve),/Invalid POS line/);
+});
+test('SKU contribution is withheld until every sold unit has known VAT and cost',()=>{
+  const known=makePaidOrder({id:'pos_sku_1',paidAt,source:'pos_csv',
+    lines:[{itemId:'cappuccino',quantity:2,unitGross:185,vatPercent:10}]},resolve);
+  const unknown=makePaidOrder({id:'manual_sku_2',paidAt,source:'staff_manual',
+    lines:[{itemId:'cappuccino',quantity:1,unitGross:185,vatPercent:null}]},resolve);
+  const partial=revenueReport([known,unknown],costs,resolve);
+  assert.equal(partial.bySku[0].units,3);
+  assert.equal(partial.bySku[0].knownUnits,2);
+  assert.equal(partial.bySku[0].contribution,null);
+  assert.equal(partial.knownOrders,1);
+  assert.equal(partial.orderCount,2);
+  const full=revenueReport([known],costs,resolve);
+  assert.equal(full.bySku[0].knownUnits,2);
+  assert.equal(full.bySku[0].contribution,paidOrderMetrics(known,costs,resolve).contribution);
+});
+
+test('POS import upgrades a matching staff receipt exactly once; never doubles paid revenue',()=>{
+  const staff=makePaidOrder({id:'receipt_101',paidAt,source:'staff_manual',attribution:{utm_source:'instagram'},
+    lines:[{itemId:'cappuccino',quantity:2,unitGross:185,vatPercent:null}]},resolve);
+  const pos=makePaidOrder({id:'receipt_101',paidAt,source:'pos_csv',
+    lines:[{itemId:'cappuccino',quantity:2,unitGross:185,vatPercent:10}]},resolve);
+  const updated=reconcilePosOrders([staff],[pos]);
+  assert.deepEqual([updated.added,updated.upgraded,updated.skipped],[0,1,0]);
+  assert.equal(updated.orders.length,1);
+  assert.equal(updated.orders[0].source,'pos_csv');
+  assert.equal(updated.orders[0].attribution.utm_source,'instagram');
+  assert.equal(revenueReport(updated.orders,costs,resolve).orderCount,1);
+  assert.equal(revenueReport(updated.orders,costs,resolve).gross,370);
+  assert.equal(revenueReport(updated.orders,costs,resolve).knownOrders,1);
+  const again=reconcilePosOrders(updated.orders,[pos]);
+  assert.deepEqual([again.added,again.upgraded,again.skipped],[0,0,1]);
+  assert.equal(again.orders.length,1);
+});
+
+test('POS conflicts are atomic and cannot silently overwrite paid totals, items or time',()=>{
+  const old=makePaidOrder({id:'receipt_210',paidAt,source:'staff_manual',
+    lines:[{itemId:'cappuccino',quantity:1,unitGross:185,vatPercent:null}]},resolve);
+  const unrelated=makePaidOrder({id:'receipt_211',paidAt,source:'pos_csv',
+    lines:[{itemId:'tea',quantity:1,unitGross:30,vatPercent:10}]},resolve);
+  const changed=makePaidOrder({id:'receipt_210',paidAt,source:'pos_csv',
+    lines:[{itemId:'cappuccino',quantity:1,unitGross:190,vatPercent:10}]},resolve);
+  const original=JSON.stringify([old]);
+  assert.throws(()=>reconcilePosOrders([old],[unrelated,changed]),/Conflicting paid receipt/);
+  assert.equal(JSON.stringify([old]),original);
+  const converted=makePaidOrder({id:'receipt_210',paidAt,source:'pos_csv',
+    lines:[{itemId:'cappuccino',quantity:1,unitGross:185,vatPercent:10}]},resolve);
+  const differentAt={...converted,paidAt:'2026-11-02T12:34:56.000Z'};
+  assert.throws(()=>reconcilePosOrders([converted],[differentAt]),/Conflicting POS receipt version/);
+  assert.throws(()=>reconcilePosOrders([old,old],[]),/Duplicate existing receipt/);
 });
 test('CSV parser handles BOM, semicolon and quoted content',()=>{
   assert.deepEqual(parseCsv('\uFEFFitem_id;ingredients\n"tea";"10"\n'),[{item_id:'tea',ingredients:'10'}]);
