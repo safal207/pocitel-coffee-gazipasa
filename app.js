@@ -3,6 +3,7 @@ import { items, categoryByItem, categoryById, combos, feedOrder, takeawaySuggest
 import { shareUrl } from './share-links.js?v=20261104-share';
 import { socialShareTargets } from './social-share.js?v=20261110-fast-share';
 import { milkOptions, syrupOptions, customization, configurationId, resolveOrderItem, optionLabels, replaceOrderLine, comboFoodIds, comboDrinkIds, builtComboId, comboChoice, isTakeaway } from './order-options.js?v=20261106-builder';
+import { comboJourneyState } from './combo-journey.js?v=20261112-combo-journey';
 import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOffer, undoCheckoutOffer } from './checkout-offers.js?v=20261106-builder';
 import { energyRanges } from './nutrition-summary.js?v=20261105-focaccia';
 import { focacciaTakeawayOffer, selectedComboOffer } from './focaccia-offer.js?v=20261106-builder';
@@ -33,6 +34,12 @@ const copy = {
   added: ['Siparişe eklendi', 'Added to your order', 'Добавлено в заказ'],
   comboFood: ['Focaccia seç', 'Choose your focaccia', 'Выберите фокаччу'],
   comboDrinkSelect: ['İçecek seç', 'Choose your drink', 'Выберите напиток'],
+  comboStepFood: ['Focaccia', 'Focaccia', 'Фокачча'],
+  comboStepDrink: ['İçecek', 'Drink', 'Напиток'],
+  comboStepOrder: ['Siparişe ekle', 'Add to order', 'В заказ'],
+  comboJourneyReady: ['Eşleşmen hazır, siparişe ekleyebilirsin', 'Your pairing is ready to add', 'Сочетание готово — осталось добавить'],
+  comboJourneyBlocked: ['Seçimini kontrol et', 'Check your selection', 'Проверьте выбор'],
+  comboJourneyProgress: ['Eşleşme adımları', 'Pairing steps', 'Шаги сборки комбо'],
   comboOptions: ['Servis ve eklemeler', 'Serving & extras', 'Подача и дополнения'],
   comboSave: ['Eşleşmeyi kaydet', 'Save pairing', 'Сохранить комбо'],
   comboAdd: ['Eşleşmeyi ekle', 'Add pairing', 'Добавить комбо'],
@@ -263,6 +270,7 @@ let draft;
 let nutritionSequence = 0;
 let focacciaOffer;
 let focacciaDraft;
+let comboLastEditedField = null;
 let focacciaTransaction;
 let focacciaOpener;
 let focacciaAutoTimer;
@@ -958,6 +966,23 @@ function comboSelect(field, title, options, value) {
   return `<label class="combo-select"><span id="combo-${field}-label">${title}</span><select id="combo-${field}" aria-labelledby="combo-${field}-label" data-combo-field="${field}">${options.map(option => `<option value="${option.id}"${option.id === value ? ' selected' : ''}>${option.label}</option>`).join('')}</select></label>`;
 }
 
+// Food and drink are already selected in the suggested pairing. The pending
+// third step is the real Add-to-order action, not a fabricated achievement.
+function comboJourneyMarkup(choice, offer) {
+  const state = comboJourneyState(choice, offer);
+  const labels = [t('comboStepFood'), t('comboStepDrink'), t('comboStepOrder')];
+  const selected = [state.foodChosen, state.drinkChosen, false];
+  const fields = ['foodId', 'drinkId', 'order'];
+  return `<div class="combo-journey" data-qa="combo-journey" role="group" aria-label="${t('comboJourneyProgress')}">
+    <div class="combo-journey-meta">
+      <strong data-qa="combo-journey-count">${state.count}/${state.total}</strong>
+      <span>${t(state.orderPossible ? 'comboJourneyReady' : 'comboJourneyBlocked')}</span>
+    </div>
+    <progress class="combo-journey-bar" value="${state.count}" max="${state.total}" aria-label="${t('comboJourneyProgress')}"></progress>
+    <ol class="combo-journey-steps">${labels.map((label, i) => `<li class="${selected[i] ? 'is-complete' : state.orderPossible ? 'is-next' : 'is-pending'}${comboLastEditedField === fields[i] ? ' is-just-chosen' : ''}" data-qa="combo-step-${fields[i]}"><span class="combo-journey-symbol" aria-hidden="true">${selected[i] ? '✓' : i + 1}</span><span>${label}</span></li>`).join('')}</ol>
+  </div>`;
+}
+
 function renderFocacciaPromo() {
   const drink = items.get(focacciaDraft.drinkId);
   const supported = customization(drink);
@@ -972,6 +997,8 @@ function renderFocacciaPromo() {
   const saving = before - entry.price;
   const delta = focacciaOffer ? `${focacciaOffer.delta < 0 ? '−' : '+'}${price(Math.abs(focacciaOffer.delta))}` : '';
   const action = focacciaDraft.editId ? 'comboSave' : focacciaOffer?.kind === 'combine' ? 'comboJoin' : focacciaOffer?.kind === 'upgrade' ? 'focacciaUpgrade' : focacciaDraft.serving === 'takeaway' ? 'focacciaAction' : 'comboAdd';
+  const scrollPane = $('#focaccia-content');
+  const previousScrollTop = focacciaPromo.open ? scrollPane.scrollTop : null;
   const advancedOpen = Boolean($('#focaccia-content .combo-advanced[open]'));
   const budgetOpen = Boolean($('#focaccia-content .combo-budget[open]'));
   const favorite = favoriteCombos.includes(builtComboId(focacciaDraft));
@@ -980,6 +1007,7 @@ function renderFocacciaPromo() {
   $('#focaccia-service').textContent = serving;
   $('#focaccia-content').innerHTML = `<div class="focaccia-hero"><div class="focaccia-food">${itemImage(food, false)}</div><div class="focaccia-drink">${itemImage(drinkPhoto, false)}<span>${icon('cup')}${serving}</span></div><small class="focaccia-illustration">${t('illustration')}</small></div>
     <div class="focaccia-copy"><h2 id="focaccia-title">${t('focacciaTitle')}</h2>
+      ${comboJourneyMarkup(focacciaDraft, focacciaOffer)}
       <div class="combo-selectors">
         ${comboSelect('foodId', t('comboFood'), comboFoodIds.map(id => ({ id, label: `${name(items.get(id))} · ${price(items.get(id).price)}` })), focacciaDraft.foodId)}
         ${comboSelect('drinkId', t('comboDrinkSelect'), comboDrinkIds.map(id => ({ id, label: `${name(items.get(id))} · ${price(items.get(id).price)}` })), focacciaDraft.drinkId)}
@@ -1008,6 +1036,7 @@ function renderFocacciaPromo() {
   $('#accept-focaccia').innerHTML = `<span>${t(action)}</span><strong>${focacciaDraft.editId ? price(entry.price * quantity) : focacciaOffer?.remove.length ? delta : price(entry.price)}</strong>${icon('arrow')}`;
   $('#focaccia-later').textContent = t('focacciaLater');
   $('#combo-price-status').textContent = `${name(food)} + ${name(drink)} · ${t('total')} ${price(entry.price * quantity)}`;
+  if (previousScrollTop != null) scrollPane.scrollTop = previousScrollTop;
 }
 
 function openFocacciaPromo(opener, automatic = false, editId = null, initialChoice = null) {
@@ -1022,6 +1051,7 @@ function openFocacciaPromo(opener, automatic = false, editId = null, initialChoi
   if (automatic && (!offer || (selection.size && !offer.remove.length))) return false;
   const choice = initialChoice ?? comboChoice(orderItem(offer?.addId ?? 'to-go-lunch-favourite'));
   focacciaDraft = { ...choice, editId, budget: '0' };
+  comboLastEditedField = null;
   focacciaOpener = opener;
   focacciaSeen = true;
   clearTimeout(focacciaAutoTimer);
@@ -1585,6 +1615,7 @@ focacciaPromo.addEventListener('change', event => {
   const field = event.target.dataset.comboField;
   if (!['foodId', 'drinkId', 'serving', 'milk', 'syrup', 'budget'].includes(field)) return;
   focacciaDraft[field] = event.target.value;
+  comboLastEditedField = field === 'foodId' || field === 'drinkId' ? field : null;
   renderFocacciaPromo();
   $(`#combo-${field}`)?.focus({ preventScroll: true });
 });
