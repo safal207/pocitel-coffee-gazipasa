@@ -387,7 +387,7 @@ function currentOrderSlip() {
     slipSignature = signature;
     const random = typeof crypto !== 'undefined' && crypto.randomUUID
       ? crypto.randomUUID().slice(0, 12).replaceAll('-', '')
-      : Math.random().toString(36).slice(2, 13);
+      : Date.now().toString(36);
     slipId = 'pct_' + Date.now().toString(36) + '_' + random;
   }
   return makeOrderSlip({
