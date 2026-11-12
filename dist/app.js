@@ -8,7 +8,7 @@ import { energyRanges } from './nutrition-summary.js?v=20261105-focaccia';
 import { focacciaTakeawayOffer, selectedComboOffer } from './focaccia-offer.js?v=20261106-builder';
 import { moments, restoreFavoriteCombos, nextComboChoice } from './discovery.js?v=20261107-moments';
 import { revealFor } from './ingredient-reveal.js?v=20261110-complete-food';
-import { cutawayOverlayMarkup } from './cutaway-overlay.js?v=20261111-inside-regression-v3';
+import { cutawayOverlayMarkup, cutawayPhotoTagsMarkup } from './cutaway-overlay.js?v=20261112-photo-reveal-v2';
 import { restoreEngagement, toggleLike, recordView, serializeEngagement } from './engagement.js?v=20261110-social';
 
 const copy = {
@@ -659,23 +659,32 @@ function scrollToMenuStart(smooth = false) {
 }
 
 const hasCutaway = entry => Boolean(revealFor(entry, language));
-const focacciaViews = {
+const dishCutawayViews = {
   'smoked-turkey': ['assets/cutaway/focaccia-outside.webp', 'assets/cutaway/focaccia-inside.webp'],
   beetroot: ['assets/cutaway/beetroot-outside.webp', 'assets/illustrations/branded/beetroot.webp'],
   zucchini: ['assets/cutaway/zucchini-outside.webp', 'assets/illustrations/branded/zucchini.webp'],
+  'breakfast-plate': ['assets/illustrations/branded/breakfast-plate.webp', 'assets/cutaway/breakfast-plate-inside-v1.webp'],
+  'omelet-plate': ['assets/illustrations/branded/omelet-plate.webp', 'assets/cutaway/omelet-plate-inside-v1.webp'],
+  pancake: ['assets/cutaway/pancake-outside-v1.webp', 'assets/cutaway/pancake-inside-v1.webp'],
+  granola: ['assets/granola.webp', 'assets/cutaway/granola-inside-v1.webp'],
+};
+const takeawayCutawayViews = {
+  'to-go-granola': ['assets/takeaway/granola.webp', 'assets/cutaway/to-go-granola-inside-v1.webp'],
 };
 
 function cutawayMarkup(entry, socialRail = '') {
   const reveal = revealFor(entry, language);
   const food = items.get(reveal.dishId);
   const shown = reveal.pairing ? food : entry;
-  const views = focacciaViews[reveal.dishId] ?? [`assets/${shown.image}.webp`, `assets/${shown.image}.webp`];
-  const illustrated = Boolean(focacciaViews[reveal.dishId]) || shown.sourceId || shown.image.startsWith('illustrations/');
-  return `<div class="cutaway" style="--cutaway-split: 50%">
+  const pair = takeawayCutawayViews[entry.id] ?? dishCutawayViews[reveal.dishId];
+  const views = pair ?? [`assets/${shown.image}.webp`, `assets/${shown.image}.webp`];
+  const illustrated = Boolean(pair) || shown.sourceId || shown.image.startsWith('illustrations/');
+  return `<div class="cutaway" style="--cutaway-split: 50%; --cutaway-tags-opacity: 1">
     <img class="cutaway-outside" src="${views[0]}" alt="" decoding="async">
-    <div class="cutaway-inside${focacciaViews[reveal.dishId] ? '' : ' cutaway-annotated'}" aria-hidden="true">
+    <div class="cutaway-inside${pair ? '' : ' cutaway-annotated'}" aria-hidden="true">
       <img src="${views[1]}" alt="" decoding="async">
     </div>
+    ${cutawayPhotoTagsMarkup(reveal)}
     <span class="cutaway-divider" aria-hidden="true"><span class="cutaway-handle">↔</span></span>
     <input type="range" min="0" max="100" step="1" value="50" class="cutaway-range" data-cutaway-range aria-label="${t('cutawayRange')}" aria-describedby="cutaway-help" aria-valuetext="${t('cutawayShown')} 50%">
     ${cutawayOverlayMarkup(reveal, t('insideLabel'), t('moreIngredients'), t('cutawayAllIngredients'))}
@@ -1513,6 +1522,7 @@ function updateCutaway(range, amount) {
   if (!cutaway || !Number.isFinite(amount)) return;
   range.value = amount;
   cutaway.style.setProperty('--cutaway-split', `${amount}%`);
+  cutaway.style.setProperty('--cutaway-tags-opacity', String(Math.min(1, Math.max(0, (100 - amount) / 30))));
   range.setAttribute('aria-valuetext', `${t('cutawayShown')} ${100 - amount}%`);
   const toggle = viewerContent.querySelector('[data-cutaway-toggle]');
   toggle.setAttribute('aria-pressed', String(amount === 0));
