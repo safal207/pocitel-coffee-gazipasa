@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { parseOrderSlip } from '../dist/revenue-core.js';
+import { parseOrderSlip, makeOrderSlip } from '../dist/revenue-core.js';
 import { items } from '../dist/catalog.js';
 import { resolveOrderItem } from '../dist/order-options.js';
 
@@ -97,6 +97,37 @@ test.describe('Revenue Intelligence: no fictitious sales and local-only ordering
     await page.locator('#import-pos').click();
     await expect(page.locator('#kpi-orders')).toHaveText('1');
     await expect(page.locator('#pos-status')).toContainText('Skipped: 1');
+  });
+  test('POS reconciliation upgrades one staff receipt, rejects contradictory cashier numbers',async({page})=>{
+    await page.goto(base+'/admin.html');
+    await page.locator('#admin-lang').selectOption('en');
+    const code=makeOrderSlip({id:'pct_reconcile_1',lines:[['cappuccino',1]],quoteTotal:185,
+      attribution:{utm_source:'instagram',qr:'table_04'}});
+    await page.locator('#slip-value').fill(code);
+    await page.locator('#decode-slip').click();
+    await page.locator('#staff-paid').check();
+    await page.locator('#confirm-paid').click();
+    await expect(page.locator('#kpi-orders')).toHaveText('1');
+    await expect(page.locator('#kpi-source')).toHaveText('0 / 1');
+    const importFile=(gross,vat=10)=>({
+      name:'pos.csv',mimeType:'text/csv',buffer:Buffer.from(
+        'order_id,paid_at,item_id,quantity,unit_gross_try,vat_percent,discount_gross_try,utm_source\\n'+
+        'pct_reconcile_1,2026-11-01T12:00:00Z,cappuccino,1,'+gross+','+vat+',0,\\n'),
+    });
+    await page.locator('#pos-file').setInputFiles(importFile(185));
+    await page.locator('#import-pos').click();
+    await expect(page.locator('#kpi-source')).toHaveText('1 / 0');
+    await expect(page.locator('#kpi-orders')).toHaveText('1');
+    await expect(page.locator('#pos-status')).toContainText('Upgraded from staff to POS: 1');
+    const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('pocitel-admin-paid-orders-v1')));
+    expect(saved).toHaveLength(1);
+    expect(saved[0].source).toBe('pos_csv');
+    expect(saved[0].attribution.utm_source).toBe('instagram');
+    await page.locator('#pos-file').setInputFiles(importFile(190));
+    await page.locator('#import-pos').click();
+    await expect(page.locator('#pos-status')).toContainText('Conflicting paid receipt');
+    await expect(page.locator('#kpi-orders')).toHaveText('1');
+    expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('pocitel-admin-paid-orders-v1')))).toEqual(saved);
   });
   test('local analytics is opt-in, UTM sanitized and never produces a paid record',async({page})=>{
     await page.goto(base+'/?lang=ru&utm_source=instagram&utm_campaign=test-2026',{waitUntil:'domcontentloaded'});
