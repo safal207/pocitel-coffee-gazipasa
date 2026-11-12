@@ -1,6 +1,6 @@
 import { items, feedOrder } from './catalog.js?v=20261105-focaccia';
 import { resolveOrderItem } from './order-options.js?v=20261106-builder';
-import { COST_FIELDS, normalizeCostBook, normalizedCost, makePaidOrder, revenueReport, parseOrderSlip, importPosCsv, parseCsv } from './revenue-core.js?v=20261112-ri';
+import { COST_FIELDS, normalizeCostBook, normalizedCost, makePaidOrder, revenueReport, parseOrderSlip, importPosCsv, reconcilePosOrders, parseCsv } from './revenue-core.js?v=20261112-ri';
 import { TELEMETRY_KEY, cleanLog } from './telemetry.js?v=20261112-ri';
 
 const $=selector=>document.querySelector(selector);
@@ -64,6 +64,7 @@ const i18n={
     'Paid receipts only. Contribution is shown only for lines with known VAT and variable costs.',
     'Только оплаченные чеки. Маржинальный доход показывается только при известных НДС и переменных затратах.'],
   units:['Adet','Units','Штук'],
+  skuCoverage:['Maliyeti bilinen adet','Units with known costs','Единиц с известной маржой'],
   noData:['Henüz ödenmiş fiş yok.','No reported paid receipts yet.','Пока нет подтверждённых оплаченных чеков.'],
   export:['Dışa aktar / yedek','Export / backup','Экспорт / резервная копия'],
   exportHint:['Tarayıcı verilerini dışa aktarın ve güvenli saklayın. Ziyaretçi olayları yalnızca kendi izin verdiği cihazda tutulur; site geneli ölçülemez.',
@@ -78,6 +79,7 @@ const i18n={
   noCosts:['Girilmiş maliyet','Cost entries','Внесено себестоимостей'],
   unknown:['Belirsiz','Unknown','Неизвестно'],missing:['Eksik','Missing','Не хватает'],
   imported:['İçe aktarıldı','Imported','Импортировано'],
+  upgraded:['POS ile doğrulandı','Upgraded from staff to POS','Заменено подтверждением POS'],
   skipped:['Atlandı','Skipped','Пропущено'],
   saved:['Kaydedildi','Saved','Сохранено'],
   failed:['Hata','Error','Ошибка'],
@@ -127,7 +129,7 @@ function renderDashboard(){
   for(const row of report.bySku) {
     const tr=document.createElement('tr');
     const entry=resolve(row.itemId);
-    for(const label of [entry?.names[LANGS.indexOf(lang)]??row.itemId,String(row.units),money(row.gross),money(row.contribution)]){
+    for(const label of [entry?.names[LANGS.indexOf(lang)]??row.itemId,String(row.units),money(row.gross),money(row.contribution),row.knownUnits+' / '+row.units]){
       const td=document.createElement('td');td.textContent=label;tr.appendChild(td);
     }
     body.appendChild(tr);
@@ -236,14 +238,11 @@ $('#import-pos').addEventListener('click',async()=>{
   const file=$('#pos-file').files?.[0];if(!file)return;
   try{
     const imported=importPosCsv(await file.text(),resolve);
-    const existing=new Set(orders.map(x=>x.id));
-    const unique=imported.filter(order=>!existing.has(order.id));
-    const duplicateCount=imported.length-unique.length;
-    const next=[...orders,...unique];
-    if(next.length>5000)throw Error('Order storage limit; back up/export data');
-    if(!storageSet(ORDER_KEY,next))throw Error('Storage not writable');
-    orders=next;renderDashboard();
-    status('#pos-status',t('imported')+': '+unique.length+' · '+t('skipped')+': '+duplicateCount);
+    const result=reconcilePosOrders(orders,imported);
+    if(result.orders.length>5000)throw Error('Order storage limit; back up/export data');
+    if(!storageSet(ORDER_KEY,result.orders))throw Error('Storage not writable');
+    orders=result.orders;renderDashboard();
+    status('#pos-status',t('imported')+': '+result.added+' · '+t('upgraded')+': '+result.upgraded+' · '+t('skipped')+': '+result.skipped);
   }catch(e){status('#pos-status',t('failed')+': '+e.message)}
 });
 $('#export-orders').addEventListener('click',()=>download('pocitel-paid-orders.json',orders));
