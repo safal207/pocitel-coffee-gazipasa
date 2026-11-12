@@ -50,7 +50,7 @@ textarea{min-height:85px;font-size:.77rem;overflow-wrap:anywhere;resize:vertical
 #slip-preview:not([hidden]){display:grid;gap:10px}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 .table-wrap{width:100%;overflow:auto;border:1px solid var(--line);border-radius:12px}
-table{width:100%;border-collapse:collapse;text-align:left;font-size:.83rem}
+table{width:100%;min-width:560px;overflow-wrap:normal;border-collapse:collapse;text-align:left;font-size:.83rem}
 thead{background:#eee2d2}
 td,th{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
 td:not(:first-child),th:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
