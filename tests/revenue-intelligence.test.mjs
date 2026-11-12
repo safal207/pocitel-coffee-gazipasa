@@ -85,7 +85,14 @@ test('POS import is grouped by paid order and validates columns and totals',()=>
   assert.equal(result[0].source,'pos_csv');
   assert.equal(result[0].attribution.utm_source,'instagram');
   assert.equal(result[1].lines[0].vatPercent,null);
-  assert.equal(revenueReport(result,costs,resolve).gross,690);
+  const report=revenueReport(result,costs,resolve);
+  assert.equal(report.gross,690);
+  assert.equal(report.bySource.length,2);
+  assert.equal(report.bySource[0].source,'instagram');
+  assert.equal(report.bySource[0].orders,1);
+  assert.equal(report.bySource[0].gross,660);
+  assert.equal(report.bySource[1].source,'google');
+  assert.equal(report.bySource[1].knownOrders,0);
   assert.throws(()=>importPosCsv('order_id,paid_at,item_id\nx,y,tea',resolve),/Missing POS CSV columns/);
   assert.throws(()=>importPosCsv(csv.replace('cappuccino,2','unknown,2'),resolve),/Invalid POS line/);
 });
