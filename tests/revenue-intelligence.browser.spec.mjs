@@ -79,6 +79,9 @@ test.describe('Revenue Intelligence: no fictitious sales and local-only ordering
     await page.locator('#cost-ingredients').fill('40');
     await page.locator('#cost-packaging').fill('8');
     await page.locator('#cost-form button[type=submit]').click();
+    await expect(page.locator('#cost-status')).toContainText('Сохранено');
+    const storedCosts=await page.evaluate(()=>JSON.parse(localStorage.getItem('pocitel-admin-costs-v2')));
+    expect(storedCosts.cappuccino.variableLabor).toBeNull();
     await expect(page.locator('#kpi-contribution')).toHaveText('—');
     // An explicit tax rate is needed; a later POS receipt can have its own rate.
     expect(saved[0].lines[0].vatPercent).toBeNull();

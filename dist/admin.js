@@ -180,8 +180,8 @@ $('#cost-form').addEventListener('submit',e=>{
   }));
   const cost=normalizedCost(input);
   if(!cost){status('#cost-status',t('costInvalid'));return}
-  costs[item]=cost;
-  if(!storageSet(COST_KEY,costs)){status('#cost-status',t('failed')+': storage');return}
+  const next={...costs,[item]:cost};
+  if(!storageSet(COST_KEY,next)){status('#cost-status',t('failed')+': storage');return}
   costs=next;
   status('#cost-status',t('saved')+' · '+item);
   renderDashboard();
@@ -201,8 +201,8 @@ $('#import-costs').addEventListener('click',async()=>{
       if(!cost){skipped++;continue}
       next[item]=cost;imported++;
     }
+    if(!storageSet(COST_KEY,next))throw Error('Storage not writable');
     costs=next;
-    if(!storageSet(COST_KEY,costs))throw Error('Storage not writable');
     renderDashboard();resetCostInputs();
     status('#cost-status',t('imported')+': '+imported+' · '+t('skipped')+': '+skipped);
   }catch(e){status('#cost-status',t('failed')+': '+e.message)}
