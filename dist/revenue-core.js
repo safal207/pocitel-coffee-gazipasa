@@ -141,8 +141,29 @@ export function revenueReport(orders, costs, resolve) {
     item.gross += line.gross;
     if (line.contribution !== null) { item.contribution += line.contribution; item.knownUnits += line.quantity; }
   }
+  // Marketing attribution only from paid receipts; an empty label is
+  // explicit "unknown", never counted as organic or attributed by guesswork.
+  const bySource=new Map();
+  paid.forEach((order,index)=>{
+    const meta=order.attribution??{};
+    const label=meta.utm_source
+      ? meta.utm_source+(meta.utm_campaign?' / '+meta.utm_campaign:'')
+      : meta.qr?'qr:'+meta.qr:'unknown';
+    const bucket=bySource.get(label)??{source:label,orders:0,gross:0,knownOrders:0,contributionKnown:0};
+    bucket.orders++;
+    bucket.gross+=metrics[index].gross;
+    if(metrics[index].costCoverage){
+      bucket.knownOrders++;
+      bucket.contributionKnown+=metrics[index].contribution;
+    }
+    bySource.set(label,bucket);
+  });
   return {
     orderCount:paid.length,
+    bySource:[...bySource.values()].map(row=>({
+      ...row,gross:money(row.gross),
+      contributionKnown:row.knownOrders?money(row.contributionKnown):null,
+    })).sort((a,b)=>b.gross-a.gross),
     sourceCounts:{pos_csv:paid.filter(o=>o.source==='pos_csv').length,
       staff_manual:paid.filter(o=>o.source==='staff_manual').length},
     gross:money(metrics.reduce((s,o)=>s+o.gross,0)),
