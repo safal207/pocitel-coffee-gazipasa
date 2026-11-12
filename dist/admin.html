@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#f7f1e6">
+  <title>Poçitel | Revenue Intelligence</title>
+  <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="admin.css?v=20261112-ri">
+  <script type="module" src="admin.js?v=20261112-ri"></script>
+</head>
+<body>
+  <header class="admin-header">
+    <div><span class="eyebrow">POÇITEL · BUSINESS</span><h1 data-i18n="title">Gelir ve ürün analizi</h1></div>
+    <div class="header-actions">
+      <label for="admin-lang" data-i18n="lang">Dil</label>
+      <select id="admin-lang"><option value="tr">Türkçe</option><option value="en">English</option><option value="ru">Русский</option></select>
+      <a href="index.html" data-i18n="back">Menüye dön</a>
+    </div>
+  </header>
+  <main>
+    <div class="notice" role="note">
+      <strong data-i18n="offline">Bu cihazda yerel kayıt — bulutta senkronize değil.</strong>
+      <p data-i18n="security">Bu sayfa henüz giriş korumalı bir yönetici paneli değildir. Veriler yalnızca bu tarayıcıda saklanır. Ortak cihazlarda hassas maliyet bilgisi girmeyin. Gerçek ödeme POS veya personel teyidi gerektirir.</p>
+    </div>
+    <nav class="admin-nav" aria-label="Dashboard sections">
+      <a href="#overview" data-i18n="overview">Genel bakış</a>
+      <a href="#costs" data-i18n="costs">Maliyetler</a>
+      <a href="#sales" data-i18n="sales">Satışlar</a>
+      <a href="#products" data-i18n="products">Ürünler</a>
+      <a href="#export" data-i18n="export">Dışa aktar</a>
+    </nav>
+    <section id="overview" class="panel">
+      <h2 data-i18n="overview">Genel bakış</h2>
+      <p class="section-hint" data-i18n="paidOnly">Sepet veya garsona gösterilen taslaklar değil, yalnızca ödemesi bildirilen siparişler.</p>
+      <div class="stats">
+        <div class="stat"><small data-i18n="paidOrders">Bildirilen ödemeler</small><strong id="kpi-orders">—</strong></div>
+        <div class="stat"><small data-i18n="gross">Brüt satışlar</small><strong id="kpi-gross">—</strong></div>
+        <div class="stat"><small data-i18n="ticket">Ortalama fiş</small><strong id="kpi-ticket">—</strong></div>
+        <div class="stat"><small data-i18n="margin">Katkı payı (bilinen)</small><strong id="kpi-contribution">—</strong></div>
+        <div class="stat"><small data-i18n="coverage">Maliyeti & KDV'si bilinen fişler</small><strong id="kpi-coverage">—</strong></div>
+        <div class="stat"><small data-i18n="proof">POS / manuel</small><strong id="kpi-source">—</strong></div>
+      </div>
+      <p id="data-quality" class="quality" role="status"></p>
+    </section>
+    <section id="costs" class="panel">
+      <h2 data-i18n="costs">Maliyetler</h2>
+      <p class="section-hint" data-i18n="costHint">Ürün başına TL cinsinden doğrudan değişken maliyetleri girin. Yalnızca malzeme doldurulursa diğer alanlar sıfır varsayılır; eksik giderleri doğrulayın. Sabit kira ve vergi sonrası net kâr hesaplanmaz.</p>
+      <form id="cost-form" class="form-grid">
+        <label class="span-all"><span data-i18n="product">Ürün</span><select id="cost-item" required></select></label>
+        <label><span data-i18n="ingredientCost">Malzeme *</span><input type="number" id="cost-ingredients" min="0" max="100000" step="0.01" required placeholder="—"></label>
+        <label><span data-i18n="packageCost">Paket</span><input type="number" id="cost-packaging" min="0" max="100000" step="0.01" placeholder="0"></label>
+        <label><span data-i18n="laborCost">Değişken işçilik</span><input type="number" id="cost-variableLabor" min="0" max="100000" step="0.01" placeholder="0"></label>
+        <label><span data-i18n="feeCost">Ödeme komisyonu</span><input type="number" id="cost-paymentFee" min="0" max="100000" step="0.01" placeholder="0"></label>
+        <label><span data-i18n="wasteCost">Fire</span><input type="number" id="cost-waste" min="0" max="100000" step="0.01" placeholder="0"></label>
+        <button class="primary span-all" type="submit" data-i18n="saveCost">Ürün maliyetini kaydet</button>
+      </form>
+      <p id="cost-status" role="status"></p>
+      <p class="section-hint" id="cost-coverage"></p>
+    </section>
+    <section id="sales" class="panel">
+      <h2 data-i18n="sales">Ödenen siparişler</h2>
+      <div class="two-col">
+        <div class="subpanel">
+          <h3 data-i18n="slip">Müşteri sipariş fişi</h3>
+          <p class="section-hint" data-i18n="slipHint">Müşterinin “Personel için siparişi kopyala” düğmesinden gelen PCT1. kodunu buraya yapıştırın. Kod ödeme kanıtı değildir.</p>
+          <label><span data-i18n="pasteSlip">Sipariş kodu</span><textarea id="slip-value" rows="3" placeholder="PCT1. ..."></textarea></label>
+          <button type="button" id="decode-slip" data-i18n="inspectSlip">Fişi kontrol et</button>
+          <div id="slip-preview" hidden>
+            <p id="slip-items" class="quality"></p>
+            <label><span data-i18n="vat">Uygulanan KDV oranı, % (bilinmiyorsa boş)</span><input type="number" id="manual-vat" min="0" max="100" step="0.01" placeholder="—"></label>
+            <label class="tick"><input type="checkbox" id="staff-paid"><span data-i18n="staffConfirmed">Ödeme gerçekten alındı, personel tarafından teyit edildi</span></label>
+            <button class="primary" type="button" id="confirm-paid" data-i18n="confirmPaid">Manuel ödenmiş olarak kaydet</button>
+          </div>
+          <p id="manual-status" role="status"></p>
+        </div>
+        <div class="subpanel">
+          <h3 data-i18n="posImport">POS CSV içe aktarımı</h3>
+          <p class="section-hint" data-i18n="posHint">Her satır için order_id, paid_at, item_id, quantity, unit_gross_try, vat_percent gerekir. CSV yalnızca bu cihazda işlenir; yinelenen siparişler atlanır.</p>
+          <label><span data-i18n="chooseCsv">POS dosyası (.csv)</span><input id="pos-file" type="file" accept=".csv,text/csv"></label>
+          <button type="button" id="import-pos" data-i18n="importCsv">CSV'yi içe aktar</button>
+          <p id="pos-status" role="status"></p>
+        </div>
+      </div>
+    </section>
+    <section id="products" class="panel">
+      <h2 data-i18n="products">Ürün katkısı</h2>
+      <p class="section-hint" data-i18n="skuHint">Yalnızca bildirilen ödenmiş fişler. Katkı sadece maliyet ve KDV bilgisi bulunan satırlarda hesaplanır. Çek tam maliyetli değilse genel toplama katılmaz.</p>
+      <div class="table-wrap"><table><thead><tr><th data-i18n="product">Ürün</th><th data-i18n="units">Adet</th><th data-i18n="gross">Brüt satışlar</th><th data-i18n="margin">Katkı payı</th></tr></thead><tbody id="sku-table"></tbody></table></div>
+      <p id="empty-sales" class="section-hint" data-i18n="noData">Henüz doğrulanmış satış kaydı yok.</p>
+    </section>
+    <section id="export" class="panel">
+      <h2 data-i18n="export">Dışa aktar / yedek</h2>
+      <p class="section-hint" data-i18n="exportHint">Bu tarayıcının verilerini dışa aktarın. Yedek dosyasını güvenli bir yerde saklayın. Analitik olayları yalnızca ziyaretçinin açıkça etkinleştirdiği cihazda tutulur; burada toplam trafik ölçülemez.</p>
+      <div class="actions">
+        <button type="button" id="export-orders" data-i18n="ordersJson">Ödenen siparişler JSON</button>
+        <button type="button" id="export-costs" data-i18n="costsJson">Maliyetler JSON</button>
+        <button type="button" id="export-events" data-i18n="eventsJson">Bu cihazın olayları JSON</button>
+      </div>
+      <p class="quality" data-i18n="backendNote">Gerçek çok cihazlı raporlama, POS entegrasyonu, personel yetkileri ve güvenli bulut saklama için ayrı sunucu + kimlik doğrulama gerekir. Bu demo böyle bir bağlantı kurmaz.</p>
+    </section>
+    <p id="global-status" role="status" aria-live="polite"></p>
+  </main>
+  <footer>Poçitel Revenue Intelligence v0.1 · Local-only, no simulated sales</footer>
+</body>
+</html>
