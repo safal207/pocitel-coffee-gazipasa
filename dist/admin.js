@@ -176,7 +176,7 @@ $('#import-costs').addEventListener('click',async()=>{
       const item=row.item_id;
       if(!items.has(item)){skipped++;continue}
       const record=Object.fromEntries(COST_FIELDS.map(key=>[key,
-        row[key]!==undefined && row[key]!==''?Number(row[key]):key==='ingredients'?NaN:0]));
+        row[key.toLowerCase()]!==undefined && row[key.toLowerCase()]!==''?Number(row[key.toLowerCase()]):key==='ingredients'?NaN:0]));
       const cost=normalizedCost(record);
       if(!cost){skipped++;continue}
       next[item]=cost;imported++;
