@@ -33,7 +33,7 @@ One row for each line item. Group with order_id; paid_at is ISO-8601 with offset
 
 Columns: item_id,ingredients,packaging,variableLabor,paymentFee,waste.
 
-Enter actual variable costs per serving in TRY, including takeaway packaging where relevant. Ingredient cost must be entered. Blank non-ingredient fields are treated as zero for the manual pilot; review incomplete information. For fixed combos the sum of component costs is used if there is no direct combo cost. Customized drinks add real plant-milk / syrup cost records.
+Enter actual variable costs per serving in TRY, including takeaway packaging where relevant. Ingredient cost must be entered. Blank expense fields are unknown; contribution requires all five fields, including explicit zero for a verified absence of expense. Earlier browser cost records must be revalidated (see OWNER_WORKSPACE.md). For fixed combos the sum of component costs is used if there is no direct combo cost. Customized drinks add real plant-milk / syrup cost records.
 
 Both CSV examples in docs are empty header templates; there are **no sample/fake paid sales** in the app.
 
@@ -42,6 +42,10 @@ Both CSV examples in docs are empty header templates; there are **no sample/fake
 Example URL: ?utm_source=instagram&utm_medium=social&utm_campaign=brunch&qr=table_04
 
 Values are bounded to short alphanumeric slugs, underscores, dots, or hyphens; avoid names, phone numbers and customer IDs. Attribution reaches staff via the order slip only if copied. Event logging starts **off** and is only stored in the visitor's current device when opted in. Logs are capped to 1000 events, expire at 30 days and are cleared when disabled. Event logging does not imply backend analytics. The deterministic A/B variant helper is present for QA but no experiment/treatment runs on customers without reliable paid-outcome attribution.
+
+## Private owner workspace added 12 November 2026
+
+An optional password-protected, loopback-only Node workspace now supports private disk storage, confirmed-unpaid orders, explicit paid declarations and authenticated POS/cost imports. See [OWNER_WORKSPACE.md](OWNER_WORKSPACE.md) for startup, boundaries and launch dependencies. It is not deployed on Pages and is not a remote cloud service.
 
 ## Security and essential production blockers
 

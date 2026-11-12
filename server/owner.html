@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Poçitel · Owner</title><link rel="stylesheet" href="/admin.css"><script type="module" src="/owner.js"></script></head>
+<body><header class="admin-header"><h1>Poçitel · <span data-text="title"></span></h1><label><span data-text="language"></span><select id="language"><option value="tr">Türkçe</option><option value="en">English</option><option value="ru">Русский</option></select></label></header>
+<main>
+<p class="notice" data-text="scope"></p>
+<section class="panel"><h2 data-text="overview"></h2><div class="stats">
+<div class="stat"><small data-text="confirmed"></small><strong id="confirmed">0</strong></div>
+<div class="stat"><small data-text="paid"></small><strong id="paid">0</strong></div>
+<div class="stat"><small data-text="gross"></small><strong id="gross">—</strong></div>
+<div class="stat"><small data-text="margin"></small><strong id="margin">—</strong></div>
+<div class="stat"><small data-text="coverage"></small><strong id="coverage">—</strong></div>
+<div class="stat"><small>POS CSV / staff_manual</small><strong id="evidence">0 / 0</strong></div>
+</div><p data-text="definitions"></p></section>
+<section class="panel"><h2 data-text="handoff"></h2>
+<form id="confirm-form"><label><span data-text="code"></span><textarea id="code" rows="3" required maxlength="15000"></textarea></label><button data-text="confirm"></button></form>
+<form id="paid-form"><label><span data-text="receipt"></span><select id="receipt" required></select></label>
+<label><span data-text="vat"></span><input id="vat" type="number" min="0" max="100" step="0.01"></label>
+<label class="tick"><input id="payment" type="checkbox" required><span data-text="payment"></span></label><button data-text="markPaid"></button></form></section>
+<section class="panel"><h2 data-text="imports"></h2><p data-text="costHint"></p>
+<form id="pos-form"><label>POS CSV<input id="pos-file" type="file" accept=".csv,text/csv" required></label><button data-text="importPos"></button></form>
+<form id="cost-form"><label><span data-text="costFile"></span><input id="cost-file" type="file" accept=".csv,text/csv" required></label><button data-text="importCosts"></button></form></section>
+<section class="panel"><h2 data-text="products"></h2><div class="table-wrap"><table><thead><tr><th>SKU</th><th data-text="units"></th><th data-text="gross"></th><th data-text="margin"></th><th data-text="coverage"></th></tr></thead><tbody id="products"></tbody></table></div></section>
+<section class="panel"><h2 data-text="sources"></h2><div class="table-wrap"><table><thead><tr><th>UTM / QR</th><th data-text="paid"></th><th data-text="gross"></th><th data-text="margin"></th><th data-text="coverage"></th></tr></thead><tbody id="sources"></tbody></table></div></section>
+<p id="status" role="status" aria-live="polite"></p><button id="backup" data-text="backup"></button>
+</main></body></html>

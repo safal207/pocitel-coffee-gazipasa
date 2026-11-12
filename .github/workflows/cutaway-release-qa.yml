@@ -5,6 +5,10 @@ on:
     paths:
       - "dist/**"
       - "tests/**"
+      - "server/**"
+      - "scripts/**"
+      - "package*.json"
+      - "playwright.config.mjs"
       - "docs/qa-cutaway-dependency-graph-2026-11-10.md"
       - ".github/workflows/cutaway-release-qa.yml"
   push:
@@ -12,6 +16,10 @@ on:
     paths:
       - "dist/**"
       - "tests/**"
+      - "server/**"
+      - "scripts/**"
+      - "package*.json"
+      - "playwright.config.mjs"
       - ".github/workflows/cutaway-release-qa.yml"
   workflow_dispatch:
 
@@ -33,7 +41,7 @@ jobs:
       - name: Rebuild all 165 share pages from current canonical template
         run: node scripts/build-share-pages.mjs
       - name: Run all Node tests
-        run: node --test tests/*.test.mjs
+        run: npm test
 
   browser-geometry:
     name: "All cutaways + declutter: responsive UX and Shorts geometry"
@@ -45,13 +53,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Install Playwright and Chromium
+      - name: Install pinned Playwright and Chromium
         run: |
-          npm init -y >/dev/null
-          npm pkg set type=module
-          npm install --no-save --no-audit --no-fund @playwright/test
-          # The hosted runner already has Chromium's system libraries.
-          # Avoid installing extra fonts from a potentially unavailable apt mirror.
+          npm ci --ignore-scripts --no-audit --no-fund
           npx playwright install chromium
       - name: Start local menu site
         run: |
@@ -63,7 +67,7 @@ jobs:
           cat /tmp/pocitel-http.log
           exit 1
       - name: Run cutaway visual geometry and interaction gate
-        run: npx playwright test tests/cutaway-browser.spec.mjs tests/visual-declutter.browser.spec.mjs tests/quick-share.browser.spec.mjs tests/warm-mirror.browser.spec.mjs tests/cart-scroll.browser.spec.mjs tests/combo-journey.browser.spec.mjs tests/revenue-intelligence.browser.spec.mjs --workers=2 --reporter=line
+        run: npx playwright test tests/cutaway-browser.spec.mjs tests/visual-declutter.browser.spec.mjs tests/quick-share.browser.spec.mjs tests/warm-mirror.browser.spec.mjs tests/cart-scroll.browser.spec.mjs tests/combo-journey.browser.spec.mjs tests/revenue-intelligence.browser.spec.mjs --project=chromium --workers=2 --reporter=line
       - name: Upload browser failure evidence
         if: failure()
         uses: actions/upload-artifact@v4
@@ -74,10 +78,34 @@ jobs:
             playwright-report/
           if-no-files-found: ignore
 
+  cross-browser:
+    name: Revenue, owner and cart on three engines
+    needs: data-and-unit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - run: npx playwright test tests/revenue-intelligence.browser.spec.mjs tests/cart-scroll.browser.spec.mjs tests/combo-journey.browser.spec.mjs tests/owner.browser.spec.mjs --project=${{ matrix.browser }} --workers=2 --reporter=line
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cross-browser-${{ matrix.browser }}
+          path: test-results/
+
   publish:
     name: "Publish tested menu and 165 canonical share pages"
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [data-and-unit, browser-geometry]
+    needs: [data-and-unit, browser-geometry, cross-browser]
     runs-on: ubuntu-latest
     timeout-minutes: 12
     permissions:

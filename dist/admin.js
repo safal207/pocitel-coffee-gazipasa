@@ -1,14 +1,15 @@
 import { items, feedOrder } from './catalog.js?v=20261105-focaccia';
 import { resolveOrderItem } from './order-options.js?v=20261106-builder';
-import { COST_FIELDS, normalizeCostBook, normalizedCost, makePaidOrder, revenueReport, parseOrderSlip, importPosCsv, reconcilePosOrders, parseCsv } from './revenue-core.js?v=20261112-ri';
-import { TELEMETRY_KEY, cleanLog } from './telemetry.js?v=20261112-ri';
+import { COST_FIELDS, normalizeCostBook, normalizedCost, makePaidOrder, revenueReport, parseOrderSlip, importPosCsv, reconcilePosOrders, parseCsv } from './revenue-core.js?v=20261112-ri2';
+import { TELEMETRY_KEY, cleanLog } from './telemetry.js?v=20261112-ri2';
 
 const $=selector=>document.querySelector(selector);
 const ORDER_KEY='pocitel-admin-paid-orders-v1';
-const COST_KEY='pocitel-admin-costs-v1';
+const COST_KEY='pocitel-admin-costs-v2';
 const ADMIN_LANG='pocitel-admin-language-v1';
 const LANGS=['tr','en','ru'];
-let lang=LANGS.includes(localStorage.getItem(ADMIN_LANG))?localStorage.getItem(ADMIN_LANG):'tr';
+let lang='tr';
+try { const saved=localStorage.getItem(ADMIN_LANG); if(LANGS.includes(saved)) lang=saved; } catch {}
 let costs={},orders=[],slip=null;
 const resolve=id=>resolveOrderItem(id,items);
 const i18n={
@@ -27,9 +28,9 @@ const i18n={
   coverage:['Tam maliyetli fişler','Complete VAT & cost coverage','Чеки с известными расходами и НДС'],
   proof:['POS / manuel','POS / manual','POS / вручную'],
   costs:['Maliyetler','Costs','Себестоимость'],
-  costHint:['Bir porsiyon için doğrudan maliyet (₺). Yalnızca malzeme girerseniz diğer alanlar sıfır kabul edilir. Eksikleri doğrulayın. Bu rakam vergi sonrası net kâr değildir.',
-    'Variable cost per portion (₺). Empty non-ingredient fields become zero; verify missing expenses. This is not net profit after fixed costs and taxes.',
-    'Переменные затраты на порцию (₺). Пустые поля, кроме ингредиентов, принимаются за ноль — проверьте полноту расходов. Это не чистая прибыль после аренды и налогов.'],
+  costHint:['Bir porsiyon için doğrudan maliyet (₺). Boş alanlar bilinmiyor demektir; sıfır gideri açıkça 0 girin. Eski maliyetleri yeniden doğrulayın. Bu rakam vergi sonrası net kâr değildir.',
+    'Variable cost per portion (₺). Blank fields are unknown; explicitly enter 0 for no expense. Revalidate costs from the earlier pilot. This is not net profit after fixed costs and taxes.',
+    'Переменные затраты на порцию (₺). Пустые поля неизвестны; отсутствие расхода укажите явно как 0. Затраты раннего пилота нужно подтвердить заново. Это не чистая прибыль после аренды и налогов.'],
   product:['Ürün','Product','Позиция'],ingredientCost:['Malzeme *','Ingredients *','Ингредиенты *'],
   packageCost:['Paket','Packaging','Упаковка'],laborCost:['Değişken işçilik','Variable labour','Переменный труд'],
   feeCost:['Ödeme komisyonu','Payment fee','Комиссия'],wasteCost:['Fire','Waste','Списания'],
@@ -175,12 +176,13 @@ $('#cost-form').addEventListener('submit',e=>{
   const item=$('#cost-item').value;
   const input=Object.fromEntries(COST_FIELDS.map(key=>{
     const raw=$('#cost-'+key).value;
-    return [key,raw===''?key==='ingredients'?NaN:0:Number(raw)];
+    return [key,raw===''?key==='ingredients'?NaN:null:Number(raw)];
   }));
   const cost=normalizedCost(input);
   if(!cost){status('#cost-status',t('costInvalid'));return}
   costs[item]=cost;
   if(!storageSet(COST_KEY,costs)){status('#cost-status',t('failed')+': storage');return}
+  costs=next;
   status('#cost-status',t('saved')+' · '+item);
   renderDashboard();
 });
@@ -194,7 +196,7 @@ $('#import-costs').addEventListener('click',async()=>{
       const item=row.item_id;
       if(!items.has(item)){skipped++;continue}
       const record=Object.fromEntries(COST_FIELDS.map(key=>[key,
-        row[key.toLowerCase()]!==undefined && row[key.toLowerCase()]!==''?Number(row[key.toLowerCase()]):key==='ingredients'?NaN:0]));
+        row[key.toLowerCase()]!==undefined && row[key.toLowerCase()]!==''?Number(row[key.toLowerCase()]):key==='ingredients'?NaN:null]));
       const cost=normalizedCost(record);
       if(!cost){skipped++;continue}
       next[item]=cost;imported++;

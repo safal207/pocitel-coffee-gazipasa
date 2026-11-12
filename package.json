@@ -1,0 +1,12 @@
+{
+  "name": "pocitel-coffee-gazipasa",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-share-pages.mjs",
+    "test": "node scripts/test.mjs",
+    "test:e2e": "playwright test",
+    "owner": "node server/owner-server.mjs"
+  },
+  "devDependencies": { "@playwright/test": "1.65.0" }
+}

@@ -63,8 +63,8 @@ test('milk/syrup modifiers cannot silently vanish from calculated costs',()=>{
   assert.ok(entry);
   const book={latte:cupCost};
   assert.deepEqual(unitCostFor(entry.id,book,resolve).missing,['plant-milk','syrup']);
-  book['plant-milk']={ingredients:12};
-  book.syrup={ingredients:4};
+  book['plant-milk']={ingredients:12,packaging:0,variableLabor:0,paymentFee:0,waste:0};
+  book.syrup={ingredients:4,packaging:0,variableLabor:0,paymentFee:0,waste:0};
   assert.equal(unitCostFor(entry.id,book,resolve).value,79);
 });
 test('cost records reject negative, NaN and bad inventory IDs',()=>{
@@ -199,5 +199,5 @@ test('source wiring: manual proof, no fake cloud authentication and no automatic
   assert.match(owner,/noindex,nofollow/);
   assert.doesNotMatch(app,/scheduleFocacciaPromo\(600\)/);
   assert.doesNotMatch(app,/offerObserver\.observe\(/);
-  assert.match(html,/style\.css\?v=20261112-revenue/);
+  assert.match(html,/style\.css\?v=20261112-revenue2/);
 });

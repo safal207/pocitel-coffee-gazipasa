@@ -17,7 +17,7 @@ for (const [id, entry] of [['menu', { image: 'hero-wide-960' }], ...items]) {
   const path = `assets/social/${id}-${hash}.jpg`;
   jobs.push({ id, source, target: resolve(dist, path), path });
 }
-const conversion = spawnSync('python3', [resolve(root, 'scripts/encode-share-images.py')], {
+const conversion = spawnSync(process.env.PYTHON ?? (process.platform === 'win32' ? 'python' : 'python3'), [resolve(root, 'scripts/encode-share-images.py')], {
   input: JSON.stringify(jobs), encoding: 'utf8', maxBuffer: 1024 * 1024,
 });
 if (conversion.status !== 0) throw new Error(conversion.stderr || conversion.error || 'JPEG encoding failed');

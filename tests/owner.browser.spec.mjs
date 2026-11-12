@@ -1,0 +1,27 @@
+import { test,expect } from '@playwright/test';
+import { mkdtemp,rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { createOwnerServer } from '../server/owner-server.mjs';
+import { makeOrderSlip } from '../dist/revenue-core.js';
+const password='synthetic-test-password-'+ 'x'.repeat(32);
+test.use({httpCredentials:{username:'owner',password}});
+let app,dir;
+test.beforeAll(async()=>{dir=await mkdtemp(join(tmpdir(),'pocitel-ui-'));app=await createOwnerServer({password,dataDir:dir})});
+test.afterAll(async()=>{await app?.close();if(dir)await rm(dir,{recursive:true,force:true})});
+for(const language of ['tr','en','ru'])test('private owner '+language+': unpaid confirmation is distinct from payment',async({page})=>{
+ const errors=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.setViewportSize({width:320,height:780});await page.goto(app.url);
+ await page.locator('#language').selectOption(language);await expect(page.locator('html')).toHaveAttribute('lang',language);
+ const before=Number(await page.locator('#paid').textContent());
+ const code=makeOrderSlip({id:'pct_ui_'+language,lines:[['cappuccino',1]],quoteTotal:185});
+ await page.getByRole('textbox').fill(code);
+ await page.locator('#confirm-form button').click();await expect(page.locator('#confirmed')).toHaveText('1');
+ await expect(page.locator('#paid')).toHaveText(String(before));
+ await page.locator('#receipt').selectOption('pct_ui_'+language);
+ await page.locator('#payment').check();await page.locator('#paid-form button').click();
+ await expect(page.locator('#paid')).toHaveText(String(before+1));await expect(page.locator('#confirmed')).toHaveText('0');
+ await expect(page.locator('#margin')).toHaveText('—');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(322);
+ expect(errors).toEqual([]);
+});

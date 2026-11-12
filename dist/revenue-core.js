@@ -14,9 +14,13 @@ const money = number => Math.round((Number(number) + Number.EPSILON) * MONEY_SCA
 const finiteNonnegative = n => typeof n === 'number' && Number.isFinite(n) && n >= 0;
 export function normalizedCost(value) {
   if (!value || typeof value !== 'object' || !finiteNonnegative(value.ingredients)) return null;
-  if (COST_FIELDS.some(field => value[field] !== undefined && !finiteNonnegative(value[field]))) return null;
-  return Object.fromEntries(COST_FIELDS.map(field => [field, money(value[field] ?? 0)]));
+  if (COST_FIELDS.some(field => value[field] != null && !finiteNonnegative(value[field]))) return null;
+  return Object.fromEntries(COST_FIELDS.map(field => [field, value[field] == null ? null : money(value[field])]));
 }
+const completeCost = value => {
+  const record = normalizedCost(value);
+  return record && COST_FIELDS.every(field => record[field] !== null) ? record : null;
+};
 export function normalizeCostBook(input, allowedIds) {
   const output = {};
   if (!input || typeof input !== 'object') return output;
@@ -31,19 +35,21 @@ export function unitCostFor(itemId, costs, resolve) {
   const entry = resolve(itemId);
   if (!entry) return {complete:false, missing:[itemId], value:null};
   // Direct SKU overrides handle special takeaway packaging or combo-specific waste.
-  if (normalizedCost(costs[itemId])) {
-    return {complete:true, missing:[], value:money(Object.values(normalizedCost(costs[itemId])).reduce((a,b)=>a+b,0))};
+  if (Object.hasOwn(costs, itemId)) {
+    const cost = completeCost(costs[itemId]);
+    return cost ? {complete:true, missing:[], value:money(Object.values(cost).reduce((a,b)=>a+b,0))}
+      : {complete:false, missing:[itemId], value:null};
   }
   const base = entry.sourceId ?? entry.baseId ?? entry.id;
-  if (base !== itemId && normalizedCost(costs[base]) && !entry.isBuiltCombo) {
-    let total = Object.values(normalizedCost(costs[base])).reduce((a,b)=>a+b,0);
+  if (base !== itemId && completeCost(costs[base]) && !entry.isBuiltCombo) {
+    let total = Object.values(completeCost(costs[base])).reduce((a,b)=>a+b,0);
     const extras = [
       ...(entry.milk && entry.milk !== 'standard' ? ['plant-milk'] : []),
       ...(entry.syrup && entry.syrup !== 'none' ? ['syrup'] : []),
     ];
     const missing=[];
     for(const id of extras) {
-      const cost=normalizedCost(costs[id]);
+      const cost=completeCost(costs[id]);
       if(!cost) missing.push(id);
       else total+=Object.values(cost).reduce((a,b)=>a+b,0);
     }
@@ -57,7 +63,7 @@ export function unitCostFor(itemId, costs, resolve) {
   const missing = [];
   let value = 0;
   for (const component of parts) {
-    const cost = normalizedCost(costs[component]);
+    const cost = completeCost(costs[component]);
     if (!cost) { missing.push(component); continue; }
     value += Object.values(cost).reduce((a,b)=>a+b,0);
   }
@@ -79,13 +85,14 @@ export function makePaidOrder(input, resolve) {
   const id = String(input.id ?? '').trim();
   if (!/^[a-z0-9_-]{4,100}$/i.test(id)) throw new Error('Invalid order ID');
   if (!['pos_csv', 'staff_manual'].includes(input.source)) throw new Error('Invalid evidence source');
+  if (typeof input.paidAt !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(input.paidAt)) throw new Error('Paid date requires ISO-8601 timezone');
   const paidAt = new Date(input.paidAt ?? '');
   if (Number.isNaN(paidAt.getTime()) || paidAt.getTime() > Date.now() + 86400000) throw new Error('Invalid paid date');
   const lines = input.lines;
   if (!Array.isArray(lines) || !lines.length || lines.length > 100) throw new Error('No valid paid lines');
   if (!lines.every(line => validSaleLine(line, resolve))) throw new Error('Invalid SKU, price or quantity');
   const attrs = input.attribution && typeof input.attribution === 'object' ? input.attribution : {};
-  const attribution = Object.fromEntries(['utm_source','utm_medium','utm_campaign','qr'].map(key => {
+  const attribution = Object.fromEntries(['utm_source','utm_medium','utm_campaign','utm_content','utm_term','qr'].map(key => {
     const value = String(attrs[key] ?? '').trim();
     return [key, /^[a-z0-9_.-]{0,48}$/i.test(value) ? value : ''];
   }));
@@ -202,6 +209,7 @@ export function parseCsv(text) {
   if(!rows.length) return [];
   const header=rows.shift().map(x=>x.trim().toLowerCase());
   if(new Set(header).size!==header.length) throw new Error('Duplicate CSV header');
+  if (rows.length > MAX_ROWS || rows.some(row => row.length !== header.length)) throw new Error('Invalid CSV row width or limit');
   return rows.map(row=>Object.fromEntries(header.map((h,i)=>[h,(row[i]??'').trim()])));
 }
 export function importPosCsv(text, resolve) {
@@ -220,7 +228,7 @@ export function importPosCsv(text, resolve) {
     if(!validSaleLine(item,resolve)) throw new Error('Invalid POS line '+row.order_id);
     const order=grouped.get(row.order_id) ?? {
       id:row.order_id,paidAt:row.paid_at,source:'pos_csv',
-      attribution:{utm_source:row.utm_source,utm_medium:row.utm_medium,utm_campaign:row.utm_campaign,qr:row.qr},
+      attribution:{utm_source:row.utm_source,utm_medium:row.utm_medium,utm_campaign:row.utm_campaign,utm_content:row.utm_content,utm_term:row.utm_term,qr:row.qr},
       lines:[],
     };
     if(order.paidAt!==row.paid_at) throw new Error('Conflicting POS timestamps');
@@ -259,7 +267,7 @@ export function reconcilePosOrders(existing, imported) {
     if (old.source === 'staff_manual') {
       // A matching POS receipt is stronger evidence, but still locally imported,
       // not server-verified. Carry forward the original campaign if POS lacks it.
-      const meta = Object.fromEntries(['utm_source','utm_medium','utm_campaign','qr']
+      const meta = Object.fromEntries(['utm_source','utm_medium','utm_campaign','utm_content','utm_term','qr']
         .map(key => [key, receipt.attribution?.[key] || old.attribution?.[key] || '']));
       indexed.set(receipt.id, { ...receipt, attribution:meta });
       upgraded++;
@@ -273,6 +281,7 @@ export function reconcilePosOrders(existing, imported) {
 }
 
 export function makeOrderSlip({id,lines,quoteTotal,attribution}) {
+  if (!finiteNonnegative(quoteTotal)) throw new Error('Invalid draft total');
   if(!/^[a-z0-9_-]{4,100}$/i.test(id)) throw new Error('Invalid draft id');
   if(!Array.isArray(lines)||!lines.length||lines.length>100 ||
      !lines.every(([sku,q])=>euroSafeId(sku)&&Number.isInteger(q)&&q>=1&&q<=99))
@@ -286,7 +295,9 @@ export function parseOrderSlip(code, resolve) {
   let data;
   try {data=JSON.parse(atob(value.slice(5).replace(/-/g,'+').replace(/_/g,'/')));} catch {throw new Error('Unreadable order slip');}
   if(data?.v!==1 || !/^[a-z0-9_-]{4,100}$/i.test(data.id) ||
-     !Array.isArray(data.lines)||!data.lines.length||data.lines.length>100) throw new Error('Bad order slip');
+     !Array.isArray(data.lines)||!data.lines.length||data.lines.length>100 ||
+     !finiteNonnegative(data.quoteTotal) || data.lines.some(line => !Array.isArray(line) || line.length !== 2) ||
+     new Set(data.lines.map(line=>line[0])).size !== data.lines.length) throw new Error('Bad order slip');
   let total=0;
   const lines=data.lines.map(([itemId,quantity])=>{
     const item=resolve(itemId);
