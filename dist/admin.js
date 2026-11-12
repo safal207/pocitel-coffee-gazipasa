@@ -54,6 +54,11 @@ const i18n={
     'Поля: order_id, paid_at, item_id, quantity, unit_gross_try, vat_percent. CSV обрабатывается локально; повторные ID пропускаются.'],
   chooseCsv:['POS CSV dosyası','POS CSV file','Файл POS CSV'],
   importCsv:['CSV içe aktar','Import CSV','Импортировать CSV'],
+  sourcesTitle:['Satış kaynakları','Paid order sources','Источники оплаченных заказов'],
+  sourcesHint:['Yalnızca ödenmiş bildirilen fişlerdeki UTM/QR bilgisi. Bu dönüşüm oranı veya reklam ROI değildir.',
+    'UTM/QR from reported paid receipts only. This is not a visitor conversion rate or ad ROI.',
+    'UTM/QR только из подтверждённых персоналом или POS чеков. Это не конверсия посетителей и не рекламный ROI.'],
+  sourceName:['Kaynak / kampanya','Source / campaign','Источник / кампания'],
   products:['Ürün katkısı','Product contribution','Доходность позиций'],
   skuHint:['Yalnızca ödenmiş fişler; katkı sadece KDV ve değişken maliyeti bilinen satırlarda gösterilir.',
     'Paid receipts only. Contribution is shown only for lines with known VAT and variable costs.',
@@ -128,6 +133,17 @@ function renderDashboard(){
     body.appendChild(tr);
   }
   $('#empty-sales').hidden=report.orderCount>0;
+  const sources=$('#source-table');
+  sources.replaceChildren();
+  for(const row of report.bySource){
+    const tr=document.createElement('tr');
+    for(const value of [row.source,String(row.orders),money(row.gross),
+        money(row.contributionKnown),row.knownOrders+' / '+row.orders]){
+      const td=document.createElement('td');td.textContent=value;tr.appendChild(td);
+    }
+    sources.appendChild(tr);
+  }
+  $('#empty-sources').hidden=report.bySource.length>0;
 }
 function download(filename,value){
   const blob=new Blob([JSON.stringify(value,null,2)],{type:'application/json;charset=utf-8'});
