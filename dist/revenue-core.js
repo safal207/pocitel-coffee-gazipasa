@@ -35,8 +35,20 @@ export function unitCostFor(itemId, costs, resolve) {
     return {complete:true, missing:[], value:money(Object.values(normalizedCost(costs[itemId])).reduce((a,b)=>a+b,0))};
   }
   const base = entry.sourceId ?? entry.baseId ?? entry.id;
-  if (base !== itemId && normalizedCost(costs[base])) {
-    return {complete:true, missing:[], value:money(Object.values(normalizedCost(costs[base])).reduce((a,b)=>a+b,0))};
+  if (base !== itemId && normalizedCost(costs[base]) && !entry.isBuiltCombo) {
+    let total = Object.values(normalizedCost(costs[base])).reduce((a,b)=>a+b,0);
+    const extras = [
+      ...(entry.milk && entry.milk !== 'standard' ? ['plant-milk'] : []),
+      ...(entry.syrup && entry.syrup !== 'none' ? ['syrup'] : []),
+    ];
+    const missing=[];
+    for(const id of extras) {
+      const cost=normalizedCost(costs[id]);
+      if(!cost) missing.push(id);
+      else total+=Object.values(cost).reduce((a,b)=>a+b,0);
+    }
+    return missing.length?{complete:false,missing,value:null}
+      :{complete:true,missing:[],value:money(total)};
   }
   const parts = entry.isBuiltCombo ? [...entry.componentIds] :
     (FIXED_COMBO_PARTS[base] ?? [base]);
