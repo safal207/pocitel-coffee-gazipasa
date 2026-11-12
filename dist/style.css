@@ -1515,3 +1515,18 @@ button.social-rail-item:hover { background: rgba(33,41,37,.91); }
 @media (prefers-reduced-motion: reduce) {
   .combo-journey-steps .is-just-chosen .combo-journey-symbol { animation: none !important; }
 }
+
+/* The order is the only event that earns stage 3/3; reuse the existing undo. */
+.focaccia-undo > .combo-done-check {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  min-width: 35px;
+  height: 26px;
+  border-radius: 100px;
+  padding-inline: 4px;
+  background: var(--olive);
+  color: var(--on-accent);
+  font: 750 .68rem/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+}
