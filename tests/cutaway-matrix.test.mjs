@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs';
 import { categories } from '../dist/menu.js';
 import { items, feedOrder, takeawayItems } from '../dist/catalog.js';
 import { revealFor } from '../dist/ingredient-reveal.js';
-import { cutawayOverlayMarkup, previewFor } from '../dist/cutaway-overlay.js';
+import { cutawayOverlayMarkup, cutawayPhotoTagsMarkup, previewFor } from '../dist/cutaway-overlay.js';
 
 const foodCategories = new Set(['breakfast', 'sweet', 'focaccia', 'combos']);
 const foodExtras = new Set(['tomato-cucumber', 'olives', 'cheese', 'egg', 'nutella', 'chocolate-sauce']);
@@ -24,6 +24,9 @@ test('inventory is complete and every catalog item has a valid photo', () => {
     assert.ok(existsSync(new URL(`../dist/assets/${entry.image}.webp`, import.meta.url)), `Missing image: ${entry.id}`);
   }
   for (const path of ['beetroot-outside', 'focaccia-outside', 'focaccia-inside', 'zucchini-outside']) {
+    assert.ok(existsSync(new URL(`../dist/assets/cutaway/${path}.webp`, import.meta.url)), path);
+  }
+  for (const path of ['breakfast-plate-inside-v1', 'omelet-plate-inside-v1', 'granola-inside-v1', 'to-go-granola-inside-v1', 'pancake-outside-v1', 'pancake-inside-v1']) {
     assert.ok(existsSync(new URL(`../dist/assets/cutaway/${path}.webp`, import.meta.url)), path);
   }
 });
@@ -59,6 +62,10 @@ test('24 cutaway cards render a localized visible on-photo summary in all langua
       assert.match(markup, /aria-controls="cutaway-ingredients" aria-expanded="false"/);
       assert.ok(markup.includes(reveal.parts[0].replaceAll('&', '&amp;')), `${entry.id}: first ingredient`);
       assert.equal((markup.match(/class="cutaway-ingredient-card"/g) || []).length, 1);
+      const photoTags = cutawayPhotoTagsMarkup(reveal);
+      assert.match(photoTags, /aria-hidden="true"/);
+      assert.equal((photoTags.match(/<span>/g) || []).length, reveal.parts.length);
+      for (const part of reveal.parts) assert.ok(photoTags.includes(part.replaceAll('&', '&amp;')), `${entry.id}: photo tag ${language}`);
     }
   }
 });
@@ -69,6 +76,9 @@ test('unexpected or empty ingredients cannot create a fake ingredient overlay', 
   assert.equal(cutawayOverlayMarkup(null, 'Внутри', 'ещё', 'Весь состав'), '');
   assert.equal(cutawayOverlayMarkup({ parts: ['<test>&"'] }, 'Inside', 'more', 'All ingredients').includes('<test>'), false);
   assert.ok(cutawayOverlayMarkup({ parts: ['<test>&"'] }, 'Inside', 'more', 'All ingredients').includes('&lt;test&gt;'));
+  assert.equal(cutawayPhotoTagsMarkup(null), '');
+  assert.ok(cutawayPhotoTagsMarkup({ parts: ['<test>&"'] }).includes('&lt;test&gt;'));
+  assert.ok(!cutawayPhotoTagsMarkup({ parts: ['<test>&"'] }).includes('<test>'));
 });
 
 test('cached older app versions keep their noninteractive caption', () => {
