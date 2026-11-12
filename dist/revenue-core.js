@@ -172,7 +172,7 @@ export function revenueReport(orders, costs, resolve) {
     knownOrders:known.length,
     missing:[...new Set(metrics.flatMap(o=>o.missing))],
     bySku:Object.values(bySku).map(o=>({...o, paidOrders:o.paidOrders.size,
-      gross:money(o.gross), contribution:o.knownUnits ? money(o.contribution) : null}))
+      gross:money(o.gross), contribution:o.knownUnits === o.units ? money(o.contribution) : null}))
       .sort((a,b)=>b.gross-a.gross),
     orders:metrics,
   };
@@ -228,6 +228,50 @@ export function importPosCsv(text, resolve) {
   }
   return [...grouped.values()].map(order=>makePaidOrder(order,resolve));
 }
+// Re-imports must not silently discard conflicting receipts or count a payment
+// twice. The POS export may upgrade a staff declaration if SKU/quantity/amount
+// agree. Conflicts fail atomically; owners must reconcile with their POS.
+const saleLinesSignature = (order, includeVat) => JSON.stringify(
+  order.lines.map(line => [
+    line.itemId, line.quantity, money(line.unitGross), money(line.discountGross ?? 0),
+    ...(includeVat ? [line.vatPercent ?? null] : []),
+  ]).map(JSON.stringify).sort()
+);
+export function reconcilePosOrders(existing, imported) {
+  if (!Array.isArray(existing) || !Array.isArray(imported)) throw new Error('Invalid order collections');
+  const indexed = new Map();
+  for (const record of existing) {
+    if (!record || typeof record.id !== 'string' || indexed.has(record.id)) throw new Error('Duplicate existing receipt');
+    indexed.set(record.id, record);
+  }
+  let added=0, upgraded=0, skipped=0;
+  for (const receipt of imported) {
+    if (receipt?.status !== 'paid' || receipt.source !== 'pos_csv' || typeof receipt.id !== 'string')
+      throw new Error('Expected paid POS receipts');
+    const old = indexed.get(receipt.id);
+    if (!old) {
+      indexed.set(receipt.id, receipt);
+      added++;
+      continue;
+    }
+    if (saleLinesSignature(old, false) !== saleLinesSignature(receipt, false))
+      throw new Error('Conflicting paid receipt: ' + receipt.id);
+    if (old.source === 'staff_manual') {
+      // A matching POS receipt is stronger evidence, but still locally imported,
+      // not server-verified. Carry forward the original campaign if POS lacks it.
+      const meta = Object.fromEntries(['utm_source','utm_medium','utm_campaign','qr']
+        .map(key => [key, receipt.attribution?.[key] || old.attribution?.[key] || '']));
+      indexed.set(receipt.id, { ...receipt, attribution:meta });
+      upgraded++;
+    } else if (old.source === 'pos_csv') {
+      if (old.paidAt !== receipt.paidAt || saleLinesSignature(old, true) !== saleLinesSignature(receipt, true))
+        throw new Error('Conflicting POS receipt version: ' + receipt.id);
+      skipped++;
+    } else throw new Error('Unknown existing receipt source');
+  }
+  return { orders:[...indexed.values()], added, upgraded, skipped };
+}
+
 export function makeOrderSlip({id,lines,quoteTotal,attribution}) {
   if(!/^[a-z0-9_-]{4,100}$/i.test(id)) throw new Error('Invalid draft id');
   if(!Array.isArray(lines)||!lines.length||lines.length>100 ||
