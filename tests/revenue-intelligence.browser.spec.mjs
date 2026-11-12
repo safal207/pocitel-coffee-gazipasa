@@ -92,6 +92,8 @@ test.describe('Revenue Intelligence: no fictitious sales and local-only ordering
     await expect(page.locator('#kpi-contribution')).not.toHaveText('—');
     await expect(page.locator('#sku-table tr')).toHaveCount(1);
     await expect(page.locator('#sku-table')).toContainText('Cappuccino');
+    await expect(page.locator('#source-table tr')).toHaveCount(1);
+    await expect(page.locator('#source-table')).toContainText('instagram');
     await page.locator('#import-pos').click();
     await expect(page.locator('#kpi-orders')).toHaveText('1');
     await expect(page.locator('#pos-status')).toContainText('Skipped: 1');
