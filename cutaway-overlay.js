@@ -12,6 +12,12 @@ export function previewFor(reveal) {
   };
 }
 
+// The labels are visual duplicates of the accessible list below the photo.
+export function cutawayPhotoTagsMarkup(reveal) {
+  if (!reveal || !Array.isArray(reveal.parts) || !reveal.parts.length) return '';
+  return `<div class="cutaway-photo-tags" data-qa="photo-ingredient-tags" aria-hidden="true">${reveal.parts.map(part => `<span>${escapeLabel(part)}</span>`).join('')}</div>`;
+}
+
 export function cutawayOverlayMarkup(reveal, title, moreLabel, allLabel) {
   const data = previewFor(reveal);
   if (!data) return '';

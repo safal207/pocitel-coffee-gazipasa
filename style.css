@@ -747,6 +747,17 @@ body:has(dialog[open]) .added-notice { visibility: hidden; }
 .cutaway-range::-moz-range-track { height: 100%; background: transparent; border: 0; }
 .cutaway-range::-moz-range-thumb { width: 1px; height: 100%; background: transparent; border: 0; }
 .cutaway-art-label { position: absolute; z-index: 4; left: .55rem; bottom: .5rem; padding: .18rem .36rem; border-radius: 4px; background: rgba(255,249,242,.92); color: #56372d; font: .6rem/1.1 var(--sans); pointer-events: none; }
+.cutaway-photo-tags {
+  position: absolute; z-index: 1; left: 9px; right: 70px; bottom: 29px;
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 3px;
+  opacity: var(--cutaway-tags-opacity, 1); pointer-events: none;
+}
+.cutaway-photo-tags span {
+  max-width: 100%; padding: .2rem .37rem; border: 1px solid rgba(255,255,255,.65);
+  border-radius: 6px; background: rgba(39,25,21,.82); color: #fff;
+  font: 650 .62rem/1.18 var(--sans); overflow-wrap: anywhere;
+  text-shadow: 0 1px 2px rgba(0,0,0,.4);
+}
 .cutaway-guide { display: flex; align-items: baseline; flex-wrap: wrap; gap: .25rem .6rem; padding: .55rem 1rem .35rem; background: var(--paper); color: var(--ink); }
 .cutaway-guide strong { color: var(--wine); font: 1.1rem/1.2 var(--serif); }
 .cutaway-guide span { color: var(--muted); font-size: .7rem; }
@@ -756,6 +767,8 @@ body:has(dialog[open]) .added-notice { visibility: hidden; }
 .cutaway-legend { display: flex; flex-wrap: wrap; gap: .28rem; padding: 0 1rem .6rem; background: var(--paper); }
 .cutaway-legend span { padding: .24rem .42rem; border: 1px solid var(--line); border-radius: 999px; color: var(--olive); font-size: .67rem; line-height: 1.2; }
 @media (max-width: 350px) {
+  .cutaway-photo-tags { left: 7px; right: 56px; bottom: 28px; gap: 2px; }
+  .cutaway-photo-tags span { padding: .17rem .2rem; font-size: .58rem; }
   .cutaway-tag { right: .3rem; padding: .18rem .28rem; font-size: .56rem; }
   .cutaway-tag::before { width: 9px; }
   .cutaway-guide { padding-inline: .75rem; }
