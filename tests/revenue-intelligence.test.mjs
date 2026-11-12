@@ -105,7 +105,7 @@ test('PCT1 order handoff is a draft, not a paid sale, and is tamper-checked',()=
   assert.equal(decoded.attribution.utm_source,'instagram');
   assert.throws(()=>makeOrderSlip({id:'bad',lines:[],quoteTotal:0}),/Invalid/);
   assert.throws(()=>parseOrderSlip('PCT1.evil',resolve),/Unreadable|Bad/);
-  assert.throws(()=>parseOrderSlip('PCT1.'+btoa(JSON.stringify({v:1,id:'pct_good',lines:[['cappuccino',1]],quoteTotal:1})),resolve),/total differs/);
+  assert.throws(()=>parseOrderSlip('PCT1.'+btoa(JSON.stringify({v:1,id:'pct_good',lines:[['cappuccino',1]],quoteTotal:1})).replace(/=+$/,''),resolve),/total differs/);
 });
 test('local diagnostics are opt-in, bounded, sanitized and never send network requests',()=>{
   const map=new Map();
