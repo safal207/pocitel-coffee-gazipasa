@@ -28,6 +28,7 @@
       <a href="#overview" data-i18n="overview">Genel bakış</a>
       <a href="#costs" data-i18n="costs">Maliyetler</a>
       <a href="#sales" data-i18n="sales">Satışlar</a>
+      <a href="#sources" data-i18n="sourcesTitle">Kaynaklar</a>
       <a href="#products" data-i18n="products">Ürünler</a>
       <a href="#export" data-i18n="export">Dışa aktar</a>
     </nav>
@@ -87,6 +88,18 @@
           <p id="pos-status" role="status"></p>
         </div>
       </div>
+    </section>
+    <section id="sources" class="panel">
+      <h2 data-i18n="sourcesTitle">Satış kaynakları (ödendi bildirilen)</h2>
+      <p class="section-hint" data-i18n="sourcesHint">Yalnızca POS/personel tarafından ödenmiş olarak kaydedilen siparişlerde bulunan UTM/QR etiketleri. Bu tablo ziyaretçi dönüşüm oranı veya reklam ROI'si değildir.</p>
+      <div class="table-wrap"><table><thead><tr>
+        <th data-i18n="sourceName">Kaynak / kampanya</th>
+        <th data-i18n="paidOrders">Fişler</th>
+        <th data-i18n="gross">Brüt satışlar</th>
+        <th data-i18n="margin">Katkı payı (bilinen)</th>
+        <th data-i18n="coverage">Tam maliyetli fişler</th>
+      </tr></thead><tbody id="source-table"></tbody></table></div>
+      <p id="empty-sources" class="section-hint" data-i18n="noData">Henüz satış kaydı yok.</p>
     </section>
     <section id="products" class="panel">
       <h2 data-i18n="products">Ürün katkısı</h2>
