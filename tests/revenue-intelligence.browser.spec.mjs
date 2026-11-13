@@ -11,6 +11,21 @@ async function ready(page,lang='ru'){
   await expect(page.locator('#post-cappuccino [data-add="cappuccino"]')).toBeVisible();
 }
 test.describe('Revenue Intelligence: no fictitious sales and local-only ordering',()=>{
+  test('on-site feedback supports keyboard and restores focus without claiming delivery',async({page})=>{
+    await page.setViewportSize({width:320,height:780});
+    await page.goto(base+'/?lang=ru');
+    await page.locator('#open-feedback').click();
+    await expect(page.locator('#feedback')).toBeVisible();
+    await expect(page.locator('#feedback-topic')).toBeFocused();
+    await expect(page.locator('#feedback')).toContainText('Сообщение не отправляется');
+    await page.locator('#feedback-topic').selectOption('2');
+    await expect(page.locator('#feedback [lang=tr]')).toHaveText('Alerjen sorusu');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#feedback')).not.toBeVisible();
+    await expect(page.locator('#open-feedback')).toBeFocused();
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(322);
+    expect(await page.evaluate(()=>localStorage.getItem('pocitel-local-events-v1'))).toBeNull();
+  });
   for(const [lang,width] of [['tr',320],['en',390],['ru',768]]){
     test(lang+' '+width+'px: menu -> waiter PCT1 draft, without a paid event',async({page})=>{
       await page.setViewportSize({width,height:780});
@@ -64,6 +79,9 @@ test.describe('Revenue Intelligence: no fictitious sales and local-only ordering
     await page.locator('#cost-ingredients').fill('40');
     await page.locator('#cost-packaging').fill('8');
     await page.locator('#cost-form button[type=submit]').click();
+    await expect(page.locator('#cost-status')).toContainText('Сохранено');
+    const storedCosts=await page.evaluate(()=>JSON.parse(localStorage.getItem('pocitel-admin-costs-v2')));
+    expect(storedCosts.cappuccino.variableLabor).toBeNull();
     await expect(page.locator('#kpi-contribution')).toHaveText('—');
     // An explicit tax rate is needed; a later POS receipt can have its own rate.
     expect(saved[0].lines[0].vatPercent).toBeNull();
@@ -77,7 +95,7 @@ test.describe('Revenue Intelligence: no fictitious sales and local-only ordering
     await page.locator('#cost-file').setInputFiles(recipe);
     await page.locator('#import-costs').click();
     await expect(page.locator('#cost-status')).toContainText('Imported: 1');
-    const importedCost=await page.evaluate(()=>JSON.parse(localStorage.getItem('pocitel-admin-costs-v1')).cappuccino);
+    const importedCost=await page.evaluate(()=>JSON.parse(localStorage.getItem('pocitel-admin-costs-v2')).cappuccino);
     expect(importedCost.variableLabor).toBe(10);
     expect(importedCost.paymentFee).toBe(4);
     expect(importedCost.waste).toBe(1);

@@ -7,8 +7,8 @@
   <meta name="theme-color" content="#f7f1e6">
   <title>Poçitel | Revenue Intelligence</title>
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="admin.css?v=20261112-ri">
-  <script type="module" src="admin.js?v=20261112-ri"></script>
+  <link rel="stylesheet" href="admin.css?v=20261112-ri2">
+  <script type="module" src="admin.js?v=20261112-ri2"></script>
 </head>
 <body>
   <header class="admin-header">
@@ -47,14 +47,14 @@
     </section>
     <section id="costs" class="panel">
       <h2 data-i18n="costs">Maliyetler</h2>
-      <p class="section-hint" data-i18n="costHint">Ürün başına TL cinsinden doğrudan değişken maliyetleri girin. Yalnızca malzeme doldurulursa diğer alanlar sıfır varsayılır; eksik giderleri doğrulayın. Sabit kira ve vergi sonrası net kâr hesaplanmaz.</p>
+      <p class="section-hint" data-i18n="costHint">Ürün başına TL cinsinden doğrudan değişken maliyetleri girin. Boş alanlar bilinmiyor; gider yoksa açıkça 0 girin. Eski maliyetleri yeniden doğrulayın. Sabit kira ve vergi sonrası net kâr hesaplanmaz.</p>
       <form id="cost-form" class="form-grid">
         <label class="span-all"><span data-i18n="product">Ürün</span><select id="cost-item" required></select></label>
         <label><span data-i18n="ingredientCost">Malzeme *</span><input type="number" id="cost-ingredients" min="0" max="100000" step="0.01" required placeholder="—"></label>
-        <label><span data-i18n="packageCost">Paket</span><input type="number" id="cost-packaging" min="0" max="100000" step="0.01" placeholder="0"></label>
-        <label><span data-i18n="laborCost">Değişken işçilik</span><input type="number" id="cost-variableLabor" min="0" max="100000" step="0.01" placeholder="0"></label>
-        <label><span data-i18n="feeCost">Ödeme komisyonu</span><input type="number" id="cost-paymentFee" min="0" max="100000" step="0.01" placeholder="0"></label>
-        <label><span data-i18n="wasteCost">Fire</span><input type="number" id="cost-waste" min="0" max="100000" step="0.01" placeholder="0"></label>
+        <label><span data-i18n="packageCost">Paket</span><input type="number" id="cost-packaging" min="0" max="100000" step="0.01" placeholder="—"></label>
+        <label><span data-i18n="laborCost">Değişken işçilik</span><input type="number" id="cost-variableLabor" min="0" max="100000" step="0.01" placeholder="—"></label>
+        <label><span data-i18n="feeCost">Ödeme komisyonu</span><input type="number" id="cost-paymentFee" min="0" max="100000" step="0.01" placeholder="—"></label>
+        <label><span data-i18n="wasteCost">Fire</span><input type="number" id="cost-waste" min="0" max="100000" step="0.01" placeholder="—"></label>
         <button class="primary span-all" type="submit" data-i18n="saveCost">Ürün maliyetini kaydet</button>
       </form>
       <div class="actions">

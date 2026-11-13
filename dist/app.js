@@ -11,8 +11,9 @@ import { moments, restoreFavoriteCombos, nextComboChoice } from './discovery.js?
 import { revealFor } from './ingredient-reveal.js?v=20261110-complete-food';
 import { cutawayOverlayMarkup, cutawayPhotoTagsMarkup } from './cutaway-overlay.js?v=20261112-photo-reveal-v2';
 import { restoreEngagement, toggleLike, recordView, serializeEngagement } from './engagement.js?v=20261110-social';
-import { createLocalTelemetry } from './telemetry.js?v=20261112-ri';
-import { makeOrderSlip } from './revenue-core.js?v=20261112-ri';
+import { createLocalTelemetry } from './telemetry.js?v=20261112-ri2';
+import './feedback.js?v=20261112-ri2';
+import { makeOrderSlip } from './revenue-core.js?v=20261112-ri2';
 
 const copy = {
   skip: ['Menüye geç', 'Skip to menu', 'Перейти к меню'],
@@ -1155,8 +1156,8 @@ function addToSelection(id, opener) {
     $('#announcement').textContent = t('quantityLimit');
     return;
   }
-  changeSelection(id, 1);
-  trace('add_to_cart', { itemId:id, quantity:selection.get(id), amount:orderItem(id)?.price });
+  changeSelection(id, 1, false);
+  trace('add_to_cart', { itemId:id, quantity:1, amount:orderItem(id)?.price });
   if (viewer.open) {
     viewer.close();
     opener = postOpener;
@@ -1289,14 +1290,14 @@ function persistSelection() {
   if (cart.open) renderCart();
 }
 
-function changeSelection(id, delta) {
+function changeSelection(id, delta, track = true) {
   const previous = selection.get(id) ?? 0;
   const next = Math.min(previous + delta, maxQuantity);
   if (next < 0 || next === previous) return;
   if (next) selection.set(id, next);
   else selection.delete(id);
   persistSelection();
-  trace('quantity_change', { itemId:id, quantity:next, amount:orderItem(id)?.price });
+  if (track) trace('quantity_change', { itemId:id, quantity:next, amount:orderItem(id)?.price });
   $('#announcement').textContent = `${name(orderItem(id))} · ${next}`;
 }
 

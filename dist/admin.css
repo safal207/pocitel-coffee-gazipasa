@@ -1,6 +1,13 @@
 :root{color-scheme:light;--ink:#322621;--wine:#683b38;--olive:#4d593d;--paper:#fbf8f0;--cream:#f5ebdc;--line:#e1d4c2;--muted:#6b645b;--success:#366d4d}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
+form,label,input,select,textarea{min-width:0;max-width:100%}
+.panel,.notice{overflow-wrap:anywhere}
+.panel form{display:grid;gap:12px;margin-block:16px}
+.panel form label{display:grid;gap:6px}
+.panel form .tick{display:flex;align-items:flex-start;gap:8px}
+.panel form .tick input{flex:none;width:20px;height:20px}
+.admin-header{flex-wrap:wrap}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,"Segoe UI",system-ui,sans-serif;font-size:15px;line-height:1.5}
 button,input,select,textarea{font:inherit}
 a{color:var(--wine)}
@@ -43,7 +50,7 @@ textarea{min-height:85px;font-size:.77rem;overflow-wrap:anywhere;resize:vertical
 #slip-preview:not([hidden]){display:grid;gap:10px}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 .table-wrap{width:100%;overflow:auto;border:1px solid var(--line);border-radius:12px}
-table{width:100%;border-collapse:collapse;text-align:left;font-size:.83rem}
+table{width:100%;min-width:560px;overflow-wrap:normal;border-collapse:collapse;text-align:left;font-size:.83rem}
 thead{background:#eee2d2}
 td,th{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
 td:not(:first-child),th:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}

@@ -22,14 +22,16 @@ export function safeEvent(name, props={}, timestamp=new Date().toISOString()) {
   const amount=Number.isFinite(props.amount)&&props.amount>=0&&props.amount<=1000000 ? props.amount : null;
   const quantity=Number.isInteger(props.quantity)&&props.quantity>=0&&props.quantity<=99 ? props.quantity : null;
   const variant=['control','treatment'].includes(props.variant)?props.variant:'';
-  const result={event:name,at:timestamp,language,itemId,amount,quantity,variant,
+  const category=['all','breakfast','sweet','focaccia','coffee','hot','cold','extras','combos'].includes(props.category)?props.category:'';
+  const result={event:name,at:timestamp,language,itemId,amount,quantity,variant,category,
     attribution:safeAttribution(new URLSearchParams(props.attribution??''))};
   return result;
 }
 export function cleanLog(events,now=Date.now()) {
   if(!Array.isArray(events)) return [];
   const cutoff=now-30*86400000;
-  return events.filter(x=>x&&EVENTS.has(x.event)&&Number.isFinite(Date.parse(x.at))&&Date.parse(x.at)>=cutoff&&Date.parse(x.at)<=now+86400000).slice(-1000);
+  return events.filter(x=>x&&EVENTS.has(x.event)&&Number.isFinite(Date.parse(x.at))&&Date.parse(x.at)>=cutoff&&Date.parse(x.at)<=now+86400000)
+    .slice(-1000).map(x=>safeEvent(x.event,x,x.at));
 }
 export function createLocalTelemetry({storage,session,search}) {
   // Do not throw when Safari private mode or storage policies disable access.
@@ -40,6 +42,9 @@ export function createLocalTelemetry({storage,session,search}) {
   let events=[];
   try {events=cleanLog(JSON.parse(get(TELEMETRY_KEY)||'[]'))} catch {events=[]}
   const commit=()=>put(TELEMETRY_KEY,JSON.stringify(events));
+  // Enforce retention on disk at startup, even if the visitor records no event.
+  if(!active){events=[];try{storage.removeItem(TELEMETRY_KEY)}catch{}}
+  else commit();
   return {
     get enabled(){return active},
     setEnabled(enabled){
@@ -50,6 +55,10 @@ export function createLocalTelemetry({storage,session,search}) {
     },
     record(name,props={}){
       if(!active) return false;
+      if(get(TELEMETRY_CONSENT)!=='yes'){
+        active=false;events=[];try{storage.removeItem(TELEMETRY_KEY)}catch{}
+        return false;
+      }
       const record=safeEvent(name,{...props,attribution:new URLSearchParams(attribution)});
       events=cleanLog([...events,record]);
       return commit();
