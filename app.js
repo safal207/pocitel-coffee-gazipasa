@@ -4,7 +4,8 @@ import { shareUrl } from './share-links.js?v=20261104-share';
 import { socialShareTargets } from './social-share.js?v=20261110-fast-share';
 import { milkOptions, syrupOptions, customization, configurationId, resolveOrderItem, optionLabels, replaceOrderLine, comboFoodIds, comboDrinkIds, builtComboId, comboChoice, isTakeaway } from './order-options.js?v=20261106-builder';
 import { comboJourneyState } from './combo-journey.js?v=20261112-combo-journey';
-import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOffer, undoCheckoutOffer } from './checkout-offers.js?v=20261106-builder';
+import { selectionSignature, checkoutSavings, recommendCheckout, applyCheckoutOffer, undoCheckoutOffer } from './checkout-offers.js?v=20261113-cart-merch';
+import { checkoutPresentation } from './cart-merchandising.js?v=20261113-cart-merch';
 import { energyRanges } from './nutrition-summary.js?v=20261105-focaccia';
 import { focacciaTakeawayOffer, selectedComboOffer } from './focaccia-offer.js?v=20261106-builder';
 import { moments, restoreFavoriteCombos, nextComboChoice } from './discovery.js?v=20261107-moments';
@@ -18,6 +19,14 @@ import { makeOrderSlip } from './revenue-core.js?v=20261112-ri2';
 import { staffOrderText, drawOrderQr } from './staff-handoff.js?v=20261113-miora';
 
 const copy = {
+  perItemPrice: ['Bir porsiyon', 'Per portion', 'За порцию'],
+  offerOptional: ['İsterseniz yanına', 'Something alongside?', 'Хотите что-нибудь к нему?'],
+  offerPairingLabel: ['Menü eşleşmesi', 'Menu pairing', 'Комбо из меню'],
+  offerAddNamed: ['Ekle', 'Add', 'Добавить'],
+  offerUndoAction: ['Eklemeyi geri al', 'Undo this change', 'Отменить изменение'],
+  offerInOrder: ['Siparişinizde', 'In your order', 'Добавлено в заказ'],
+  offerCurrentTotal: ['Şimdi', 'Current total', 'Сейчас'],
+  offerPreviousTotal: ['Önce', 'Before', 'Было'],
   menuView: ['Menü görünümü', 'Menu view', 'Вид меню'],
   photoView: ['Fotoğraflar', 'Photos', 'Фото'],
   compactView: ['Kısa liste', 'Compact list', 'Список'],
@@ -223,8 +232,8 @@ const copy = {
   upgradeOffer: ['Eşleşmeyi seç', 'Choose the pairing', 'Взять комбо'],
   combineOffer: ['Eşleşmeyle tasarruf et', 'Bundle and save', 'Объединить в комбо'],
   offerAdded: ['Siparişinizde · kaldırmak için dokunun', 'In your order · tap to undo', 'В заказе · нажмите, чтобы отменить'],
-  offerReplaces: ['Birer adet yerine', 'Replaces one of each', 'Заменит по одной порции'],
-  offerReplacesSingle: ['Bir porsiyon yerine', 'Replaces one portion', 'Заменит одну порцию'],
+  offerReplaces: ['Seçtiğiniz birer porsiyon eşleşmeye dahil', 'One of each selected portion goes into the pairing', 'В комбо войдёт по одной выбранной порции'],
+  offerReplacesSingle: ['Seçtiğiniz bir porsiyon eşleşmeye dahil', 'Your selected portion goes into the pairing', 'Выбранная порция войдёт в комбо'],
   offerPriceAfter: ['Yeni toplam', 'New total', 'Новый итог'],
   offerApplied: ['Sipariş güncellendi.', 'Order updated.', 'Заказ обновлён.'],
   offerUndone: ['Önceki seçiminiz geri yüklendi.', 'Your previous selection is restored.', 'Прежний выбор восстановлен.'],
@@ -234,7 +243,7 @@ const copy = {
   teaWithBreakfastReason: ['Kahvaltınızın yanına bir bardak Türk çayı.', 'A glass of Turkish tea alongside your breakfast.', 'Стакан турецкого чая к вашему завтраку.'],
   coffeeForWalkReason: ['Brunch burada, cappuccino yolda. Molayı yanınızda götürün.', 'Brunch here, cappuccino on your walk. Take the moment with you.', 'Бранч здесь, капучино на прогулку. Возьмите настроение с собой.'],
   breakfastToGoReason: ['Kahvenizin yanına meyve, yoğurt ve granola — bardakta.', 'Fruit, yogurt and granola to go with your coffee — in a cup.', 'Фрукты, йогурт и гранола к кофе — тоже в стакане.'],
-  sweetWithCoffeeReason: ['Kahvenizin yanına meyveli, Nutellalı pancake.', 'Fruit and Nutella pancakes to enjoy with your coffee.', 'Панкейки с фруктами и Nutella к вашему кофе.'],
+  sweetWithCoffeeReason: ['İçeceğinizin yanına meyveli, Nutellalı pancake.', 'Fruit and Nutella pancakes alongside your drink.', 'Панкейки с фруктами и Nutella к вашему напитку.'],
   telemetryLabel: ['Yerel kullanım günlüğü', 'Local usage diagnostics', 'Локальная диагностика'],
   telemetryScope: ['İsteğe bağlı, yalnızca bu cihazda 30 gün saklanır. Sunucuya gönderilmez.', 'Optional: kept on this device for 30 days. Nothing is sent to a server.', 'Необязательно. Хранится 30 дней только на этом устройстве, на сервер не отправляется.'],
   orderSlipSummary: ['Sipariş kodu (isteğe bağlı)', 'Order code (optional)', 'Код заказа (необязательно)'],
@@ -1209,27 +1218,29 @@ function renderCartSuggestion() {
     trace('offer_view', { itemId: checkoutOffer.addId, amount: checkoutOffer.delta });
     lastOfferTracked = offerSignature;
   }
-  const next = orderItem(checkoutOffer.addId);
   const applied = Boolean(offerTransaction);
-  const titleKey = checkoutOffer.kind === 'combine' ? 'combineTitle' : checkoutOffer.kind === 'upgrade' ? 'upgradeTitle' : 'oneMoreTouch';
-  const actionKey = checkoutOffer.kind === 'combine' ? 'combineOffer' : checkoutOffer.kind === 'upgrade' ? 'upgradeOffer' : 'addOffer';
-  const delta = checkoutOffer.delta < 0 ? `−${price(-checkoutOffer.delta)}` : `+${price(checkoutOffer.delta)}`;
+  const model=checkoutPresentation(applied?new Map(offerTransaction.before):selection,checkoutOffer,orderItem);
+  if(!model){offer.hidden=true;offer.innerHTML='';return}
+  const next = model.display;
+  const delta = model.delta < 0 ? `−${price(-model.delta)}` : `+${price(model.delta)}`;
   offer.classList.toggle('offer-selected', applied);
   offer.innerHTML = `
-    <p class="eyebrow">${t(titleKey)}</p>
+    <div class="offer-heading"><p class="eyebrow">${t(applied?'offerInOrder':checkoutOffer.kind==='combine'?'combineTitle':'offerOptional')}</p>
+    ${model.saving>0?`<span class="offer-saving">${t('quickSavings')} ${price(model.saving)}</span>`:''}</div>
     <div class="checkout-offer-product">
       <div class="checkout-offer-photo">${itemImage(next, false)}${illustrationLabel(next)}</div>
-      <div><h3>${name(next)}</h3><p>${t(`${checkoutOffer.reason}Reason`)}</p>
-        ${description(next) ? `<small>${description(next)}</small>` : ''}
+      <div><h3>${name(next)}</h3><p>${description(next) || t(`${checkoutOffer.reason}Reason`)}</p>
         ${optionLabels(next, language) ? `<small>${optionLabels(next, language)}</small>` : ''}
+        ${checkoutOffer.kind!=='add'?`<small class="offer-pairing-label">${t('offerPairingLabel')}: ${name(model.bundle)}</small>`:''}
+        ${checkoutOffer.kind==='upgrade'?`<small class="offer-pairing-composition">${description(model.bundle)}${optionLabels(model.bundle,language)?` · ${optionLabels(model.bundle,language)}`:''}</small>`:''}
       </div>
     </div>
     ${checkoutOffer.remove.length ? `<p class="offer-replacement">${t(checkoutOffer.remove.length === 1 ? 'offerReplacesSingle' : 'offerReplaces')}: ${checkoutOffer.remove.map(([id]) => name(orderItem(id))).join(' + ')}.</p>` : ''}
-    <label class="checkout-offer-toggle">
-      <input type="checkbox" id="checkout-offer-toggle" ${applied ? 'checked' : ''}>
-      <span>${t(applied ? 'offerAdded' : actionKey)}</span><strong>${delta}</strong>
-    </label>
-    <div class="offer-bottom"><small>${t(applied ? 'total' : 'offerPriceAfter')} <b>${price(selectionTotal() + (applied ? 0 : checkoutOffer.delta))}</b></small>
+    <div class="offer-price-preview"><span>${t(applied?'offerPreviousTotal':'offerCurrentTotal')} <b>${price(model.before)}</b></span><span aria-hidden="true">→</span><span>${t('offerPriceAfter')} <b>${price(model.after)}</b></span></div>
+    <button type="button" class="checkout-offer-toggle" id="checkout-offer-toggle" aria-label="${applied?t('offerUndoAction'):`${t(checkoutOffer.kind==='combine'?'combineOffer':'offerAddNamed')} · ${name(next)} · ${delta}`}">
+      <span>${t(applied?'offerUndoAction':checkoutOffer.kind==='combine'?'combineOffer':'offerAddNamed')}${!applied&&checkoutOffer.kind!=='combine'?` · ${name(next)}`:''}</span>${applied?'':`<strong>${delta}</strong>`}
+    </button>
+    <div class="offer-bottom">${model.saving>0?`<small>${t('separately')}: <del>${price(model.separate)}</del></small>`:''}
     ${applied ? '' : `<button type="button" class="skip-extras" id="skip-extras">${t('skipExtras')}</button>`}</div>`;
 }
 
@@ -1257,7 +1268,8 @@ function renderCart() {
     const entry = orderItem(id);
     return `<article class="cart-row">
       <div class="cart-product-image">${itemImage(entry)}${illustrationLabel(entry)}</div>
-      <div class="cart-product-copy"><h3>${name(entry)}</h3><small class="service-tag">${t(isTakeaway(entry) ? 'takeaway' : 'dineIn')}</small>${entry.before || entry.isBuiltCombo ? `<p class="cart-description">${description(entry)}</p>` : ''}${optionLabels(entry, language) ? `<small class="line-options">${optionLabels(entry, language)}</small>` : ''}
+      <div class="cart-product-copy"><h3>${name(entry)}</h3><small class="service-tag">${t(isTakeaway(entry) ? 'takeaway' : 'dineIn')}</small>${description(entry) ? `<p class="cart-description">${description(entry)}</p>` : ''}${optionLabels(entry, language) ? `<small class="line-options">${optionLabels(entry, language)}</small>` : ''}
+        <small class="cart-unit-price">${t('perItemPrice')}: ${price(entry.price)} × ${quantity}</small>
         <button type="button" class="edit-line" data-edit="${id}" aria-label="${t('edit')} · ${name(entry)}">${t('edit')}</button>
       </div>
       <div class="quantity cart-quantity">
@@ -1511,6 +1523,8 @@ document.addEventListener('click', event => {
     suggestionsDismissed = true;
     renderCartSuggestion();
     $('#show-waiter').focus({preventScroll:true});
+  } else if (button.id === 'checkout-offer-toggle') {
+    toggleCheckoutOffer();
   } else if (quantity) {
     changeSelection(item, Number(quantity));
     // Re-rendering replaces the clicked node. Restore keyboard focus without
@@ -1564,9 +1578,6 @@ focacciaPromo.addEventListener('close', () => {
   if (!cart.open && focacciaOpener?.isConnected && !focacciaOpener.hidden) focacciaOpener.focus({ preventScroll: true });
 });
 
-cart.addEventListener('change', event => {
-  if (event.target.id === 'checkout-offer-toggle') toggleCheckoutOffer();
-});
 waiter.addEventListener('close', () => ($('#show-waiter').hidden ? $('#close-cart') : $('#show-waiter')).focus({ preventScroll: true }));
 
 configure.addEventListener('change', event => {
