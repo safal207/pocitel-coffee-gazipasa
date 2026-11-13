@@ -1581,3 +1581,15 @@ button.social-rail-item:hover { background: rgba(33,41,37,.91); }
 .staff-handoff summary{cursor:pointer;min-height:44px;padding-block:12px}
 #staff-qr-canvas{display:block;max-width:min(100%,300px);height:auto;margin:12px auto;background:white;image-rendering:pixelated}
 @media(max-width:760px){.feed-grid[data-menu-view="list"]{grid-template-columns:minmax(0,1fr)}}
+/* Large, complete product pictures in the cart, inspired by Miora's showcase. */
+#cart .cart-row{grid-template-columns:minmax(0,1fr) auto;gap:10px 12px;padding:0 0 14px;overflow:hidden}
+#cart .cart-product-image{grid-column:1 / -1;grid-row:1;position:relative;background:var(--image-ground);width:100%;min-width:0}
+#cart .cart-product-image img{display:block;width:100%;height:clamp(180px,48vw,240px);aspect-ratio:auto;object-fit:contain;border-radius:0}
+#cart .cart-product-image .illustration-label{right:8px;bottom:8px;max-width:calc(100% - 16px)}
+#cart .cart-product-copy{grid-column:1 / -1;grid-row:2;padding-inline:14px}
+#cart .cart-quantity{grid-column:1;grid-row:3;padding-inline-start:14px}
+#cart .cart-row > strong{grid-column:2;grid-row:3;padding-inline-end:14px}
+.static-ingredients{border:1px solid var(--line);border-radius:12px;padding:12px;margin-block:12px;background:var(--cream)}
+.static-ingredients summary{min-height:44px;padding-block:10px;cursor:pointer;font-weight:650}
+.static-ingredients ul{margin:8px 0;padding-inline-start:20px;line-height:1.7}
+.static-ingredients small{display:block;color:var(--muted);font-size:.75rem}

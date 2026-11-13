@@ -9,6 +9,7 @@ import { energyRanges } from './nutrition-summary.js?v=20261105-focaccia';
 import { focacciaTakeawayOffer, selectedComboOffer } from './focaccia-offer.js?v=20261106-builder';
 import { moments, restoreFavoriteCombos, nextComboChoice } from './discovery.js?v=20261107-moments';
 import { revealFor } from './ingredient-reveal.js?v=20261110-complete-food';
+import { cutawayImagesFor } from './cutaway-media.js?v=20261113-cart-photo';
 import { cutawayOverlayMarkup, cutawayPhotoTagsMarkup } from './cutaway-overlay.js?v=20261112-photo-reveal-v2';
 import { restoreEngagement, toggleLike, recordView, serializeEngagement } from './engagement.js?v=20261110-social';
 import { createLocalTelemetry } from './telemetry.js?v=20261112-ri2';
@@ -80,6 +81,7 @@ const copy = {
   comboUpTo: ['En fazla', 'Up to', 'До'],
   comboNoAlternative: ['Bu bütçe ve seçeneklerle başka eşleşme yok. Bütçeyi veya seçenekleri değiştirin.', 'No other pairing fits these options and budget. Change the budget or options.', 'Других сочетаний с такими настройками и бюджетом нет. Измените бюджет или дополнения.'],
   lookInside: ['İçine bak', 'Look inside', 'Заглянуть внутрь'],
+  ingredients: ['İçindekiler', 'Ingredients', 'Состав'],
   cutawayHeading: ['İçindekileri keşfet', 'Discover what is inside', 'Посмотрите, что внутри'],
   insideLabel: ['İçinde', 'Inside', 'Внутри'],
   moreIngredients: ['daha', 'more', 'ещё'],
@@ -651,7 +653,7 @@ function menuPost(entry, index = 8) {
     <div class="post-body">
       <div class="post-heading"><h3>${name(entry)}</h3>${priceMarkup(entry)}</div>
       ${description(entry) ? `<p class="post-description">${description(entry)}</p>` : ''}
-      ${peek ? `<button type="button" class="look-inside-button" data-post="${entry.id}" aria-label="${t('lookInside')} · ${name(entry)}"><span aria-hidden="true">↔</span> ${t('lookInside')}</button>` : ''}
+      ${revealFor(entry,language) ? `<button type="button" class="look-inside-button" data-post="${entry.id}" aria-label="${t(peek ? 'lookInside' : 'ingredients')} · ${name(entry)}">${peek ? '<span aria-hidden="true">↔</span> ' : ''}${t(peek ? 'lookInside' : 'ingredients')}</button>` : ''}
       ${nutritionLink(entry)}
       ${postActions(entry)}
       <small class="list-provenance">${entry.sourceId || entry.image.startsWith('illustrations/') ? t('illustration') : ''}</small>
@@ -723,30 +725,25 @@ function scrollToMenuStart(smooth = false) {
   });
 }
 
-const hasCutaway = entry => Boolean(revealFor(entry, language));
-const dishCutawayViews = {
-  'smoked-turkey': ['assets/cutaway/focaccia-outside.webp', 'assets/cutaway/focaccia-inside.webp'],
-  beetroot: ['assets/cutaway/beetroot-outside.webp', 'assets/illustrations/branded/beetroot.webp'],
-  zucchini: ['assets/cutaway/zucchini-outside.webp', 'assets/illustrations/branded/zucchini.webp'],
-  'breakfast-plate': ['assets/illustrations/branded/breakfast-plate.webp', 'assets/cutaway/breakfast-plate-inside-v1.webp'],
-  'omelet-plate': ['assets/illustrations/branded/omelet-plate.webp', 'assets/cutaway/omelet-plate-inside-v1.webp'],
-  pancake: ['assets/cutaway/pancake-outside-v1.webp', 'assets/cutaway/pancake-inside-v1.webp'],
-  granola: ['assets/granola.webp', 'assets/cutaway/granola-inside-v1.webp'],
-};
-const takeawayCutawayViews = {
-  'to-go-granola': ['assets/takeaway/granola.webp', 'assets/cutaway/to-go-granola-inside-v1.webp'],
-};
+const hasCutaway = entry => Boolean(cutawayImagesFor(entry));
+
+function staticIngredientsMarkup(entry){
+  const reveal=revealFor(entry,language);
+  if(!reveal)return '';
+  return `<details class="static-ingredients" data-qa="ingredient-disclosure" open>
+    <summary>${t('ingredients')}</summary>
+    <ul>${reveal.parts.map(part=>`<li>${part}</li>`).join('')}</ul>
+    <small>${t('cutawaySource')}</small>
+  </details>`;
+}
 
 function cutawayMarkup(entry, socialRail = '') {
   const reveal = revealFor(entry, language);
-  const food = items.get(reveal.dishId);
-  const shown = reveal.pairing ? food : entry;
-  const pair = takeawayCutawayViews[entry.id] ?? dishCutawayViews[reveal.dishId];
-  const views = pair ?? [`assets/${shown.image}.webp`, `assets/${shown.image}.webp`];
-  const illustrated = Boolean(pair) || shown.sourceId || shown.image.startsWith('illustrations/');
+  const views = cutawayImagesFor(entry);
+  if(!views)return '';
   return `<div class="cutaway" style="--cutaway-split: 50%; --cutaway-tags-opacity: 1">
     <img class="cutaway-outside" src="${views[0]}" alt="" decoding="async">
-    <div class="cutaway-inside${pair ? '' : ' cutaway-annotated'}" aria-hidden="true">
+    <div class="cutaway-inside" aria-hidden="true">
       <img src="${views[1]}" alt="" decoding="async">
     </div>
     ${cutawayPhotoTagsMarkup(reveal)}
@@ -754,7 +751,7 @@ function cutawayMarkup(entry, socialRail = '') {
     <input type="range" min="0" max="100" step="1" value="50" class="cutaway-range" data-cutaway-range aria-label="${t('cutawayRange')}" aria-describedby="cutaway-help" aria-valuetext="${t('cutawayShown')} 50%">
     ${cutawayOverlayMarkup(reveal, t('insideLabel'), t('moreIngredients'), t('cutawayAllIngredients'))}
     ${socialRail}
-    ${illustrated ? `<span class="cutaway-art-label">${t('illustration')}</span>` : ''}
+    <span class="cutaway-art-label">${t('illustration')}</span>
   </div>
   <div class="cutaway-details">
     <div class="cutaway-guide" id="cutaway-help">${t('cutawayHelpShort')}</div>
@@ -783,6 +780,7 @@ function renderViewer() {
     <div class="viewer-body">
       <div class="post-heading"><h2 id="post-title">${name(entry)}</h2>${priceMarkup(entry)}</div>
       ${description(entry) ? `<p class="post-description">${description(entry)}</p>` : ''}
+      ${!hasCutaway(entry) ? staticIngredientsMarkup(entry) : ''}
       ${postActions(entry)}
       <div id="viewer-nutrition"></div>
       <button type="button" class="customize-item" data-customize="${entry.id}">${t('customize')}</button>
@@ -1258,7 +1256,7 @@ function renderCart() {
   const rows = [...selection].map(([id, quantity]) => {
     const entry = orderItem(id);
     return `<article class="cart-row">
-      <div class="cart-product-image">${itemImage(entry)}</div>
+      <div class="cart-product-image">${itemImage(entry)}${illustrationLabel(entry)}</div>
       <div class="cart-product-copy"><h3>${name(entry)}</h3><small class="service-tag">${t(isTakeaway(entry) ? 'takeaway' : 'dineIn')}</small>${entry.before || entry.isBuiltCombo ? `<p class="cart-description">${description(entry)}</p>` : ''}${optionLabels(entry, language) ? `<small class="line-options">${optionLabels(entry, language)}</small>` : ''}
         <button type="button" class="edit-line" data-edit="${id}" aria-label="${t('edit')} · ${name(entry)}">${t('edit')}</button>
       </div>

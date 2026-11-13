@@ -42,8 +42,8 @@ test('order success reuses existing editable notice and real selection bar', () 
 });
 
 test('new versions do not replace existing photographs or sharing flow', () => {
-  assert.match(html, /style\.css\?v=20261113-miora/);
-  assert.match(html, /app\.js\?v=20261113-miora/);
+  assert.match(html, /style\.css\?v=20261113-cart-photo/);
+  assert.match(html, /app\.js\?v=20261113-cart-photo/);
   assert.match(app, /navigator\.share\(payload\)/);
   assert.match(app, /function itemImage\(entry/);
   assert.match(app, /function postSocialRail\(entry\)/);

@@ -4,6 +4,7 @@ import { existsSync } from 'node:fs';
 import { categories } from '../dist/menu.js';
 import { items, feedOrder, takeawayItems } from '../dist/catalog.js';
 import { revealFor } from '../dist/ingredient-reveal.js';
+import { cutawayImagesFor } from '../dist/cutaway-media.js';
 import { cutawayOverlayMarkup, cutawayPhotoTagsMarkup, previewFor } from '../dist/cutaway-overlay.js';
 
 const foodCategories = new Set(['breakfast', 'sweet', 'focaccia', 'combos']);
@@ -31,8 +32,8 @@ test('inventory is complete and every catalog item has a valid photo', () => {
   }
 });
 
-test('all 55 items have correct support or explicit non-support across TR/EN/RU', () => {
-  assert.equal(allEntries.filter(expectedReveal).length, 24, 'Cutaway inventory changed');
+test('all 55 items have ingredient text or explicit non-support across TR/EN/RU', () => {
+  assert.equal(allEntries.filter(expectedReveal).length, 24, 'Ingredient inventory changed');
   for (const entry of allEntries) {
     for (const language of [0, 1, 2]) {
       const data = revealFor(entry, language);
@@ -48,7 +49,7 @@ test('all 55 items have correct support or explicit non-support across TR/EN/RU'
   }
 });
 
-test('24 cutaway cards render a localized visible on-photo summary in all languages', () => {
+test('24 food descriptions can feed a localized ingredient summary independently of slider eligibility', () => {
   for (const entry of allEntries.filter(expectedReveal)) {
     for (const [language, title, more] of [[0, 'İçinde', 'daha'], [1, 'Inside', 'more'], [2, 'Внутри', 'ещё']]) {
       const reveal = revealFor(entry, language);
@@ -67,6 +68,18 @@ test('24 cutaway cards render a localized visible on-photo summary in all langua
       assert.equal((photoTags.match(/<span>/g) || []).length, reveal.parts.length);
       for (const part of reveal.parts) assert.ok(photoTags.includes(part.replaceAll('&', '&amp;')), `${entry.id}: photo tag ${language}`);
     }
+  }
+});
+
+test('sliders require reviewed distinct inside media; a recipe or alternate top view is insufficient',()=>{
+  const expected=['smoked-turkey','beetroot','zucchini','omelet-plate','pancake','sweet-morning','lunch-favourite','to-go-lunch-favourite'].sort();
+  assert.deepEqual(allEntries.filter(entry=>cutawayImagesFor(entry)).map(entry=>entry.id).sort(),expected);
+  for(const entry of allEntries){
+    const pair=cutawayImagesFor(entry);
+    if(pair){assert.notEqual(pair[0],pair[1]);for(const path of pair)assert.ok(existsSync(new URL('../dist/'+path,import.meta.url)))}
+  }
+  for(const id of ['cilbir','menemen','granola','to-go-granola','breakfast-plate','fresh-energy','fries','egg']){
+    assert.ok(revealFor(items.get(id),2),id);assert.equal(cutawayImagesFor(items.get(id)),null,id);
   }
 });
 
