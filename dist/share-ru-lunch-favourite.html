@@ -32,12 +32,12 @@
   <!-- social-meta:end -->
   <meta name="robots" content="noindex">
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20261112-revenue2">
+  <link rel="stylesheet" href="style.css?v=20261113-miora">
   <link rel="stylesheet" href="appearance.css?v=20261104-simple">
   <link rel="modulepreload" href="menu.js?v=20261104-drinks">
   <link rel="modulepreload" href="order-options.js?v=20261106-builder">
   <link rel="modulepreload" href="checkout-offers.js?v=20261106-builder">
-  <script src="app.js?v=20261112-revenue2" type="module"></script>
+  <script src="app.js?v=20261113-miora" type="module"></script>
 </head>
 <body>
   <div class="startup-screen" aria-hidden="true" hidden>
@@ -141,6 +141,10 @@
             <button type="button" class="icon-button" id="toggle-search" aria-expanded="false" aria-controls="search-panel" aria-label="Menüde ara" data-aria="search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg></button>
             <button type="button" class="icon-button saved-filter" id="saved-filter" aria-label="Kaydedilenler" data-aria="saved" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-bookmark"/></svg></button>
           </div>
+        </div>
+        <div class="menu-view-switch" role="group" data-aria="menuView" aria-label="Menü görünümü">
+          <button type="button" data-menu-view="photos" aria-pressed="true" data-copy="photoView">Fotoğraflar</button>
+          <button type="button" data-menu-view="list" aria-pressed="false" data-copy="compactView">Kısa liste</button>
         </div>
         <div class="search" id="search-panel" hidden>
           <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
@@ -323,6 +327,17 @@
         <div class="cart-total waiter-total"><span>Toplam</span><strong id="waiter-total"></strong></div>
         <p class="waiter-note" id="waiter-take-note" hidden>Paket servis isteği için lütfen uygunluğu teyit edin.</p>
       </div>
+      <section class="staff-handoff" aria-label="Türkçe sipariş taslağı" data-aria="staffTextLabel">
+        <button type="button" id="copy-staff-order" class="button quiet" data-copy="copyStaffOrder">Türkçe listeyi kopyala</button>
+        <textarea id="staff-order-text" rows="5" lang="tr" readonly hidden aria-label="Türkçe sipariş taslağı" data-aria="staffTextLabel"></textarea>
+        <p id="staff-copy-status" role="status"></p>
+        <details id="staff-qr">
+          <summary data-copy="staffQr">Sipariş metni QR</summary>
+          <canvas id="staff-qr-canvas" role="img" aria-label="Sipariş metni QR" data-aria="staffQr" hidden></canvas>
+          <p class="waiter-note" data-copy="staffQrHelp">Yalnızca sipariş metni. Sipariş göndermez, ödeme kanıtı değildir.</p>
+          <p id="staff-qr-error" role="status" data-copy="staffQrUnavailable" hidden>QR kullanılamıyor. Listeyi gösterin ya da metni kopyalayın.</p>
+        </details>
+      </section>
       <details class="order-slip-details">
         <summary data-copy="orderSlipSummary">Sipariş kodu (isteğe bağlı)</summary>
         <p class="waiter-note" data-copy="orderSlipHelp">Ödeme belgesi değildir. İşletme, ödeme sonrası bu kodu POS veya yönetim ekranında teyit edebilir.</p>

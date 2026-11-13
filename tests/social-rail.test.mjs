@@ -31,8 +31,8 @@ test('actions use the pre-existing like and share handlers', () => {
 test('right-aligned, accessible controls ship with cache-busted assets', () => {
   assert.match(css, /\.post-social-rail\s*\{[\s\S]*?position: absolute;[\s\S]*?right: 8px/);
   assert.match(css, /social-rail-item:focus-visible/);
-  assert.match(html, /app\.js\?v=20261112-revenue/);
-  assert.match(html, /style\.css\?v=20261112-revenue/);
+  assert.match(html, /app\.js\?v=20261113-miora/);
+  assert.match(html, /style\.css\?v=20261113-miora/);
 });
 test('compact cutaway controls show all ingredients under image and an overlay on the photo', () => {
   assert.match(app, /<div class="cutaway-details">/);
@@ -46,7 +46,7 @@ test('share button is icon-only visually while keeping localized accessible name
   assert.match(app, /class="social-rail-item social-rail-share"[^>]*aria-label="/);
   assert.match(css, /\.social-rail-share span\s*\{[^}]*white-space: nowrap/);
   assert.match(css, /\.post-social-rail\s*\{[^}]*env\(safe-area-inset-right\)/);
-  assert.match(html, /style\.css\?v=20261112-revenue/);
+  assert.match(html, /style\.css\?v=20261113-miora/);
 });
 
 test('on-photo caption stays visible and away from the Shorts controls at all slider positions', () => {
@@ -56,5 +56,5 @@ test('on-photo caption stays visible and away from the Shorts controls at all sl
   assert.match(css, /\.cutaway-ingredient-card\s*\{[\s\S]*?top: 9px;[\s\S]*?left: 9px;/);
   assert.match(css, /\.cutaway-ingredient-card\s*\{[\s\S]*?pointer-events: auto/);
   assert.doesNotMatch(css, /cutaway\[data-inside-visible="false"\]/);
-  assert.match(html, /cutaway-overlay\.js\?v=20261112-revenue|app\.js\?v=20261112-revenue/);
+  assert.match(html, /cutaway-overlay\.js\?v=20261113-miora|app\.js\?v=20261113-miora/);
 });
