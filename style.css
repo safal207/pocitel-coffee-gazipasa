@@ -1554,3 +1554,30 @@ button.social-rail-item:hover { background: rgba(33,41,37,.91); }
 #feedback select{width:100%;max-width:100%;min-height:44px;font:inherit}
 #feedback button{min-height:44px}
 #feedback select:focus-visible{outline:3px solid currentColor;outline-offset:2px}
+/* Optional compact menu, adapted from Miora's photo/list choice. */
+.menu-view-switch{display:flex;justify-content:flex-end;gap:4px;padding-top:6px}
+.menu-view-switch button{min-height:44px;padding:6px 14px;border:1px solid var(--line);border-radius:100px;background:transparent;color:var(--ink);font:inherit;font-size:.8rem}
+.menu-view-switch button[aria-pressed="true"]{background:var(--action);color:var(--on-action)}
+.list-provenance{display:none}
+.feed-grid[data-menu-view="list"]{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.feed-grid[data-menu-view="list"] .feed-post{display:grid;grid-template-columns:92px minmax(0,1fr);align-items:center;padding:8px;gap:10px}
+.feed-grid[data-menu-view="list"] .post-top,
+.feed-grid[data-menu-view="list"] .post-social-rail,
+.feed-grid[data-menu-view="list"] .cutaway-preview,
+.feed-grid[data-menu-view="list"] .illustration-label,
+.feed-grid[data-menu-view="list"] .post-description,
+.feed-grid[data-menu-view="list"] .look-inside-button,
+.feed-grid[data-menu-view="list"] .nutrition-link{display:none}
+.feed-grid[data-menu-view="list"] .post-media{border-radius:12px;overflow:hidden}
+.feed-grid[data-menu-view="list"] .post-media img{width:92px;height:92px;aspect-ratio:1;object-fit:cover}
+.feed-grid[data-menu-view="list"] .post-body{padding:0;gap:4px;min-width:0}
+.feed-grid[data-menu-view="list"] .post-heading{flex-direction:column;align-items:flex-start;gap:4px}
+.feed-grid[data-menu-view="list"] .post-heading h3{font-size:1rem;overflow-wrap:anywhere}
+.feed-grid[data-menu-view="list"] .post-actions{padding:0;gap:4px}
+.feed-grid[data-menu-view="list"] .post-add{margin-inline-start:0}
+.feed-grid[data-menu-view="list"] .list-provenance:not(:empty){display:block;font-size:.66rem;color:var(--muted)}
+.staff-handoff{margin-block:18px;padding-block:12px;border-block:1px solid var(--line)}
+.staff-handoff textarea{width:100%;max-width:100%;font:inherit;resize:vertical;margin-block:10px}
+.staff-handoff summary{cursor:pointer;min-height:44px;padding-block:12px}
+#staff-qr-canvas{display:block;max-width:min(100%,300px);height:auto;margin:12px auto;background:white;image-rendering:pixelated}
+@media(max-width:760px){.feed-grid[data-menu-view="list"]{grid-template-columns:minmax(0,1fr)}}
