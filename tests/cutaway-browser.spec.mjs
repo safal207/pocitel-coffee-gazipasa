@@ -5,7 +5,7 @@ import { revealFor } from '../dist/ingredient-reveal.js';
 const port = process.env.PORT ?? '8088';
 const base = process.env.POCITEL_TEST_BASE_URL ?? `http://127.0.0.1:${port}`;
 const eligible = [...feedOrder, ...takeawayItems].filter(entry => revealFor(entry, 2));
-const illustratedPairs = new Set(['smoked-turkey', 'beetroot', 'zucchini', 'lunch-favourite', 'to-go-lunch-favourite', 'breakfast-plate', 'omelet-plate', 'pancake', 'sweet-morning', 'granola', 'fresh-energy', 'to-go-granola']);
+const illustratedPairs = new Set(['smoked-turkey', 'beetroot', 'zucchini', 'lunch-favourite', 'to-go-lunch-favourite', 'omelet-plate', 'pancake', 'sweet-morning']);
 
 const intersection = (a, b) => {
   if (!a || !b) return 0;
@@ -17,10 +17,21 @@ const intersection = (a, b) => {
 test.describe('Mobile ingredient reveal / Shorts release gate', () => {
   test.use({ viewport: { width: 390, height: 844 } });
   for (const entry of eligible) {
-    test(`${entry.id}: overlay, scroll/touch and social-panel geometry`, async ({ page }) => {
+    test(`${entry.id}: readable ingredients and only meaningful image sliders`, async ({ page }) => {
       await page.goto(`${base}/?lang=ru&item=${encodeURIComponent(entry.id)}`, { waitUntil: 'domcontentloaded' });
       const dialog = page.locator('#post-viewer');
       await expect(dialog).toBeVisible();
+      if(!illustratedPairs.has(entry.id)){
+        await expect(dialog.locator('[data-cutaway-range], [data-cutaway-toggle], .cutaway-divider')).toHaveCount(0);
+        await expect(dialog.locator('.cutaway')).toHaveCount(0);
+        const ingredients=dialog.locator('.static-ingredients');
+        await expect(ingredients).toBeVisible();
+        await expect(ingredients.locator('li')).toHaveText(revealFor(entry,2).parts);
+        await expect(dialog.locator('.viewer-photo > img')).toHaveCount(1);
+        await expect(dialog.locator('.post-social-rail')).toBeVisible();
+        expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(392);
+        return;
+      }
       const photo = dialog.locator('.cutaway');
       const preview = photo.locator('[data-qa="inside-overlay"]');
       const tags = photo.locator('[data-qa="photo-ingredient-tags"]');

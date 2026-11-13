@@ -60,6 +60,6 @@ test('low-cost animation, reduced motion and images/price calculation are preser
   assert.match(app, /price\(entry\.price\)/);
   assert.match(app, /const drinkPhoto =/);
   assert.match(app, /selectedComboOffer\(selection, items, orderItem, focacciaDraft/);
-  assert.match(html, /style\.css\?v=20261113-miora/);
-  assert.match(html, /app\.js\?v=20261113-miora/);
+  assert.match(html, /style\.css\?v=20261113-cart-photo/);
+  assert.match(html, /app\.js\?v=20261113-cart-photo/);
 });
