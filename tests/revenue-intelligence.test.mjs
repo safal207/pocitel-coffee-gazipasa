@@ -199,5 +199,5 @@ test('source wiring: manual proof, no fake cloud authentication and no automatic
   assert.match(owner,/noindex,nofollow/);
   assert.doesNotMatch(app,/scheduleFocacciaPromo\(600\)/);
   assert.doesNotMatch(app,/offerObserver\.observe\(/);
-  assert.match(html,/style\.css\?v=20261112-revenue2/);
+  assert.match(html,/style\.css\?v=20261113-miora/);
 });

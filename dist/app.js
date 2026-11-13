@@ -14,8 +14,20 @@ import { restoreEngagement, toggleLike, recordView, serializeEngagement } from '
 import { createLocalTelemetry } from './telemetry.js?v=20261112-ri2';
 import './feedback.js?v=20261112-ri2';
 import { makeOrderSlip } from './revenue-core.js?v=20261112-ri2';
+import { staffOrderText, drawOrderQr } from './staff-handoff.js?v=20261113-miora';
 
 const copy = {
+  menuView: ['Menü görünümü', 'Menu view', 'Вид меню'],
+  photoView: ['Fotoğraflar', 'Photos', 'Фото'],
+  compactView: ['Kısa liste', 'Compact list', 'Список'],
+  copyStaffOrder: ['Türkçe listeyi kopyala', 'Copy Turkish order', 'Копировать заказ на турецком'],
+  staffCopied: ['Liste kopyalandı. Sipariş gönderilmedi.', 'List copied. Order not sent.', 'Список скопирован. Заказ не отправлен.'],
+  staffCopyFallback: ['Metni seçip kopyalayın.', 'Select and copy the text.', 'Выделите и скопируйте текст.'],
+  staffTextLabel: ['Türkçe sipariş taslağı', 'Turkish order draft', 'Черновик заказа на турецком'],
+  staffQr: ['Sipariş metni QR', 'Order text QR', 'QR с текстом заказа'],
+  staffQrHelp: ['Yalnızca sipariş metni. Sipariş göndermez, ödeme kanıtı değildir.', 'Order text only. Does not send an order or prove payment.', 'Только текст заказа. Не отправляет заказ и не подтверждает оплату.'],
+  staffQrUnavailable: ['QR için liste çok uzun veya QR kullanılamıyor. Listeyi gösterin ya da metni kopyalayın.', 'QR unavailable or order too long. Show the list or copy the text.', 'QR недоступен или заказ слишком длинный. Покажите список либо скопируйте текст.'],
+  cartSynced: ['Liste başka sekmede güncellendi.', 'Order updated in another tab.', 'Заказ обновлён в другой вкладке.'],
   skip: ['Menüye geç', 'Skip to menu', 'Перейти к меню'],
   navigation: ['Gezinme', 'Navigation', 'Навигация'],
   navPair: ['Eşleşmeler', 'Pairings', 'Комбо'],
@@ -274,6 +286,7 @@ const languageKey = 'pocitel-language';
 const savedKey = 'pocitel-saved-v1';
 const engagementKey = 'pocitel-engagement-v1';
 const favoriteCombosKey = 'pocitel-favorite-combos-v1';
+const menuViewKey = 'pocitel-menu-view-v1';
 const pageSize = 8;
 const maxQuantity = 99;
 let draft;
@@ -341,6 +354,7 @@ function restoreSelection() {
 }
 
 const params = new URLSearchParams(location.search);
+let menuView = (params.get('view') ?? readSetting(menuViewKey)) === 'list' ? 'list' : 'photos';
 const linkedItem = document.documentElement.dataset.shareItem || params.get('item');
 let language = languages.indexOf(document.documentElement.dataset.shareLang || params.get('lang'));
 if (language < 0) language = Math.max(0, languages.indexOf(readSetting(languageKey)));
@@ -640,6 +654,7 @@ function menuPost(entry, index = 8) {
       ${peek ? `<button type="button" class="look-inside-button" data-post="${entry.id}" aria-label="${t('lookInside')} · ${name(entry)}"><span aria-hidden="true">↔</span> ${t('lookInside')}</button>` : ''}
       ${nutritionLink(entry)}
       ${postActions(entry)}
+      <small class="list-provenance">${entry.sourceId || entry.image.startsWith('illustrations/') ? t('illustration') : ''}</small>
     </div>
   </article>`;
 }
@@ -662,6 +677,8 @@ function renderServiceMode() {
 }
 
 function renderResults(append = false) {
+  results.dataset.menuView = menuView;
+  document.querySelectorAll('button[data-menu-view]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.menuView===menuView)));
   const terms = normalize(search.value).split(/\s+/u).filter(Boolean);
   const moment = moments.find(option => option.id === activeMoment);
   const matching = (takeawayMode ? takeawayItems : feedOrder).filter(entry =>
@@ -700,7 +717,8 @@ function scrollToMenuStart(smooth = false) {
     const tools = $('.menu-tools');
     const style = getComputedStyle(tools);
     const offset = style.position === 'sticky' ? parseFloat(style.top) + tools.offsetHeight : 0;
-    const top = $('#result-meta').getBoundingClientRect().top + window.scrollY - offset;
+    const anchor = activeCategory === 'all' ? $('#result-meta') : results;
+    const top = anchor.getBoundingClientRect().top + window.scrollY - offset;
     window.scrollTo({ top: Math.max(0, top), behavior: smooth && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'instant' });
   });
 }
@@ -1270,6 +1288,11 @@ function renderCart() {
 }
 
 function renderWaiter() {
+  $('#staff-order-text').value = staffOrderText(selection,orderItem);
+  $('#staff-copy-status').textContent = '';
+  $('#staff-qr').open = false;
+  $('#staff-qr-canvas').hidden = true;
+  $('#staff-qr-error').hidden = true;
   $('#waiter-items').innerHTML = [...selection].map(([id, quantity]) => {
     const entry = orderItem(id);
     return `<li><div class="waiter-photo">${itemImage(entry, false)}<span class="waiter-quantity">${quantity}×</span></div>
@@ -1420,6 +1443,8 @@ document.addEventListener('click', event => {
   } else if (category) {
     trace('category_select', { category });
     activeMoment = null;
+    search.value = '';
+    savedOnly = false;
     activeCategory = category;
     filterResults();
     scrollToMenuStart();
@@ -1516,6 +1541,15 @@ document.addEventListener('click', event => {
       input.focus({preventScroll:true});input.select();
       $('#order-slip-status').textContent=t('slipManualCopy');
     }
+  } else if (button.id === 'copy-staff-order') {
+    const input=$('#staff-order-text');
+    const fallback=()=>{input.hidden=false;input.focus({preventScroll:true});input.select();$('#staff-copy-status').textContent=t('staffCopyFallback')};
+    if(navigator.clipboard?.writeText) navigator.clipboard.writeText(input.value).then(()=>{$('#staff-copy-status').textContent=t('staffCopied')},fallback);
+    else fallback();
+  } else if (button.dataset.menuView) {
+    menuView=button.dataset.menuView==='list'?'list':'photos';
+    writeSetting(menuViewKey,menuView);
+    renderResults();
   } else if (button.id === 'close-waiter') {
     waiter.close();
   } else if (button.id === 'close-cart') {
@@ -1535,7 +1569,7 @@ focacciaPromo.addEventListener('close', () => {
 cart.addEventListener('change', event => {
   if (event.target.id === 'checkout-offer-toggle') toggleCheckoutOffer();
 });
-waiter.addEventListener('close', () => $('#show-waiter').focus({ preventScroll: true }));
+waiter.addEventListener('close', () => ($('#show-waiter').hidden ? $('#close-cart') : $('#show-waiter')).focus({ preventScroll: true }));
 
 configure.addEventListener('change', event => {
   const input = event.target;
@@ -1666,9 +1700,31 @@ $('#telemetry-optin').addEventListener('change', event => {
   if (telemetry.enabled) trace('menu_view');
 });
 window.addEventListener('storage', event => {
+  if(event.key===selectionKey||event.key===null){
+    const incoming=restoreSelection();
+    if(selectionSignature(incoming)!==selectionSignature(selection)){
+      selection.clear();incoming.forEach((quantity,id)=>selection.set(id,quantity));
+      suggestionsDismissed=true;offerTransaction=null;focacciaTransaction=null;
+      if(configure.open)configure.close('external');
+      if(focacciaPromo.open)focacciaPromo.close();
+      renderCounts();if(cart.open)renderCart();
+      if(waiter.open){if(selection.size){renderWaiter();$('#order-slip-value').value=currentOrderSlip()}else waiter.close()}
+      $('#announcement').textContent=t('cartSynced');
+    }
+  }
   if (event.key !== engagementKey) return;
   engagement = restoreEngagement(event.newValue, items.keys());
   for (const id of items.keys()) refreshEngagement(id);
+});
+
+$('#staff-qr').addEventListener('toggle',async()=>{
+  if(!$('#staff-qr').open)return;
+  const text=$('#staff-order-text').value;
+  try{
+    await drawOrderQr($('#staff-qr-canvas'),text);
+    if(text!==$('#staff-order-text').value||!$('#staff-qr').open)return;
+    $('#staff-qr-canvas').hidden=false;$('#staff-qr-error').hidden=true;
+  }catch{$('#staff-qr-canvas').hidden=true;$('#staff-qr-error').hidden=false}
 });
 
 applyLanguage();

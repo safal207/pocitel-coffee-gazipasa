@@ -38,6 +38,8 @@ jobs:
           node-version: "22"
       - name: Install image converter
         run: python3 -m pip install --quiet Pillow
+      - name: Install locked test dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Rebuild all 165 share pages from current canonical template
         run: node scripts/build-share-pages.mjs
       - name: Run all Node tests
@@ -58,7 +60,7 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund
           npx playwright install chromium
       - name: Run cutaway visual geometry and interaction gate
-        run: npx playwright test tests/cutaway-browser.spec.mjs tests/visual-declutter.browser.spec.mjs tests/quick-share.browser.spec.mjs tests/warm-mirror.browser.spec.mjs tests/cart-scroll.browser.spec.mjs tests/combo-journey.browser.spec.mjs tests/revenue-intelligence.browser.spec.mjs --project=chromium --workers=2 --reporter=line
+        run: npx playwright test tests/cutaway-browser.spec.mjs tests/visual-declutter.browser.spec.mjs tests/quick-share.browser.spec.mjs tests/warm-mirror.browser.spec.mjs tests/cart-scroll.browser.spec.mjs tests/combo-journey.browser.spec.mjs tests/revenue-intelligence.browser.spec.mjs tests/miora-transfer.browser.spec.mjs --project=chromium --workers=2 --reporter=line
       - name: Upload browser failure evidence
         if: failure()
         uses: actions/upload-artifact@v4
@@ -86,7 +88,7 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npx playwright install --with-deps ${{ matrix.browser }}
-      - run: npx playwright test tests/revenue-intelligence.browser.spec.mjs tests/cart-scroll.browser.spec.mjs tests/combo-journey.browser.spec.mjs tests/owner.browser.spec.mjs --project=${{ matrix.browser }} --workers=2 --reporter=line
+      - run: npx playwright test tests/revenue-intelligence.browser.spec.mjs tests/miora-transfer.browser.spec.mjs tests/cart-scroll.browser.spec.mjs tests/combo-journey.browser.spec.mjs tests/owner.browser.spec.mjs --project=${{ matrix.browser }} --workers=2 --reporter=line
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
