@@ -19,6 +19,7 @@ for (const [id, entry] of [['menu', { image: 'hero-wide-960' }], ...items]) {
 }
 const conversion = spawnSync(process.env.PYTHON ?? (process.platform === 'win32' ? 'python' : 'python3'), [resolve(root, 'scripts/encode-share-images.py')], {
   input: JSON.stringify(jobs), encoding: 'utf8', maxBuffer: 1024 * 1024,
+  env: { ...process.env, PYTHONUTF8:'1', PYTHONIOENCODING:'utf-8' },
 });
 if (conversion.status !== 0) throw new Error(conversion.stderr || conversion.error || 'JPEG encoding failed');
 const images = new Map(JSON.parse(conversion.stdout).map((image, i) => [jobs[i].id, image]));

@@ -7,12 +7,13 @@ import { makeOrderSlip } from '../dist/revenue-core.js';
 const password='synthetic-test-password-'+ 'x'.repeat(32);
 test.use({httpCredentials:{username:'owner',password}});
 let app,dir;
-test.beforeAll(async()=>{dir=await mkdtemp(join(tmpdir(),'pocitel-ui-'));app=await createOwnerServer({password,dataDir:dir})});
-test.afterAll(async()=>{await app?.close();if(dir)await rm(dir,{recursive:true,force:true})});
+test.beforeEach(async()=>{dir=await mkdtemp(join(tmpdir(),'pocitel-ui-'));app=await createOwnerServer({password,dataDir:dir})});
+test.afterEach(async()=>{await app?.close();if(dir)await rm(dir,{recursive:true,force:true})});
 for(const language of ['tr','en','ru'])test('private owner '+language+': unpaid confirmation is distinct from payment',async({page})=>{
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
  await page.setViewportSize({width:320,height:780});await page.goto(app.url);
  await page.locator('#language').selectOption(language);await expect(page.locator('html')).toHaveAttribute('lang',language);
+ await expect(page.locator('#status')).toHaveText(/^(Kaydedildi|Saved|Сохранено)$/);
  const before=Number(await page.locator('#paid').textContent());
  const code=makeOrderSlip({id:'pct_ui_'+language,lines:[['cappuccino',1]],quoteTotal:185});
  await page.getByRole('textbox').fill(code);
