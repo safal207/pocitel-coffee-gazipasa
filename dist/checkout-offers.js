@@ -1,11 +1,12 @@
 import { configurationId, isTakeaway } from './order-options.js?v=20261106-builder';
 
-const pairings = [
+export const checkoutPairings = [
   { id: 'turkish-classic', food: 'cilbir', drink: 'tea' },
   { id: 'sweet-morning', food: 'pancake', drink: 'cappuccino' },
   { id: 'fresh-energy', food: 'granola', drink: 'iced-matcha' },
   { id: 'lunch-favourite', food: 'smoked-turkey', drink: 'iced-americano' },
 ];
+const pairings=checkoutPairings;
 const foods = new Set(['breakfast-plate', 'omelet-plate', 'menemen', 'cilbir', 'pancake', 'sucuk', 'fries', 'granola', 'beetroot', 'smoked-turkey', 'zucchini']);
 const drinks = new Set(['turkish-coffee', 'espresso', 'americano', 'flat-white', 'cappuccino', 'latte', 'cortado', 'mocha', 'matcha', 'hot-chocolate', 'chai', 'salep', 'toffee', 'caramel', 'iced-americano', 'iced-latte', 'iced-mocha', 'frappe', 'iced-matcha', 'tea', 'relax', 'maroc', 'balance']);
 const baseId = entry => entry.sourceId ?? entry.baseId ?? entry.id;
@@ -50,7 +51,6 @@ export function recommendCheckout(selection, catalog, resolve) {
   const findSingle = id => entries.find(entry => !entry.sourceId && baseId(entry) === id);
   const hasFood = entries.some(entry => entry.isBuiltCombo || foods.has(baseId(entry)) || pairings.some(pair => pair.id === baseId(entry)));
   const hasDrink = entries.some(entry => entry.isBuiltCombo || drinks.has(baseId(entry)) || pairings.some(pair => pair.id === baseId(entry)));
-  const hasCoffee = entries.some(entry => (entry.isBuiltCombo && !['tea', 'relax', 'maroc', 'balance'].includes(entry.comboChoice.drinkId)) || (drinks.has(baseId(entry)) && !['tea', 'relax', 'maroc', 'balance'].includes(baseId(entry))) || pairings.some(pair => pair.id === baseId(entry) && pair.drink !== 'tea'));
   const make = (kind, addId, remove = [], reason = kind) => {
     const added = resolve(addId);
     if (!added) return null;
@@ -64,9 +64,10 @@ export function recommendCheckout(selection, catalog, resolve) {
     const drink = findSingle(pair.drink);
     if (food && drink) {
       const offer = make('combine', configurationId(pair.id, drink.milk, drink.syrup), [[food.id, 1], [drink.id, 1]]);
-      if (offer) return offer;
+      if (offer && offer.delta < 0) return offer;
     }
   }
+  if (hasFood && hasDrink) return null;
   if (!hasDrink || !hasFood) {
     for (const pair of pairings) {
       const single = findSingle(hasDrink ? pair.drink : pair.food);
@@ -79,10 +80,9 @@ export function recommendCheckout(selection, catalog, resolve) {
   const hasTakeaway = entries.some(isTakeaway);
   let next;
   let reason;
-  if (hasFood && !hasDrink && !hasTakeaway) {
-    next = 'tea'; reason = 'teaWithBreakfast';
-  } else if (hasFood && !hasCoffee) {
-    next = 'to-go-cappuccino'; reason = 'coffeeForWalk';
+  if (hasFood && !hasDrink) {
+    next = hasTakeaway ? 'to-go-cappuccino' : 'tea';
+    reason = hasTakeaway ? 'coffeeForWalk' : 'teaWithBreakfast';
   } else if (hasDrink && !hasFood) {
     next = hasTakeaway ? 'to-go-granola' : 'pancake'; reason = hasTakeaway ? 'breakfastToGo' : 'sweetWithCoffee';
   }

@@ -1593,3 +1593,31 @@ button.social-rail-item:hover { background: rgba(33,41,37,.91); }
 .static-ingredients summary{min-height:44px;padding-block:10px;cursor:pointer;font-weight:650}
 .static-ingredients ul{margin:8px 0;padding-inline-start:20px;line-height:1.7}
 .static-ingredients small{display:block;color:var(--muted);font-size:.75rem}
+/* A readable selected card and one explicit, reversible companion offer. */
+#cart .cart-row{border-radius:16px;box-shadow:0 3px 16px var(--shadow);margin-block-end:16px}
+#cart .cart-product-copy{padding-block:3px;display:grid;gap:7px}
+#cart .cart-product-copy h3{font-size:clamp(1.15rem,4.4vw,1.45rem);line-height:1.2}
+#cart .cart-product-copy .cart-description{font-size:.84rem;line-height:1.55;margin:0;color:var(--ink)}
+#cart .cart-product-copy .service-tag{margin:0}
+#cart .cart-product-copy .line-options{display:flex;gap:5px;font-size:.78rem;margin:0}
+#cart .cart-product-copy .cart-unit-price{font-size:.77rem;margin:0;color:var(--muted);font-variant-numeric:tabular-nums}
+#cart .edit-line{justify-self:start;padding:0;text-underline-offset:3px}
+#cart-suggestion{padding:14px;border-radius:16px;background:var(--surface-selected);box-shadow:0 3px 16px var(--shadow)}
+.offer-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.offer-heading .eyebrow{margin:0;max-width:100%}
+.offer-saving{padding:6px 9px;border-radius:20px;background:var(--cream);color:var(--olive);border:1px solid var(--line);font-size:.75rem;font-weight:700}
+#cart-suggestion .checkout-offer-product{display:flex;flex-direction:column;align-items:stretch;gap:12px;margin-block:12px}
+#cart-suggestion .checkout-offer-photo{width:100%;background:var(--image-ground);border-radius:12px;overflow:hidden}
+#cart-suggestion .checkout-offer-photo img{display:block;width:100%;height:clamp(160px,44vw,210px);object-fit:contain;aspect-ratio:auto;border-radius:0}
+#cart-suggestion .checkout-offer-product h3{font-size:clamp(1.25rem,5vw,1.65rem);overflow-wrap:anywhere}
+#cart-suggestion .checkout-offer-product p{font-size:.87rem;line-height:1.5}
+#cart-suggestion .offer-pairing-label{color:var(--olive);font-weight:650}
+.offer-price-preview{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-block:12px;font-size:.78rem}
+.offer-price-preview span:not([aria-hidden]){display:grid;gap:3px}
+.offer-price-preview span:last-child{text-align:end}
+.offer-price-preview b{font-size:1.1rem;color:var(--wine);white-space:nowrap}
+#cart-suggestion .checkout-offer-toggle{width:100%;justify-content:space-between;min-height:52px;background:var(--action);color:var(--on-action);border:1px solid var(--action);border-radius:12px;font:inherit}
+#cart-suggestion .checkout-offer-toggle span{font-size:.86rem;text-align:start}
+#cart-suggestion.offer-selected .checkout-offer-toggle{background:var(--cream);color:var(--wine);border-color:var(--line)}
+#cart-suggestion .offer-bottom{gap:10px;min-height:44px}
+#cart-suggestion .skip-extras{min-height:44px;margin-inline-start:auto;font-size:.8rem}
