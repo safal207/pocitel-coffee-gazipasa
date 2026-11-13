@@ -42,8 +42,7 @@ Existing Poçitel pairing discovery, favorites, customization and native sharing
 already cover the corresponding Miora capabilities.
 
 The QR vendor bundle was reused from Miora under its included MIT notice, retaining
-the Kazuhiko Arase copyright/license in `dist/assets/qr-LICENSE.txt`. Only the
-browser global was renamed to `PocitelQRCode`. Reference bundle SHA-256:
+the Kazuhiko Arase copyright/license in `dist/assets/qr-LICENSE.txt`. The browser global was renamed to `PocitelQRCode` and trailing whitespace normalized. Reference bundle SHA-256:
 `7219f6396e569c47f9f2a66221e5aa98b4a73aeca7bc5491d11ff55035f41109`.
 The byte encoder receives UTF-8 bytes; a test decodes the resulting raster with
 locked dev-only `jsqr@1.4.0` and checks exact Turkish text round-trip.
