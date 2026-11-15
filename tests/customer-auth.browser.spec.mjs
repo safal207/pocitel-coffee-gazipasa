@@ -1,25 +1,26 @@
 import { test,expect } from '@playwright/test';
 // Provider contract tests use intercepted synthetic responses, never live users/messages.
 const project='https://pocitel-test.supabase.co';
-async function setup(page,{signed=false}={}){
+async function setup(page,{signed=false,callback=false}={}){
   await page.route('**/account-config.js',route=>route.fulfill({contentType:'text/javascript',body:`export const accountConfig={url:'${project}',publishableKey:'sb_publishable_test_fixture',privacyReviewed:true,providers:{google:true,email:true,whatsapp:true}};`}));
   const user={id:'11111111-1111-4111-8111-111111111111',aud:'authenticated',role:'authenticated',email:'synthetic@example.test',app_metadata:{provider:'email'},user_metadata:{},identities:[],created_at:'2026-11-15T00:00:00Z'};
-  if(signed){
-    const token=[{alg:'HS256',typ:'JWT'},{sub:user.id,aud:'authenticated',role:'authenticated',exp:Math.floor(Date.now()/1000)+3600},'synthetic-signature'].map((part,i)=>i===2?part:Buffer.from(JSON.stringify(part)).toString('base64url')).join('.');
-    await page.addInitScript(session=>localStorage.setItem('pocitel-customer-auth-v1',JSON.stringify(session)),{access_token:token,refresh_token:'synthetic-test-only',token_type:'bearer',expires_in:3600,expires_at:Math.floor(Date.now()/1000)+3600,user});
-  }
+  const token=[{alg:'HS256',typ:'JWT'},{sub:user.id,aud:'authenticated',role:'authenticated',exp:Math.floor(Date.now()/1000)+3600},'synthetic-signature'].map((part,i)=>i===2?part:Buffer.from(JSON.stringify(part)).toString('base64url')).join('.');
+  const session={access_token:token,refresh_token:'synthetic-test-only',token_type:'bearer',expires_in:3600,expires_at:Math.floor(Date.now()/1000)+3600,user};
+  if(signed)await page.addInitScript(value=>localStorage.setItem('pocitel-customer-auth-v1',JSON.stringify(value)),session);
+  if(callback)await page.addInitScript(()=>localStorage.setItem('pocitel-customer-auth-v1-code-verifier',JSON.stringify('synthetic-test-verifier')));
   const requests=[];
   await page.route(project+'/**',async route=>{
     const request=route.request(),url=new URL(request.url());requests.push({method:request.method(),url,body:request.postDataJSON()});
     const headers={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'GET,POST,DELETE,OPTIONS'};
     if(request.method()==='OPTIONS')return route.fulfill({status:204,headers});
     if(url.pathname==='/auth/v1/user')return route.fulfill({contentType:'application/json',headers,body:JSON.stringify(user)});
+    if(url.pathname==='/auth/v1/token')return route.fulfill({contentType:'application/json',headers,body:JSON.stringify(session)});
     if(url.pathname==='/auth/v1/verify')return route.fulfill({status:403,contentType:'application/json',headers,body:JSON.stringify({code:'otp_expired',msg:'Synthetic expired code'})});
     if(url.pathname==='/rest/v1/customer_preferences')return route.fulfill({status:200,contentType:'application/json',headers,body:request.method()==='GET'?JSON.stringify({preferences:{drink:'tea',milk:'standard',syrup:'none',serving:'cafe'}}):'[]'});
     if(url.pathname==='/auth/v1/authorize')return route.fulfill({contentType:'text/html',body:'<p>Synthetic provider page</p>'});
     return route.fulfill({status:200,contentType:'application/json',headers,body:'{}'});
   });
-  await page.goto('/?lang=ru');await page.locator('[data-open-profile]').click();await expect(page.locator('.profile-cloud [data-profile]')).not.toHaveCount(0);
+  await page.goto(callback?'/?lang=ru&account=1&code=synthetic-auth-code':'/?lang=ru');if(!callback)await page.locator('[data-open-profile]').click();await expect(page.locator('.profile-cloud [data-profile]')).not.toHaveCount(0);
   return requests;
 }
 test('configured email and WhatsApp use real SDK requests; an invalid code never signs a guest in',async({page})=>{
@@ -40,4 +41,10 @@ test('configured session sync is explicit and scoped to the verified user, with 
 });
 test('Google redirect uses PKCE and returns to this menu root',async({page})=>{
   await setup(page);const request=page.waitForRequest(url=>url.url().startsWith(project+'/auth/v1/authorize'));await page.locator('[data-profile="google"]').click();const url=new URL((await request).url());expect(url.searchParams.get('provider')).toBe('google');expect(url.searchParams.get('code_challenge')).toBeTruthy();expect(url.searchParams.get('code_challenge_method')).toBe('s256');expect(new URL(url.searchParams.get('redirect_to')).pathname).toBe('/');
+});
+test('PKCE callback is exchanged before its URL code is removed; reloading does not reopen a modal',async({page})=>{
+  const requests=await setup(page,{callback:true});await expect(page.locator('[data-profile="upload"]')).toBeVisible();
+  const exchange=requests.find(r=>r.url.pathname==='/auth/v1/token');expect(exchange.body.auth_code).toBe('synthetic-auth-code');expect(exchange.body.code_verifier).toBe('synthetic-test-verifier');
+  expect(new URL(page.url()).searchParams.has('code')).toBe(false);expect(new URL(page.url()).searchParams.has('account')).toBe(false);
+  await page.reload();await expect(page.locator('dialog[open]')).toHaveCount(0);
 });

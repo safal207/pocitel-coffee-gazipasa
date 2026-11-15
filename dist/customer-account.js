@@ -71,9 +71,12 @@ export function setupCustomerAccount({catalog,getLanguage,onChooseDrink}) {
   }
   async function initialize(){
     if(!validAccountConfig(accountConfig))return;
-    if(!initializing)initializing=(async()=>{client=await createAccountClient(accountConfig);const url=new URL(location.href);if(url.searchParams.has('account')){for(const key of ['account','code','error','error_code','error_description'])url.searchParams.delete(key);history.replaceState(null,'',url)}})();
+    if(!initializing)initializing=createAccountClient(accountConfig).then(value=>{client=value});
     await initializing;
+    // Await the SDK's callback/session initialization before removing a PKCE code.
     user=await client.user();
+    const url=new URL(location.href);
+    if(url.searchParams.has('account')){for(const key of ['account','code','error','error_code','error_description'])url.searchParams.delete(key);history.replaceState(null,'',url)}
   }
   function persist(values){const result=savePreferences(storage,values);preferences=result.data;window.dispatchEvent(new CustomEvent('pocitel:preferences',{detail:preferences}));return result}
   async function open(button){opener=button;render();dialog.showModal();try{await initialize();if(client){render();if(new URL(location.href).searchParams.has('account'))dialog.querySelector('[data-profile="close"]').focus()}}catch{initializing=null;status(t('error'))}}
