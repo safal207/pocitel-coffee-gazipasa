@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir, readdir, unlink } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, readdir, unlink, copyFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -8,6 +8,11 @@ import { publicSiteUrl, shareLanguages, sharePageName, shareUrl } from '../dist/
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = resolve(root, 'dist');
+// Bundle the locked official browser client locally. It is lazy-loaded only
+// after Poçitel cloud auth is configured; menu visitors never contact a CDN.
+await mkdir(resolve(dist,'vendor'),{recursive:true});
+await copyFile(resolve(root,'node_modules/@supabase/supabase-js/dist/umd/supabase.js'),resolve(dist,'vendor/supabase.js'));
+await copyFile(resolve(root,'node_modules/@supabase/supabase-js/LICENSE'),resolve(dist,'vendor/supabase-LICENSE'));
 const social = resolve(dist, 'assets/social');
 await mkdir(social, { recursive: true });
 const jobs = [];

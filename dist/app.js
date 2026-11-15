@@ -1,3 +1,5 @@
+import { showcaseMarkup } from './home-showcase.js?v=20261115-mobile-profile';
+import { setupCustomerAccount } from './customer-account.js?v=20261115-mobile-profile';
 import { categories } from './menu.js?v=20261104-drinks';
 import { items, categoryByItem, categoryById, combos, feedOrder, takeawaySuggestions, takeawayItems } from './catalog.js?v=20261105-focaccia';
 import { shareUrl } from './share-links.js?v=20261104-share';
@@ -19,6 +21,7 @@ import { makeOrderSlip } from './revenue-core.js?v=20261112-ri2';
 import { staffOrderText, drawOrderQr } from './staff-handoff.js?v=20261113-miora';
 
 const copy = {
+  profile: ['Benim Poçitel’im','My Poçitel','Мой Poçitel'],
   perItemPrice: ['Bir porsiyon', 'Per portion', 'За порцию'],
   offerOptional: ['İsterseniz yanına', 'Something alongside?', 'Хотите что-нибудь к нему?'],
   offerPairingLabel: ['Menü eşleşmesi', 'Menu pairing', 'Комбо из меню'],
@@ -123,13 +126,9 @@ const copy = {
   themeDark: ['Koyu', 'Dark', 'Тёмный'],
   themeRomantic: ['Romantik', 'Romantic', 'Романтика'],
   themeKids: ['Çocuk', 'Kids', 'Детский'],
-  heroFirst: ['İyi kahve.', 'Good coffee.', 'Хороший кофе.'],
-  heroSecond: ['Güzel anlar.', 'Beautiful moments.', 'Приятные моменты.'],
-  heroBody: [
-    'Gazipaşa’da kahvaltı, taze focaccia ve kahve.',
-    'Breakfast, fresh focaccia and coffee in Gazipaşa.',
-    'Завтраки, свежая фокачча и кофе в Газипаше.',
-  ],
+  heroFirst: ['Focaccia, brunch','Focaccia, brunch','Фокачча, бранч'],
+  heroSecond: ['ve iyi kahve.','and good coffee.','и хороший кофе.'],
+  heroBody: ['Bir tabak seç. Yanına sevdiğin kahveyi ekle. Güzel bir mola ver.','Choose a plate, add your favourite coffee and make time for a break.','Выберите блюдо, добавьте любимый кофе и устройте себе паузу.'],
   seeMenu: ['Menüyü keşfet', 'Explore the menu', 'Посмотреть меню'],
   findUs: ['Bizi bulun', 'Find us', 'Как добраться'],
   heroAlt: ['Yoğurt, poşe yumurta ve ekmekle çılbır', 'Çılbır with yogurt, poached eggs and bread', 'Чылбыр с йогуртом, яйцами пашот и хлебом'],
@@ -494,14 +493,14 @@ function updateConfigurationTotal() {
   fillNutrition($('#configure-nutrition'), entry, { changed: draft.milk !== 'standard' || draft.syrup !== 'none' });
 }
 
-function openConfigurator(id, opener, editId) {
+function openConfigurator(id, opener, editId, preferred) {
   const entry = orderItem(id);
   const pairing = comboChoice(entry);
   if (pairing) return openFocacciaPromo(opener, false, editId, pairing);
   const baseId = entry.baseId ?? entry.id;
   draft = {
     singleId: entry.sourceId ?? baseId, itemId: baseId,
-    milk: entry.milk ?? 'standard', syrup: entry.syrup ?? 'none',
+    milk: entry.milk ?? preferred?.milk ?? 'standard', syrup: entry.syrup ?? preferred?.syrup ?? 'none',
     quantity: editId ? selection.get(editId) : 1, editId,
   };
   configureOpener = opener;
@@ -1334,7 +1333,10 @@ function changeSelection(id, delta, track = true) {
   $('#announcement').textContent = `${name(orderItem(id))} · ${next}`;
 }
 
+let heroChoice = 'focaccia';
+function renderShowcase() { $('#home-showcase').innerHTML = showcaseMarkup(items, language, heroChoice); }
 function applyLanguage() {
+  renderShowcase();
   document.documentElement.lang = languages[language];
   document.querySelectorAll('[data-lang]').forEach(button => button.setAttribute('aria-pressed', button.dataset.lang === languages[language]));
   document.querySelectorAll('[data-copy]').forEach(node => { node.textContent = t(node.dataset.copy); });
@@ -1387,6 +1389,14 @@ document.addEventListener('click', event => {
   const button = event.target.closest('button');
   if (!button) return;
   const { lang, category, add, quantity, item, post, story, save, like, share, related, mode, edit, moment, favoriteCombo, removeFavorite } = button.dataset;
+  if (button.dataset.heroOpen) { openPost([button.dataset.heroOpen],button); return; }
+  if (button.dataset.heroChoice) {
+    heroChoice = button.dataset.heroChoice;
+    renderShowcase();
+    document.querySelector(`[data-hero-choice="${heroChoice}"]`).focus({preventScroll:true});
+    return;
+  }
+  if (button.hasAttribute('data-home-pairing')) { openFocacciaPromo(button); return; }
   if (moment) {
     activeMoment = activeMoment === moment ? null : moment;
     const selected = moments.find(option => option.id === activeMoment);
@@ -1736,6 +1746,10 @@ $('#staff-qr').addEventListener('toggle',async()=>{
   }catch{$('#staff-qr-canvas').hidden=true;$('#staff-qr-error').hidden=false}
 });
 
+setupCustomerAccount({catalog:items,getLanguage:()=>language,onChooseDrink:(preferences,opener)=>{
+  const id=preferences.serving==='takeaway'&&items.has(`to-go-${preferences.drink}`)?`to-go-${preferences.drink}`:preferences.drink;
+  openConfigurator(id,opener,undefined,preferences);
+}});
 applyLanguage();
 trace('menu_view');
 $('#service-picker').hidden = false;
