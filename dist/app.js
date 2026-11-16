@@ -1,5 +1,5 @@
-import { showcaseMarkup } from './home-showcase.js?v=20261115-mobile-profile';
-import { setupCustomerAccount } from './customer-account.js?v=20261115-mobile-profile';
+import { showcaseMarkup } from './home-showcase.js?v=20261116-mobile-photo';
+import { setupCustomerAccount } from './customer-account.js?v=20261116-mobile-photo';
 import { categories } from './menu.js?v=20261104-drinks';
 import { items, categoryByItem, categoryById, combos, feedOrder, takeawaySuggestions, takeawayItems } from './catalog.js?v=20261105-focaccia';
 import { shareUrl } from './share-links.js?v=20261104-share';
