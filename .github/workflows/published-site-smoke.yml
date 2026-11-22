@@ -1,0 +1,47 @@
+name: Poçitel published site smoke
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["pages build and deployment"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pocitel-published-site-smoke
+  cancel-in-progress: true
+
+jobs:
+  published-smoke:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Verify exact published HTML and critical public assets
+        run: node scripts/public-site-smoke.mjs
+      - name: Install locked browser test dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Real public HTTPS smoke — mobile menu, languages and sharing
+        env:
+          POCITEL_TEST_BASE_URL: https://safal207.github.io/pocitel-coffee-gazipasa
+        run: npx playwright test tests/mobile-home.browser.spec.mjs tests/quick-share.browser.spec.mjs --project=chromium --workers=2 --reporter=line
+      - name: Preserve failure screenshots and traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pocitel-published-smoke-evidence
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
